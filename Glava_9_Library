@@ -983,6 +983,8 @@ void Library::book_issue()
 	Transaction Trans_check_book_member;
 	Transaction Trans;
 
+	bool valid_check_book_isbn = false;
+
 	Trans_check_book_member.FK_Book_Isbn = parse_isbn();
 
 	for (int i = 0; i < Vec_Book_Class.size(); i++)
@@ -990,10 +992,15 @@ void Library::book_issue()
 		if (Trans_check_book_member.FK_Book_Isbn.I == Vec_Book_Class[i].get_isbn().I && Trans_check_book_member.FK_Book_Isbn.S == Vec_Book_Class[i].get_isbn().S && Trans_check_book_member.FK_Book_Isbn.B == Vec_Book_Class[i].get_isbn().B && Trans_check_book_member.FK_Book_Isbn.N == Vec_Book_Class[i].get_isbn().N)
 			{
 				cout << "Is book issue Library under number == [" << i << "]" << '\n';
+				valid_check_book_isbn = true;
+				break;
 			}
-			else
+	}
+
+	if (valid_check_book_isbn == false)
+	{
 				error("Book not issue Library!");
-		
+				return;
 	}
 
 
