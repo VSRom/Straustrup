@@ -981,27 +981,19 @@ Patron Library::add_human()
 void Library::book_issue()
 {
 	Transaction Trans_check_book_member;
-
 	Transaction Trans;
-
-	Patron your_pay;
-
-	string cout_isbn;
-	string cout_card;
 
 	Trans_check_book_member.FK_Book_Isbn = parse_isbn();
 
 	for (int i = 0; i < Vec_Book_Class.size(); i++)
 	{
-		for (int j = 0; j < Vec_Book_Class.size(); i++)
-		{
-			if (Trans_check_book_member.FK_Book_Isbn.I == Vec_Book_Class[i].get_isbn().I && Trans_check_book_member.FK_Book_Isbn.S == Vec_Book_Class[i].get_isbn().S && Trans_check_book_member.FK_Book_Isbn.B == Vec_Book_Class[i].get_isbn().B && Trans_check_book_member.FK_Book_Isbn.N == Vec_Book_Class[i].get_isbn().N)
+		if (Trans_check_book_member.FK_Book_Isbn.I == Vec_Book_Class[i].get_isbn().I && Trans_check_book_member.FK_Book_Isbn.S == Vec_Book_Class[i].get_isbn().S && Trans_check_book_member.FK_Book_Isbn.B == Vec_Book_Class[i].get_isbn().B && Trans_check_book_member.FK_Book_Isbn.N == Vec_Book_Class[i].get_isbn().N)
 			{
 				cout << "Is book issue Library under number == [" << i << "]" << '\n';
 			}
 			else
 				error("Book not issue Library!");
-		}
+		
 	}
 
 
@@ -1016,14 +1008,14 @@ void Library::book_issue()
 			if (Vec_Trans_Struct[i].FK_Library_Card == Vec_Patron_Class[j].get_library_card())
 			{
 				cout << "Is human issue Library under number == [" << i << "]" << '\n';
-				if (your_pay.paying() == true)
+				if (Vec_Patron_Class[j].paying() == true)
 				{
 					cout << "Human is pay for membership" << '\n';
 					Vec_Trans_Struct[i] = Trans;
 				}
-				else if (your_pay.paying() == false)
+				else if (Vec_Patron_Class[j].paying() == false)
 				{
-					string NAME = Vec_Patron_Class[i].get_name();
+					string NAME = Vec_Patron_Class[j].get_name();
 					Debtors_NOT_Members.push_back(NAME);
 					cout << "Human is NOT pay for membership" << '\n';
 				}
