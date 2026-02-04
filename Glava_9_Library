@@ -1010,28 +1010,26 @@ void Library::book_issue()
 
 	for (int i = 0; i < Vec_Patron_Class.size(); i++)
 	{
-		for (int j = 0; j < Vec_Patron_Class.size(); j++)
-		{
-			if (Vec_Trans_Struct[i].FK_Library_Card == Vec_Patron_Class[j].get_library_card())
+			if (Trans_check_book_member.FK_Library_Card == Vec_Patron_Class[i].get_library_card())
 			{
 				cout << "Is human issue Library under number == [" << i << "]" << '\n';
-				if (Vec_Patron_Class[j].paying() == true)
+				if (Vec_Patron_Class[i].paying() == true)
 				{
 					cout << "Human is pay for membership" << '\n';
 					Vec_Trans_Struct[i] = Trans;
 				}
-				else if (Vec_Patron_Class[j].paying() == false)
+				else if (Vec_Patron_Class[i].paying() == false)
 				{
-					string NAME = Vec_Patron_Class[j].get_name();
+					string NAME = Vec_Patron_Class[i].get_name();
 					Debtors_NOT_Members.push_back(NAME);
 					cout << "Human is NOT pay for membership" << '\n';
 				}
 			}
 			else
 				error("Human not member for Library");
-		}
 	}
 }
+
 //=======================================================================================================================================
 int main()
 {
