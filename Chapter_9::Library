@@ -950,7 +950,7 @@ public:
 	void check_member(Transaction &Trans, bool &valid_check);
 	void check_book(Transaction &Trans, bool &valid_check, int &index_book);
 	void add_Debtors_NOT_Members(string &name);
-	void check_book_issue(int &index_book, bool &valid_check);
+	void check_book_issue(Transaction &Trans, bool &valid_check, int &index_book);
 
 	bool add_state()
 	{
@@ -1002,7 +1002,10 @@ void Library::check_member(Transaction &Trans, bool &valid_check)
 	}
 
 	if (valid_check_member == false)
+	{
 		error("Human not member for Library");
+		valid_check = false;
+	}
 }
 //=======================================================================================================================================
 void Library::check_book(Transaction &Trans, bool &valid_check, int &index_book)
@@ -1031,7 +1034,7 @@ void Library::check_book(Transaction &Trans, bool &valid_check, int &index_book)
 	}
 }
 //=======================================================================================================================================
-void Library::check_book_issue(int &index_book, bool &valid_check)
+void Library::check_book_issue(Transaction &Trans, bool &valid_check, int &index_book)
 {
 	bool issued = Vec_Book_Class[index_book].get_book_issued();
 
@@ -1040,12 +1043,12 @@ void Library::check_book_issue(int &index_book, bool &valid_check)
 		cout << "Can borrow a book!" << '\n';
 		issued = true;
 		Vec_Book_Class[index_book].set_book_issued(issued);
-		valid_check = true;
+		Vec_Trans_Struct.push_back(Trans);
 	}
 	else
 	{
-		cout << "Don`t can borrow a book, please wait." << '\n';
-		valid_check = false;
+		error("Don`t can borrow a book, please wait.");
+		return;
 	}
 }
 //=======================================================================================================================================
@@ -1095,7 +1098,7 @@ Patron Library::add_member()
 void Library::book_issue()
 {
 	Transaction Trans;
-	bool valid_check = false;
+	bool valid_check;
 	int index_book = 0;
 
 	check_member(Trans, valid_check);
@@ -1104,11 +1107,7 @@ void Library::book_issue()
 		check_book(Trans, valid_check, index_book);
 	
 	if (valid_check == true)
-		check_book_issue(index_book, valid_check);
-
-	if (valid_check == true)
-		Vec_Trans_Struct.push_back(Trans);
-
+		check_book_issue(Trans, valid_check, index_book);
 }
 //=======================================================================================================================================
 int main()
