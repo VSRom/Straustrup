@@ -1,0 +1,363 @@
+/*
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <fstream>
+//=======================================================================================================================================
+class Name_pairs
+{
+public:
+
+	struct NamePair
+	{
+		std::string name;
+		double age;
+	};
+
+	std::vector<NamePair> EasyPair;
+
+	std::vector<std::string> read_names();
+	std::vector<double> read_age(std::vector<std::string> &get_names);
+	void sortirovka(std::vector<std::string> &get_names, std::vector<double> &get_ages);
+	std::vector<NamePair> Easy(std::vector<std::string> &get_names, std::vector<double> &get_ages);
+
+	bool operator == (const Name_pairs::NamePair &EasyPair) const
+	{
+	  return this->name == this->name;
+	}
+
+	bool operator != (const Name_pairs::NamePair &EasyPair) const
+	{
+		return this->age == this->age;
+	}
+
+private:
+	std::vector<std::string> name;
+	std::vector<double> age;
+};
+//=======================================================================================================================================
+std::vector<std::string> Name_pairs::read_names()
+{
+	std::string readn;
+
+	std::cout << "Please, enter names: ";
+
+	while (std::cin >> readn)
+	{
+		if (readn == "quit")
+			break;
+
+		this->name.push_back(readn);
+	}
+
+	return this->name;
+}
+//=======================================================================================================================================
+std::vector<double> Name_pairs::read_age(std::vector<std::string> &get_names)
+{
+	double agen = 0.0;
+
+	for (int i = 0; i < get_names.size(); i++)
+	{
+		std::cout << "Please, enter age for name: " << get_names[i] << " == ";
+
+		std::cin >> agen;
+		this->age.push_back(agen);
+	}
+	return this->age;
+}
+//=======================================================================================================================================
+std::vector<Name_pairs::NamePair> Name_pairs::Easy(std::vector<std::string> &get_names, std::vector<double> &get_ages)
+{
+	for (int i = 0; i < get_names.size(); i++)
+	{
+		EasyPair.push_back ({ get_names[i], get_ages[i] });
+	}
+	return EasyPair;
+}
+//=======================================================================================================================================
+std::ostream &operator<<(std::ostream &os, const std::vector<Name_pairs::NamePair> &EasyPair)
+{
+	for (int i = 0; i < EasyPair.size(); i++)
+		os << "Name: " << EasyPair[i].name << "\tAge: "<< EasyPair[i].age << "\n";
+
+	return os;
+}
+//=======================================================================================================================================
+void Name_pairs::sortirovka(std::vector<std::string> &get_names, std::vector<double> &get_ages)
+{
+	std::vector<std::string> before_names = get_names;
+	std::vector<double> after_age;
+	double BN = 0.0;
+
+	std::sort(get_names.begin(), get_names.end());
+
+	for (int i = 0; i < get_names.size(); i++)
+	{
+		for (int j = 0; j < get_names.size(); j++)
+		{
+			if (get_names[i] == before_names[j])
+			{
+				BN = get_ages[j];
+				after_age.push_back(BN);
+				break;
+			}
+		}
+	}
+	get_ages = after_age;
+
+	Easy(get_names, get_ages);
+
+	std::cout << EasyPair;
+}
+//=======================================================================================================================================
+int main()
+{
+	Name_pairs gogogo;
+
+	std::vector<std::string> GETNAME = gogogo.read_names();
+	std::vector<double> GETAGE = gogogo.read_age(GETNAME);
+
+
+	gogogo.sortirovka(GETNAME, GETAGE);
+
+	return 0;
+}
+
+
+
+
+
+//=======================================================================================================================================
+	3. Посмотрите на головоломный пример из раздела 8.4. Вставьте его в программу и объясните смысл каждой конструкции.
+Обратите внимание на то, что этот код не делает никаких осмысленных операций; он используется только для усложнения примера.
+//=======================================================================================================================================ХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗХЗ
+//=======================================================================================================================================
+	V   2. Замените функцию Name_pair::print() (глобальным) оператором operator<< и определите операции == и != для объектов класса Name_pair.
+//=======================================================================================================================================
+class Name_pairs
+{
+public:
+
+struct NamePair
+{
+std::string name;
+double age;
+};
+
+std::vector<NamePair> EasyPair;
+
+std::vector<std::string> read_names();
+std::vector<double> read_age(std::vector<std::string> &get_names);
+void sortirovka(std::vector<std::string> &get_names, std::vector<double> &get_ages);
+std::vector<NamePair> Easy(std::vector<std::string> &get_names, std::vector<double> &get_ages);
+
+Name_pairs operator == (const Name_pairs::NamePair &EasyPair) const
+{
+return this->name == this->name;
+}
+
+Name_pairs operator != (const Name_pairs::NamePair &EasyPair) const
+{
+return this->age == this->age;
+}
+
+private:
+std::vector<std::string> name;
+std::vector<double> age;
+};
+//=======================================================================================================================================
+std::vector<std::string> Name_pairs::read_names()
+{
+std::string readn;
+
+std::cout << "Please, enter names: ";
+
+while (std::cin >> readn)
+{
+if (readn == "quit")
+break;
+
+this->name.push_back(readn);
+}
+
+return this->name;
+}
+//=======================================================================================================================================
+std::vector<double> Name_pairs::read_age(std::vector<std::string> &get_names)
+{
+double agen = 0.0;
+
+for (int i = 0; i < get_names.size(); i++)
+{
+std::cout << "Please, enter age for name: " << get_names[i] << " == ";
+
+std::cin >> agen;
+this->age.push_back(agen);
+}
+return this->age;
+}
+//=======================================================================================================================================
+std::vector<Name_pairs::NamePair> Name_pairs::Easy(std::vector<std::string> &get_names, std::vector<double> &get_ages)
+{
+for (int i = 0; i < get_names.size(); i++)
+{
+EasyPair.push_back ({ get_names[i], get_ages[i] });
+}
+return EasyPair;
+}
+//=======================================================================================================================================
+std::ostream &operator<<(std::ostream &os, std::vector<Name_pairs::NamePair> &EasyPair)
+{
+for (int i = 0; i < EasyPair.size(); i++)
+os << "Name: " << EasyPair[i].name << "\tAge: "<< EasyPair[i].age << "\n";
+
+return os;
+}
+//=======================================================================================================================================
+void Name_pairs::sortirovka(std::vector<std::string> &get_names, std::vector<double> &get_ages)
+{
+std::vector<std::string> before_names = get_names;
+std::vector<double> after_age;
+double BN = 0.0;
+
+std::sort(get_names.begin(), get_names.end());
+
+for (int i = 0; i < get_names.size(); i++)
+{
+for (int j = 0; j < get_names.size(); j++)
+{
+if (get_names[i] == before_names[j])
+{
+BN = get_ages[j];
+after_age.push_back(BN);
+break;
+}
+}
+}
+get_ages = after_age;
+
+Easy(get_names, get_ages);
+
+std::cout << EasyPair;
+}
+//=======================================================================================================================================
+int main()
+{
+Name_pairs gogogo;
+
+std::vector<std::string> GETNAME = gogogo.read_names();
+std::vector<double> GETAGE = gogogo.read_age(GETNAME);
+
+
+gogogo.sortirovka(GETNAME, GETAGE);
+
+return 0;
+}
+
+//=======================================================================================================================================
+V  1. Разработайте и реализуйте класс Name_pairs, содержащий пару (имя,возраст), где имя — объект класса string, а возраст — переменная типа double.
+Представьте эти члены класса в виде объектов классов vector<string> (с именем name ) и vector<double> (с именем age).
+Предусмотрите операцию ввода read_names(), считывающую ряд имен. Предусмотрите операцию read_ages(), предлагающую пользователю ввести возраст для каждого имени.
+Предусмотрите операцию print(), которая выводит на печать пары (name[i], age[i]) (по одной на строке) в порядке, определенном вектором name.
+Предусмотрите операцию sort(), упорядочивающую вектор name в алфавитном порядке и сортирующую вектор age соответствующим образом.
+Реализуйте все “операции” как функции-члены. Проверьте этот класс (конечно, проверять надо как можно раньше и чаще).
+//=======================================================================================================================================
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <fstream>
+//=======================================================================================================================================
+class Name_pairs
+{
+public:
+std::vector<std::string> read_names();
+std::vector<double> read_age(std::vector<std::string> &get_names);
+void print(std::vector<std::string> &get_names, std::vector<double> &get_ages);
+void sortirovka(std::vector<std::string> &get_names, std::vector<double> &get_ages);
+
+private:
+std::vector<std::string> name;
+std::vector<double> age;
+};
+//=======================================================================================================================================
+std::vector<std::string> Name_pairs::read_names()
+{
+std::string readn;
+
+std::cout << "Please, enter names: ";
+
+while (std::cin >> readn)
+{
+if (readn == "quit")
+break;
+
+this->name.push_back(readn);
+}
+
+return this->name;
+}
+//=======================================================================================================================================
+std::vector<double> Name_pairs::read_age(std::vector<std::string> &get_names)
+{
+double agen = 0.0;
+
+for (int i = 0; i < get_names.size(); i++)
+{
+std::cout << "Please, enter age for name: " << get_names[i] << " == ";
+
+std::cin >> agen;
+this->age.push_back(agen);
+}
+return this->age;
+}
+//=======================================================================================================================================
+void Name_pairs::print(std::vector<std::string> &get_names, std::vector<double> &get_ages)
+{
+for (int i = 0; i < get_names.size(); i++)
+{
+std::cout << "Name: " << get_names[i] << "\t" << "Age: " << get_ages[i] << '\n';
+}
+}
+//=======================================================================================================================================
+void Name_pairs::sortirovka(std::vector<std::string> &get_names, std::vector<double> &get_ages)
+{
+std::vector<std::string> before_names = get_names;
+std::vector<double> after_age;
+double BN = 0.0;
+
+std::sort(get_names.begin(), get_names.end());
+
+for (int i = 0; i < get_names.size(); i++)
+{
+for (int j = 0; j < get_names.size(); j++)
+{
+if (get_names[i] == before_names[j])
+{
+BN = get_ages[j];
+after_age.push_back(BN);
+break;
+}
+}
+}
+get_ages = after_age;
+
+print(get_names, get_ages);
+}
+//=======================================================================================================================================
+int main()
+{
+Name_pairs gogogo;
+
+std::vector<std::string> GETNAME = gogogo.read_names();
+std::vector<double> GETAGE = gogogo.read_age(GETNAME);
+
+
+gogogo.sortirovka(GETNAME, GETAGE);
+
+return 0;
+}
+
+*/
