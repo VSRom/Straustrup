@@ -1,0 +1,556 @@
+/*
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cmath>
+#include <gsl/gsl>
+
+void error(std::string s)
+{
+	std::cerr << s << '\n';
+}
+//===============================================================================================================================
+										//	CLASS Variable
+//===============================================================================================================================
+class Variable
+{
+public:
+	Variable();
+
+	std::string ISconst;
+	std::string name;
+	double value;
+	bool is_const;
+	bool isConst(int i);
+
+	Variable(std::string con, std::string n, double v)
+		:ISconst(con), name(n), value(v)
+	{ }
+
+	Variable(std::string n, double v, bool c)
+		:name(n), value(v), is_const(c)
+	{ }
+};
+//===============================================================================================================================
+std::vector<Variable> var_table;
+//===============================================================================================================================
+Variable::Variable()
+{ }
+//===============================================================================================================================
+Variable varik;
+//===============================================================================================================================
+bool Variable::isConst(int i)
+{
+	if (var_table[i].is_const == true);
+	return true;
+
+		return false;
+}
+//===============================================================================================================================
+double get_value(std::string s)
+{
+	for (int i = 0; i < var_table.size(); ++i)
+	{
+		if (var_table[i].name == s)
+			return var_table[i].value;
+	}
+
+	error("get: indefinite lexeme");
+}
+//===============================================================================================================================
+void set_value(std::string s, double d)
+{
+	for (int i = 0; i < var_table.size(); ++i)
+		if (var_table[i].name == s && varik.isConst(i))
+		{
+			var_table[i].value = d;
+			return;
+		}
+		else return;
+}
+//===============================================================================================================================
+double expression();
+double term();
+double factorial(double left);
+//===============================================================================================================================
+											//	CLASS Token
+//===============================================================================================================================
+class Token
+{
+public:
+	char kind;
+	double value;
+	std::string name;
+
+	Token(char ch)
+		:kind(ch), value(0.0)
+	{
+	}
+
+	Token(char ch, double val)
+		:kind(ch), value(val)
+	{
+	}
+
+	Token(char ch, std::string n)
+		:kind(ch), name(n)
+	{
+	}
+};
+//===============================================================================================================================
+							//			CLASS	Token_stream
+//===============================================================================================================================
+class Token_stream
+{
+public: // Пользовательский интерфейс
+	Token_stream();	// Создаём объект класса Token_stream считывающий данные из потока cin
+
+	Token get();	// Cчитывает лексему
+
+	void putback(Token t);	// Возвращает лексему
+	void ignore(char c);	// Отбрасывает символы, предшуствующие символу с включительно
+	double statement();
+	double declaration(bool is_const);
+	void calculate();
+	bool is_declared(std::string var);
+	double define_name(std::string var, double val, bool is_const);
+
+private: // Детали реализации
+	bool full;	// Есть лексему в буфере?
+	Token buffer;	// Здесь хранится объект класса Token возвращаем в поток функцией putback()
+};
+//===============================================================================================================================
+Token_stream::Token_stream()
+	:full(false), buffer{ '\0' } // В буфере нет ни одного объекта
+{ }
+//===============================================================================================================================
+Token_stream ts;
+//===============================================================================================================================
+const char name = 'a';	// Лексему name
+//===============================================================================================================================
+const std::string useLet = "let";
+const char let = '#';	// Лексема let
+//===============================================================================================================================
+const char uSqrt = 's';	// Лексема sqrt
+const std::string useSqrt = "sqrt";	// Ключевая функция sqrt
+//===============================================================================================================================
+const char uPow = 'p';	// Лексема sqrt
+const std::string usePow = "pow";	// Ключевая функция sqrt
+//===============================================================================================================================
+const char quit = 'q';	// Лексему quit
+const std::string useQuit = "quit";	// Ключевая функция quit
+//===============================================================================================================================
+const char uConst = '@';	// Лексема sqrt
+const std::string useConst = "const";	// Ключевая функция sqrt
+//===============================================================================================================================
+const char number = '8';
+const char print = ';';
+const char underscore = '_';
+const char grab = '=';
+//===============================================================================================================================
+Token Token_stream::get()
+{
+	// Считываем символ из потока cin и образуем лексему
+	if (full)	// Проверяем, есть ли в потоке хотя бы одна лексема
+	{
+		full = false;
+		return buffer;
+	}
+	char ch;
+	std::cin >> ch;
+
+	switch (ch)
+	{
+	case ';': case 'quit': case '(': case ')': case '{': case '}': case 'sqrt': case 'pow': case 'let':
+	case '+': case '-': case '*': case '/': case '!': case '%': case '=': case ',': case '#': case '@':
+		return Token(ch); // пусть каждый символ представляет себя сам
+
+	case '.':
+	case '0': case '1': case '2': case '3': case '4':
+	case '5': case '6': case '7': case '8': case '9':
+	{
+		std::cin.putback(ch); // возвращем цифру обратно в поток ввода
+
+		double val;
+		std::cin >> val; // считываем число с плавающей точкой
+		return Token(number, val); // пусть символ '8' означает "число"
+	}
+	default:
+
+		if (isalpha(ch))	// Является ли лексема введная буквой?
+		{
+			std::string s;
+			s += ch;
+
+			while (std::cin.get(ch) && (isalpha(ch) || isdigit(ch)) || ch == underscore)	// Считываем все следующие буквы или цифры
+				s += ch;
+
+			std::cin.putback(ch);
+
+			// Проверяем какие буквы в нашей строке s
+			// При совпадение со строками присваиваем значение символьное для использование в switch
+
+			if (s == useSqrt) return Token(uSqrt);	// Ключевое слово sqrt
+
+			if (s == usePow) return Token(uPow);
+
+			if (s == useQuit) return Token(quit);
+
+			if (s == useConst) return Token(uConst);
+
+			if (ch == let || s == useLet) return Token(let);
+			return Token(name, s);
+		}
+		error("Error Bad Token!");
+
+	}
+}
+//===============================================================================================================================
+void Token_stream::putback(Token t)
+{
+	if (full == false)
+	{
+		buffer = t;     // Копируем объект t в буфер
+		full = true;    // Теперь буфер полон
+	}
+}
+//===============================================================================================================================
+void Token_stream::ignore(char c)
+{
+	if (full && buffer.kind == c)
+	{
+		full = false;
+		return;
+	}
+
+	full = false;
+
+	char ch = 0;
+	while (std::cin >> ch)
+		if (ch == c) return;
+}
+//===============================================================================================================================
+double powpow(double value, int i);
+//===============================================================================================================================
+double primary()
+{
+	Token t = ts.get();
+
+	double value;
+
+	if (t.kind == number)
+	{
+		Token next_token = ts.get();    //Берем следующий символ после цифры
+		value = t.value;
+
+		if (next_token.kind == '!')
+			return factorial(value);    // Если следующий символ ! то выполняем подсчет факториала и возвращаем его значение
+		else
+		{
+			ts.putback(next_token); // Иначе вернем это значение оператор или операнд обратно во входной поток для дальнейшей обработки
+			return value;
+		}
+	}
+
+	switch (t.kind)
+	{
+	case uPow:
+	{
+		t = ts.get();
+
+		if (t.kind != '(')					error("pow it`s looks like pow( x(double),i(int) )");	// Является ли элемент после sqrt - '('
+
+		t = ts.get();
+		double x = t.value;
+
+		t = ts.get();
+		if (t.kind != ',')					error("pow it`s looks like pow( x(double),i(int) )");
+
+		t = ts.get();
+		int i = gsl::narrow<int>(t.value);
+
+		double d = powpow(x, i);
+
+		t = ts.get();	// Берем символ после уравнения
+
+		if (t.kind != ')')	// Проверяем является ли символ после уравнения закрывающейся скобкой
+			error("pow it`s looks like pow( x(double),i(int) )");
+
+		return d;	// Вернем pow в случае успеха в обоих случаях
+	}
+	case uSqrt:
+	{
+		t = ts.get();	// Получаем следующий элемент
+
+		if (t.kind != '(')	// Является ли элемент после sqrt - '('
+			error("sqrt it`s looks like sqrt(x)");
+
+		double d = expression();	// Если является считаем внутри скобок уравнение
+
+		if (d <= 0) error("sqrt cannot be negative");
+		t = ts.get();	// Берем символ после уравнения
+
+		if (t.kind != ')')	// Проверяем является ли символ после уравнения закрывающейся скобкой
+			error("please, don`t forget == ( ***** )");
+
+		return sqrt(d);	// Вернем корень в случае успеха в обоих случаях
+	}
+
+	case '(':
+	{
+		double d = expression();
+		t = ts.get();
+
+		if (t.kind != ')')
+			error("please, don`t forget == ( ***** )");
+
+		return d;
+	}
+
+	case '{':
+	{
+		double d = expression();
+		t = ts.get();
+
+		if (t.kind != '}')
+			error("please, don`t forget == { ( ***** ) }");
+
+		return d;
+	}
+
+	case '-':
+		return -primary();
+
+	case name:
+		return get_value(t.name);
+
+	case number:
+		return t.value;
+
+	default:
+		error("Primary Exprected!");
+	}
+}
+//===============================================================================================================================
+double powpow(double value, int i)
+{
+	double powpow = value;
+
+	for (int j = 1; j < i; j++)
+	{
+		powpow *= value;
+	}
+	return powpow;
+}
+//===============================================================================================================================
+double factorial(double value)
+{
+	int i;
+	double fact = 1;
+
+	if (value < 0) error("Factorial not may < 0");
+	if (value == 0) fact = 1;
+
+	for (i = 1; i <= value; i++)
+	{
+		fact *= i;
+	}
+
+	value = fact;
+	return value;
+}
+//===============================================================================================================================
+double term()
+{
+	double left = primary();
+	while (true)
+	{
+		Token t = ts.get();
+
+		switch (t.kind) {
+		case '*':
+		{
+			left *= primary();
+			break;
+		}
+
+		case '/':
+		{
+			double d = primary();
+			if (d == 0) error("Division");
+			left /= d;
+			break;
+		}
+
+		case '%':
+		{
+			double d = primary();
+			int i1 = int(left);
+			if (i1 != left)
+				error("Left operand % don`t int");
+
+			int i2 = int(d);
+			if (i2 != d)
+				error("Right operand % don`t int");
+
+			if (i2 == 0) error("%: division by zero");
+			left = i1 % i2;
+			break;
+		}
+		default:
+			ts.putback(t);  // Помещаем объект t обратно в поток лексем
+			return left;
+		}
+	}
+}
+//===============================================================================================================================
+double expression()
+{
+	// Считывам и вычисляем Терм
+	double left = term();
+
+	while (true)
+	{// Получаем следующую лексему из потока лексем
+		Token t = ts.get();
+
+		switch (t.kind)
+		{
+		case '+':
+		{ // Вычисляем и добавляем Терм
+			left += term();
+			break;
+		}
+		case '-':
+		{
+			// Вычисляем и вычитаем Терм
+			left -= term();
+			break;
+		}
+		default:
+			ts.putback(t);  // Помещаем объект t обратно в поток лексем
+			return left;    // Символов + и - нет, возвращаем ответ
+		}
+	}
+}
+//===============================================================================================================================
+void clean_up_mess()
+{
+	ts.ignore(print);
+}
+//===============================================================================================================================
+bool Token_stream::is_declared(std::string var)
+// Есть ли переменная var в векторе var_table?
+{
+	for (int i = 0; i < var_table.size(); ++i)
+
+		if (var_table[i].name == var)
+			return true;
+
+	return false;
+}
+//===============================================================================================================================
+double Token_stream::define_name(std::string var, double val, bool is_const)
+// Добавляем пару(var,val) в вектор var_table
+{
+	if (is_declared(var))
+	{
+		error("already announced");
+	}
+	else
+	{
+		std::cout << var << " == write! == " << val << '\n';
+		var_table.push_back(Variable(var, val, is_const));
+	}
+	
+	return val;
+}
+//===============================================================================================================================
+double Token_stream::declaration(bool is_const)
+
+// Предполагается что мы можем выделить ключевое слово "let"
+// Обработка: name = выражение
+// Объявляется переменная с именем "name" с начальным значение, заданным "Выражением"
+{
+	Token t = ts.get();
+
+	if (t.kind != name) error("In announcement waiting variable 'name'");
+
+	std::string var_name = t.name;
+
+	Token t2 = ts.get();
+
+	if (t2.kind != '=') error("In announcement missed symbol = ");
+
+	double d = expression();
+
+	define_name(var_name, d, is_const);
+	return d;
+}
+//===============================================================================================================================
+double Token_stream::statement()
+{
+	Token t = ts.get();
+
+	switch (t.kind)
+	{
+	case uConst:
+		return declaration(true);
+
+	case let:
+		return declaration(false);
+
+	default:
+		ts.putback(t);
+		return expression();		// Не рабочий!
+	}
+}
+//===============================================================================================================================
+void Token_stream::calculate()
+{
+	const std::string promt = "> ";
+	const std::string result = "= ";
+
+	while (std::cin)try
+	{
+		std::cout << promt;	// Получили >
+		Token t = ts.get();	// Считываем ввод
+
+		while (t.kind == print)	t = ts.get();	// Сначала игнорируем все инструкции "печать"
+
+	if (t.kind == quit)
+			return;
+
+		ts.putback(t);
+		std::cout << result << statement() << '\n';
+	}
+	catch (std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+		clean_up_mess();
+	}
+}
+//===============================================================================================================================
+int main()try
+{
+	const std::string HELLO = "Hello, my Dear Friend! Welcome to the calculator!!!\nYou may enter numbers int or double and symbols:\n- + * / { ( ) }for math formuls!\nq  Quit!\n=  Total\nLET`S GO! GOOD NICE!!!\n";
+	std::cout << HELLO;
+
+	ts.define_name("pi", 3.141592535, true);	// Заносим pi и e в определение калькулятора до запуска
+	ts.define_name("e", 2.7182818284, true);
+	ts.define_name("k", 1000, true);
+
+	ts.calculate();
+}
+catch (std::exception& e) {
+	std::cerr << e.what() << std::endl;
+	return 1;
+}
+catch (...) {
+	std::cerr << "exception \n";
+	return 2;
+}
+
+Реализуйте именованные константы, которые действительно не могут изменять свои значения. Подсказка: в класс Variable необходимо добавить функцию-член,
+различающую константы и переменные и проверяющую это при выполнении функции set_value(). Если хотите дать пользователю возможность объявлять собственные
+именованные константы (а не только pi и e), то необходимо добавить соответствующее обозначение, например const pi = 3.14;
+*/
