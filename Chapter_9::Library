@@ -98,28 +98,24 @@ public:
 	}
 
 	//=======================================================================================================================================
-	friend bool operator==(const Book::ISBN &isbn_a, const Book::ISBN &isbn_b)
-	{
-		if (isbn_a.I == isbn_b.I && isbn_a.S == isbn_b.S && isbn_a.B == isbn_b.B && isbn_a.N == isbn_b.N)
-			return true;
-		else
-			return false;
-	}
+friend bool operator==(const Book::ISBN &isbn_a, const Book::ISBN &isbn_b)
+{
+	return (isbn_a.I == isbn_b.I && isbn_a.S == isbn_b.S && isbn_a.B == isbn_b.B && isbn_a.N == isbn_b.N);
+}
 
-	friend bool operator!=(const Book::ISBN &isbn_a, const Book::ISBN &isbn_b)
-	{
-		if (isbn_a.I != isbn_b.I || isbn_a.S != isbn_b.S || isbn_a.B != isbn_b.B)
-			return true;
-		else
-			return false;
-	}
 
-	friend ostream &operator<<(ostream &os, const Book &isbn)
-	{
-		os << isbn.Name << '\n' << isbn.LastName_Author << '\n' << genre_to_string(isbn.genre) << '\n' << isbn.isbn.I << '-' << isbn.isbn.S << '-' << isbn.isbn.B << '-' << isbn.isbn.N << '\n';
 
-		return os;
-	}
+friend bool operator!=(const Book::ISBN &isbn_a, const Book::ISBN &isbn_b)
+{
+	return !(isbn_a == isbn_b);
+}
+
+
+friend ostream &operator<<(ostream &os, const Book &isbn)
+{
+	return os << isbn.Name << '\n' << isbn.LastName_Author << '\n' << genre_to_string(isbn.genre) << '\n' << isbn.isbn.I << '-' << isbn.isbn.S << '-' << isbn.isbn.B << '-' << isbn.isbn.N << '\n';
+}
+
 	//=======================================================================================================================================
 private:
 	string Name;
@@ -949,10 +945,10 @@ public:
 	//=======================================================================================================================================
 	Book add_book();
 	Patron add_member();
-	void book_issue(Transaction &Trans);
+	void book_issue();
 
-	void check_member();
-	void check_book();
+	void check_member(Transaction &Trans, Transaction &Trans_valid, bool &valid_check);
+	void check_book(Transaction &Trans, Transaction &Trans_valid, bool &valid_check);
 	void add_Debtors_NOT_Members(string &name);
 
 	bool add_state()
@@ -1002,53 +998,9 @@ Patron Library::add_member()
 	return Human;
 }
 //=======================================================================================================================================
-void Library::check_member()
+void Library::check_member(Transaction &Trans, Transaction &Trans_valid, bool &valid_check)
 {
-
-}
-//=======================================================================================================================================
-void Library::check_book()
-{
-
-}
-//=======================================================================================================================================
-void Library::add_Debtors_NOT_Members(string &name)
-{
-	for (int i = 0; i < Debtors_NOT_Members.size(); i++)
-	{
-
-	}
-}
-//=======================================================================================================================================
-void Library::book_issue(Transaction &Trans)
-{
-	Transaction Trans_valid;
-
-	bool valid_check_book_isbn = false;
 	bool valid_check_member = false;
-
-	Trans.FK_Book_Isbn = parse_isbn();
-
-	int index_book = 0;
-
-	for (int i = 0; i < Vec_Book_Class.size(); i++)
-	{
-		if (Trans.FK_Book_Isbn == Vec_Book_Class[i].get_isbn())
-		{
-			cout << "Is book issue Library under number == [" << i << "]" << '\n';
-			index_book = i;
-			valid_check_book_isbn = true;
-			break;
-		}
-	}
-
-
-	if (valid_check_book_isbn == false)
-	{
-		error("Book not issue Library!");
-		return;
-	}
-
 
 	Trans.FK_Library_Card = parse_library_card();
 
@@ -1062,42 +1014,103 @@ void Library::book_issue(Transaction &Trans)
 			if (Vec_Patron_Class[i].paying() == true)
 			{
 				cout << "Human is pay for membership" << '\n';
-				Trans_valid = Trans;
-				Vec_Trans_Struct.push_back(Trans_valid);
-				bool issued = Vec_Book_Class[index_book].get_book_issued();
-
-				if (issued == false)
-				{
-					cout << "Can borrow a book!" << '\n';
-					issued = true;
-					Vec_Book_Class[index_book].set_book_issued(issued);
-				}
+				
+				valid_check = true;
 			}
+
 			else if (Vec_Patron_Class[i].paying() == false)
 			{
 				string NAME = Vec_Patron_Class[i].get_name();
-				Debtors_NOT_Members.push_back(NAME);
+				add_Debtors_NOT_Members(NAME);
 				cout << "Human is NOT pay for membership" << '\n';
-
+				return;
 			}
 		}
 	}
 
 	if (valid_check_member == false)
 		error("Human not member for Library");
+}
+//=======================================================================================================================================
+void Library::check_book(Transaction &Trans, Transaction &Trans_valid, bool &valid_check)
+{
+	bool valid_check_book_isbn = false;
+
+	Trans.FK_Book_Isbn = parse_isbn();
+
+	for (int i = 0; i < Vec_Book_Class.size(); i++)
+	{
+		if (Trans.FK_Book_Isbn == Vec_Book_Class[i].get_isbn())
+		{
+			cout << "The book belongs to the library under number == [" << i << "]" << '\n';
+
+			valid_check_book_isbn = true;
+			bool issued = Vec_Book_Class[i].get_book_issued();
+
+			if (issued == false)
+			{
+				cout << "Can borrow a book!" << '\n';
+				issued = true;
+				Vec_Book_Class[i].set_book_issued(issued);
+				valid_check = true;
+			}
+			else
+			{
+				cout << "Don`t can borrow a book, please wait." << '\n';
+			}
+			break;
+		}
+	}
+
+	if (valid_check_book_isbn == false)
+	{
+		error("Book not issue Library!");
+		return;
+	}
+}
+//=======================================================================================================================================
+void Library::add_Debtors_NOT_Members(string &name)
+{
+	bool debtors = false;
+	for (int i = 0; i < Debtors_NOT_Members.size(); i++)
+	{
+		if (Debtors_NOT_Members[i] == name)
+		{
+			debtors = true;
+			break;
+		}
+	}
+	if (debtors != true)
+		Debtors_NOT_Members.push_back(name);
+}
+//=======================================================================================================================================
+void Library::book_issue()
+{
+	Transaction Trans_valid;
+	Transaction Trans;
+	bool valid_check = false;
+
+	check_member(Trans, Trans_valid, valid_check);
+
+	if (valid_check == true)
+	{
+		valid_check = false;
+		check_book(Trans, Trans_valid, valid_check);
+	}
+	if (valid_check == true)
+		Vec_Trans_Struct.push_back(Trans);
 
 }
 //=======================================================================================================================================
 int main()
 {
-	Library::Transaction Trans;
 	Library StartLibrary;
 
 	StartLibrary.add_book();
 
 	StartLibrary.add_member();
 
-	StartLibrary.book_issue(Trans);
+	StartLibrary.book_issue();
 
 	return 0;
 }
@@ -1123,27 +1136,19 @@ V	6. Добавьте операторы в класс Book. Пусть опер
 Пусть также оператор != сравнивает цифры ISBN, а оператор << выводит на печать название, фамилию автора и код ISBN в отдельных строках.
 //=======================================================================================================================================
 friend bool operator==(const Book::ISBN &isbn_a, const Book::ISBN &isbn_b)
-	{
-		if (isbn_a.I == isbn_b.I && isbn_a.S == isbn_b.S && isbn_a.B == isbn_b.B && isbn_a.N == isbn_b.N)
-			return true;
-		else
-			return false;
-	}
+{
+	return (isbn_a.I == isbn_b.I && isbn_a.S == isbn_b.S && isbn_a.B == isbn_b.B && isbn_a.N == isbn_b.N);
+}
 
-	friend bool operator!=(const Book::ISBN &isbn_a, const Book::ISBN &isbn_b)
-	{
-		if (isbn_a.I != isbn_b.I || isbn_a.S != isbn_b.S || isbn_a.B != isbn_b.B)
-			return true;
-		else
-			return false;
-	}
+friend bool operator!=(const Book::ISBN &isbn_a, const Book::ISBN &isbn_b)
+{
+	return !(isbn_a == isbn_b);
+}
 
-	friend ostream &operator<<(ostream &os, const Book &isbn)
-	{
-		os << isbn.Name << '\n' << isbn.LastName_Author << '\n' << genre_to_string(isbn.genre) << '\n' << isbn.isbn.I << '-' << isbn.isbn.S << '-' << isbn.isbn.B << '-' << isbn.isbn.N << '\n';
-
-		return os;
-	}
+friend ostream &operator<<(ostream &os, const Book &isbn)
+{
+	return os << isbn.Name << '\n' << isbn.LastName_Author << '\n' << genre_to_string(isbn.genre) << '\n' << isbn.isbn.I << '-' << isbn.isbn.S << '-' << isbn.isbn.B << '-' << isbn.isbn.N << '\n';
+}
 //=======================================================================================================================================
 V	5. Для выполнения этого и нескольких следующих упражнений необходимо разработать и реализовать класс Book, который является частью программного обеспечения библиотеки.
 Класс Book должен иметь члены для хранения кода ISBN, названия, фамилии автора и даты регистрации авторских прав. Кроме того, он должен хранить данные о том, выдана книга на руки или нет.
