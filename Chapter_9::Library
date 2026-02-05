@@ -85,7 +85,7 @@ public:
 
 	bool set_book_issued(bool issued)
 	{
-		this->book_issued = issued;
+		return this->book_issued = issued;
 	}
 	//=======================================================================================================================================
 	vector<ISBN> vec_isbn;
@@ -947,8 +947,8 @@ public:
 	Patron add_member();
 	void book_issue();
 
-	void check_member(Transaction &Trans, Transaction &Trans_valid, bool &valid_check);
-	void check_book(Transaction &Trans, Transaction &Trans_valid, bool &valid_check);
+	void check_member(Transaction &Trans, bool &valid_check);
+	void check_book(Transaction &Trans, bool &valid_check);
 	void add_Debtors_NOT_Members(string &name);
 
 	bool add_state()
@@ -998,7 +998,7 @@ Patron Library::add_member()
 	return Human;
 }
 //=======================================================================================================================================
-void Library::check_member(Transaction &Trans, Transaction &Trans_valid, bool &valid_check)
+void Library::check_member(Transaction &Trans, bool &valid_check)
 {
 	bool valid_check_member = false;
 
@@ -1023,7 +1023,7 @@ void Library::check_member(Transaction &Trans, Transaction &Trans_valid, bool &v
 				string NAME = Vec_Patron_Class[i].get_name();
 				add_Debtors_NOT_Members(NAME);
 				cout << "Human is NOT pay for membership" << '\n';
-				return;
+				valid_check = false;
 			}
 		}
 	}
@@ -1032,7 +1032,7 @@ void Library::check_member(Transaction &Trans, Transaction &Trans_valid, bool &v
 		error("Human not member for Library");
 }
 //=======================================================================================================================================
-void Library::check_book(Transaction &Trans, Transaction &Trans_valid, bool &valid_check)
+void Library::check_book(Transaction &Trans, bool &valid_check)
 {
 	bool valid_check_book_isbn = false;
 
@@ -1057,6 +1057,8 @@ void Library::check_book(Transaction &Trans, Transaction &Trans_valid, bool &val
 			else
 			{
 				cout << "Don`t can borrow a book, please wait." << '\n';
+				valid_check = false;
+			
 			}
 			break;
 		}
@@ -1065,7 +1067,7 @@ void Library::check_book(Transaction &Trans, Transaction &Trans_valid, bool &val
 	if (valid_check_book_isbn == false)
 	{
 		error("Book not issue Library!");
-		return;
+		valid_check = false;
 	}
 }
 //=======================================================================================================================================
@@ -1086,17 +1088,14 @@ void Library::add_Debtors_NOT_Members(string &name)
 //=======================================================================================================================================
 void Library::book_issue()
 {
-	Transaction Trans_valid;
 	Transaction Trans;
 	bool valid_check = false;
 
-	check_member(Trans, Trans_valid, valid_check);
+	check_member(Trans, valid_check);
 
 	if (valid_check == true)
-	{
-		valid_check = false;
-		check_book(Trans, Trans_valid, valid_check);
-	}
+		check_book(Trans, valid_check);
+	
 	if (valid_check == true)
 		Vec_Trans_Struct.push_back(Trans);
 
