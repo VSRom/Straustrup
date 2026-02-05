@@ -1,0 +1,92 @@
+#include <iostream>
+#include <vector>
+#include <ctime>
+#include <cstdlib>
+
+#include <chrono>
+#include <random>
+
+int main() try
+{
+	std::vector<int> vecComp;
+	std::vector<int> vecUser;
+
+	int i, j, k, l;
+
+	int bull = 0;
+	int cow = 0;
+	int n = 0;
+	int Ch;
+
+	bool bulls = false;
+	bool cows = false;
+
+	bool allBulls = true;
+	bool whileGame = true;
+
+	while (whileGame == true)
+	{
+
+		if (allBulls == true)
+		{
+			vecComp.clear();
+
+			for (i = 0; i < 4; i++)
+			{
+				int G = unsigned(std::time(nullptr));
+				G = G % 10;
+				vecComp.push_back(G);
+			}
+		}
+
+		std::cout << bull << " BULL  ";
+		std::cout << cow << " COW  ";
+
+		allBulls = false;
+		bull = 0;
+		cow = 0;
+
+		vecUser.clear();
+
+		std::cout << "Please enter numbers, through SPACE!" << '\n';
+
+		for (i = 0; i < 4; i++)
+		{
+			std::cin >> Ch;
+			vecUser.push_back(Ch);
+		}
+		for (i = 0; i < 4; i++)
+		{
+			bulls = false;
+			cows = false;
+
+			for (j = 0; j < 4; j++)
+			{
+				if (vecComp[i] == vecUser[j] && i == j && cows == false)
+				{
+					bull++;
+					bulls = true;
+				}
+				else if (vecComp[i] == vecUser[j] && i != j && bulls == false)
+				{
+					cow++;
+					cows = true;
+				}
+
+				if (bull == 4)
+				{
+					allBulls = true;
+					break;
+				}
+				if (cow == 4)
+					break;
+			}
+		}
+	}
+
+}
+
+catch (std::exception& e)
+{
+	std::cerr << "" << e.what() << '\n';
+}
