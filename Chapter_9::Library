@@ -948,8 +948,9 @@ public:
 	void book_issue();
 
 	void check_member(Transaction &Trans, bool &valid_check);
-	void check_book(Transaction &Trans, bool &valid_check);
+	void check_book(Transaction &Trans, bool &valid_check, int &index_book);
 	void add_Debtors_NOT_Members(string &name);
+	void check_book_issue(int &index_book, bool &valid_check);
 
 	bool add_state()
 	{
@@ -969,34 +970,6 @@ private:
 
 	bool book_in_Library;
 };
-//=======================================================================================================================================
-Book Library::add_book()
-{
-	Book Character;
-
-	Character.enter_name();
-	Character.date_author_prav();
-	Character.enter_last_name_author();
-	Character.enter_isbn();
-	Character.enter_genre();
-	Character.check_book();
-
-	Vec_Book_Class.push_back(Character);
-	return Character;
-}
-//=======================================================================================================================================
-Patron Library::add_member()
-{
-	Patron Human;
-
-	Human.establishing_amount_membership_fee();
-	Human.enter_name_human();
-	Human.enter_library_card();
-	Human.mark_pay();
-
-	Vec_Patron_Class.push_back(Human);
-	return Human;
-}
 //=======================================================================================================================================
 void Library::check_member(Transaction &Trans, bool &valid_check)
 {
@@ -1032,7 +1005,7 @@ void Library::check_member(Transaction &Trans, bool &valid_check)
 		error("Human not member for Library");
 }
 //=======================================================================================================================================
-void Library::check_book(Transaction &Trans, bool &valid_check)
+void Library::check_book(Transaction &Trans, bool &valid_check, int &index_book)
 {
 	bool valid_check_book_isbn = false;
 
@@ -1045,21 +1018,8 @@ void Library::check_book(Transaction &Trans, bool &valid_check)
 			cout << "The book belongs to the library under number == [" << i << "]" << '\n';
 
 			valid_check_book_isbn = true;
-			bool issued = Vec_Book_Class[i].get_book_issued();
-
-			if (issued == false)
-			{
-				cout << "Can borrow a book!" << '\n';
-				issued = true;
-				Vec_Book_Class[i].set_book_issued(issued);
-				valid_check = true;
-			}
-			else
-			{
-				cout << "Don`t can borrow a book, please wait." << '\n';
-				valid_check = false;
-			
-			}
+			index_book = i;
+			valid_check = true;
 			break;
 		}
 	}
@@ -1067,6 +1027,24 @@ void Library::check_book(Transaction &Trans, bool &valid_check)
 	if (valid_check_book_isbn == false)
 	{
 		error("Book not issue Library!");
+		valid_check = false;
+	}
+}
+//=======================================================================================================================================
+void Library::check_book_issue(int &index_book, bool &valid_check)
+{
+	bool issued = Vec_Book_Class[index_book].get_book_issued();
+
+	if (issued == false)
+	{
+		cout << "Can borrow a book!" << '\n';
+		issued = true;
+		Vec_Book_Class[index_book].set_book_issued(issued);
+		valid_check = true;
+	}
+	else
+	{
+		cout << "Don`t can borrow a book, please wait." << '\n';
 		valid_check = false;
 	}
 }
@@ -1086,16 +1064,48 @@ void Library::add_Debtors_NOT_Members(string &name)
 		Debtors_NOT_Members.push_back(name);
 }
 //=======================================================================================================================================
+Book Library::add_book()
+{
+	Book Character;
+
+	Character.enter_name();
+	Character.date_author_prav();
+	Character.enter_last_name_author();
+	Character.enter_isbn();
+	Character.enter_genre();
+	Character.check_book();
+
+	Vec_Book_Class.push_back(Character);
+	return Character;
+}
+//=======================================================================================================================================
+Patron Library::add_member()
+{
+	Patron Human;
+
+	Human.establishing_amount_membership_fee();
+	Human.enter_name_human();
+	Human.enter_library_card();
+	Human.mark_pay();
+
+	Vec_Patron_Class.push_back(Human);
+	return Human;
+}
+//=======================================================================================================================================
 void Library::book_issue()
 {
 	Transaction Trans;
 	bool valid_check = false;
+	int index_book = 0;
 
 	check_member(Trans, valid_check);
 
 	if (valid_check == true)
-		check_book(Trans, valid_check);
+		check_book(Trans, valid_check, index_book);
 	
+	if (valid_check == true)
+		check_book_issue(index_book, valid_check);
+
 	if (valid_check == true)
 		Vec_Trans_Struct.push_back(Trans);
 
