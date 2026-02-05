@@ -1,0 +1,570 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+//===============================================================================================================================
+struct MinMaxLexema
+{
+	std::string max;
+	std::string min;
+};
+//===============================================================================================================================
+struct miniMaxi
+{
+	int min;
+	int max;
+};
+//===============================================================================================================================
+miniMaxi min_max(const std::vector<std::string>& v, const std::vector<int>& Gint)
+{
+	int min = Gint[0];
+	int max = Gint[0];
+
+	for (int i = 1; i < Gint.size(); i++)
+	{
+		if (Gint[i] > max)	// Максимум
+			max = Gint[i];
+
+		if (Gint[i] < min)	// Минимум
+			min = Gint[i];
+	}
+
+	miniMaxi mix;
+	mix.min = min;
+	mix.max = max;
+
+	return mix;
+}
+//===============================================================================================================================
+std::vector<int> vozvrat(const std::vector<std::string>& v)
+{
+	std::vector<int> Gint = { };
+
+	int count = 0;
+	int G = 0;
+
+	// Подсчет количества символов до спецсимвола новой строки \n
+
+	for (int i = 0; i < v.size(); i++)
+	{
+		for (int j = 0; j < v[i].size(); j++)
+		{
+			count++;
+		}
+		G = count;
+		Gint.push_back(G);
+	}
+
+	return Gint;
+}
+//===============================================================================================================================
+MinMaxLexema min_max_lexema(const std::vector<std::string>& v)
+{
+	std::string min = v[0];
+	std::string max = v[0];
+
+	for (int i = 0; i < v.size(); i++)
+	{
+		if (v[i] > max)	// Максимум
+			max = v[i];
+
+		if (v[i] < min)	// Минимум
+			min = v[i];
+	}
+	MinMaxLexema lexa;
+
+	lexa.min = min;
+	lexa.max = max;
+
+	return lexa;
+}
+//===============================================================================================================================
+int main()
+{
+	std::vector<std::string> v = { "Zebra", "apple", "Banana", "cherry", "Apricot", "123start", "  space", "alpha" };
+
+	std::vector<int> result_stroke = vozvrat(v);
+
+	for (int i = 0; i < result_stroke.size(); i++)
+	{
+		std::cout << "Symbols in " << i << " stroke == [" << result_stroke[i] << "]" << '\n';
+	}
+
+	miniMaxi mix = min_max(v, result_stroke);
+
+	std::cout << "MIN == [" << mix.min << "]" << '\n' << "MAX == [" << mix.max << "]" << '\n';
+
+	MinMaxLexema result_lexema = min_max_lexema(v);
+
+	std::cout << "1 stroke for lexema == [" << result_lexema.min << "]" << '\n' << "Last stroke for lexema == [" << result_lexema.max << "]" << '\n';
+
+	return 0;
+}
+/*
+//===============================================================================================================================
+	V	15. Можно ли объявить константный аргумент функции, который передается не по ссылке (например, void f(const int);)? Что это значит?
+Зачем это нужно? Почему эта конструкция применяется редко? Испытайте ее; напишите несколько маленьких программ, чтобы увидеть, как она работает.
+//===============================================================================================================================
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+//===============================================================================================================================
+struct MinMaxLexema
+{
+std::string max;
+std::string min;
+};
+//===============================================================================================================================
+struct miniMaxi
+{
+int min;
+int max;
+};
+//===============================================================================================================================
+miniMaxi min_max(const std::vector<std::string> &v, const std::vector<int> &Gint)
+{
+int min = Gint[0];
+int max = Gint[0];
+
+for (int i = 1; i < Gint.size(); i++)
+{
+if (Gint[i] > max)	// Максимум
+max = Gint[i];
+
+if (Gint[i] < min)	// Минимум
+min = Gint[i];
+}
+
+miniMaxi mix;
+mix.min = min;
+mix.max = max;
+
+return mix;
+}
+//===============================================================================================================================
+std::vector<int> vozvrat(const std::vector<std::string> &v)
+{
+std::vector<int> Gint = { };
+
+int count = 0;
+int G = 0;
+
+// Подсчет количества символов до спецсимвола новой строки \n
+
+for (int i = 0; i < v.size(); i++)
+{
+for (int j = 0; j < v[i].size(); j++)
+{
+count++;
+}
+G = count;
+Gint.push_back(G);
+}
+
+return Gint;
+}
+//===============================================================================================================================
+MinMaxLexema min_max_lexema(const std::vector<std::string> &v)
+{
+std::string min = v[0];
+std::string max = v[0];
+
+for (int i = 0; i < v.size(); i ++)
+{
+if (v[i] > max)	// Максимум
+max = v[i];
+
+if (v[i] < min)	// Минимум
+min = v[i];
+}
+MinMaxLexema lexa;
+
+lexa.min = min;
+lexa.max = max;
+
+return lexa;
+}
+//===============================================================================================================================
+int main()
+{
+std::vector<std::string> v = { "Zebra", "apple", "Banana", "cherry", "Apricot", "123start", "  space", "alpha" };
+
+std::vector<int> result_stroke = vozvrat(v);
+
+for (int i = 0; i < result_stroke.size(); i++)
+{
+std::cout << "Symbols in " << i << " stroke == [" << result_stroke[i] << "]" << '\n';
+}
+
+miniMaxi mix = min_max(v, result_stroke);
+
+std::cout << "MIN == [" << mix.min << "]" << '\n' << "MAX == [" << mix.max << "]" << '\n';
+
+MinMaxLexema result_lexema = min_max_lexema(v);
+
+std::cout << "1 stroke for lexema == [" << result_lexema.min << "]" << '\n' << "Last stroke for lexema == [" << result_lexema.max << "]" << '\n';
+
+return 0;
+}
+//===============================================================================================================================
+	V	14. Напишите функцию, принимающую аргумент типа vector<string> и возвращающую объект типа vector<int>,
+содержащий количество символов в каждой строке. Кроме того, найдите самую короткую и самую длинную строки,
+а также первую и последнюю строки в соответствии с лексикографическим порядком
+Сколько отдельных функций вы использовали бы для решения этой задачи? Почему?
+
+Для каждой операции отдельные функции.
+//===============================================================================================================================
+//===============================================================================================================================
+struct MinMaxLexema
+{
+std::string max;
+std::string min;
+};
+//===============================================================================================================================
+struct miniMaxi
+{
+int min;
+int max;
+};
+//===============================================================================================================================
+miniMaxi min_max(const std::vector<std::string> &v, const std::vector<int> Gint)
+{
+int min = Gint[0];
+int max = Gint[0];
+
+for (int i = 1; i < Gint.size(); i++)
+{
+if (Gint[i] > max)	// Максимум
+max = Gint[i];
+
+if (Gint[i] < min)	// Минимум
+min = Gint[i];
+}
+
+miniMaxi mix;
+mix.min = min;
+mix.max = max;
+
+return mix;
+}
+//===============================================================================================================================
+std::vector<int> vozvrat(const std::vector<std::string> &v)
+{
+std::vector<int> Gint = { };
+
+int count = 0;
+int G = 0;
+
+// Подсчет количества символов до спецсимвола новой строки \n
+
+for (int i = 0; i < v.size(); i++)
+{
+for (int j = 0; j < v[i].size(); j++)
+{
+count++;
+}
+G = count;
+Gint.push_back(G);
+}
+
+return Gint;
+}
+//===============================================================================================================================
+MinMaxLexema min_max_lexema(const std::vector<std::string> &v)
+{
+std::string min = v[0];
+std::string max = v[0];
+
+for (int i = 0; i < v.size(); i ++)
+{
+if (v[i] > max)	// Максимум
+max = v[i];
+
+if (v[i] < min)	// Минимум
+min = v[i];
+}
+MinMaxLexema lexa;
+
+lexa.min = min;
+lexa.max = max;
+
+return lexa;
+}
+//===============================================================================================================================
+int main()
+{
+std::vector<std::string> v = { "Zebra", "apple", "Banana", "cherry", "Apricot", "123start", "  space", "alpha" };
+
+std::vector<int> result_stroke = vozvrat(v);
+
+for (int i = 0; i < result_stroke.size(); i++)
+{
+std::cout << "Symbols in " << i << " stroke == [" << result_stroke[i] << "]" << '\n';
+}
+
+miniMaxi mix = min_max(v, vozvrat(v));
+
+std::cout << "MIN == [" << mix.min << "]" << '\n' << "MAX == [" << mix.max << "]" << '\n';
+
+MinMaxLexema result_lexema = min_max_lexema(v);
+
+std::cout << "1 stroke for lexema == [" << result_lexema.min << "]" << '\n' << "Last stroke for lexema == [" << result_lexema.max << "]" << '\n';
+
+return 0;
+}
+//===============================================================================================================================
+	V	13. Усовершенствуйте функцию print_until_s() из раздела 8.5.2. Протестируйте ее.
+Какие наборы данных лучше всего подходят для тестирования? Укажите причины.
+Затем напишите функцию print_until_ss(), которая выводит на печать сроки, пока не обнаружит строку аргумента quit.
+//===============================================================================================================================
+//===============================================================================================================================
+void print_until_s(const std::vector<std::string> &v, const std::string &stop)
+{
+for(int i = 0; i < v.size(); ++i)
+{
+if (v[i] == stop)
+return;
+
+std::cout << v[i] << '\n';
+}
+}
+//===============================================================================================================================
+int main()
+{
+std::vector<std::string> v = { "GudNize", "Hello", "zalupa"};
+
+print_until_s(v, "zalpa");
+
+return 0;
+}
+//===============================================================================================================================
+	V	12. Напишите функцию, которая находит наименьший и наибольший элементы вектора, являющегося ее аргументом, а также вычисляющую их среднее и медиану.
+Результаты можно вернуть либо в виде структуры struct, либо с помощью механизма передачи аргументов по ссылке.
+Какой из этих двух способов следует предпочесть и почему?
+//===============================================================================================================================
+struct vivod
+{
+double max;
+double min;
+double avg;
+double mean;
+};
+
+//===============================================================================================================================
+void error(const std::string &s)
+{
+std::cerr << s << '\n';
+}
+//===============================================================================================================================
+vivod znaki(std::vector<double> &a)
+{
+double max = a[0];
+double min = a[0];
+double avg;
+double mediana;
+vivod vivo;
+
+double summa = 0.0;
+
+for (int i = 1; i < a.size(); i++)
+{
+if (a[i] > max)	// Максимум
+max = a[i];
+
+if (a[i] < min)	// Минимум
+min = a[i];
+}
+
+for (int i = 0; i < a.size(); i++)
+{
+summa += a[i];
+}
+avg = summa / a.size(); // Среднее
+
+// Медиана
+
+std::vector<double> copy = a;
+
+int k = copy.size()/2;
+std::sort(copy.begin(), copy.end());
+
+if (copy.size() % 2 != 0)
+mediana = copy[k];
+
+else
+{
+int m = k-1;
+mediana = (copy[k] + copy[m]) / 2;
+}
+
+vivo.max = max;
+vivo.min = min;
+vivo.avg = avg;
+vivo.mean = mediana;
+
+return vivo;
+}
+//===============================================================================================================================
+std::pair<double, double> maxv(std::vector<double> &a)
+{
+double max = a[0];
+double min = a[0];
+
+for (int i = 1; i < a.size(); i++)
+{
+if (a[i] > max)
+max = a[i];
+
+if (a[i] < min)
+min = a[i];
+}
+
+std::pair<double, double> minmax(max, min);
+return minmax;
+}
+//===============================================================================================================================
+double index(std::vector<double> &a, std::vector<double> &b)
+{
+double Otvet = 0.0;
+int m;
+
+if (a.size() > b.size())
+m = a.size();
+
+else if (b.size() > a.size())
+m = b.size();
+
+else
+m = a.size();
+
+for (int i = 0; i < m; i++)
+{
+if (!(b.size() <= a.size()))
+{
+error("weight !<= price");
+break;
+}
+Otvet += a[i] * b[i];
+}
+return Otvet;
+}
+//===============================================================================================================================
+int main()
+{
+std::vector<double> price;
+std::vector<double> weight;
+
+double priceIn = 0.0;
+double weightIn = 0.0;
+
+while (std::cin >> priceIn) // >> weightIn)
+{
+price.push_back(priceIn);
+//	weight.push_back(weightIn);
+}
+
+vivod vivo = znaki(price);
+//				auto result = maxv(price);
+//				std::cout << "Index == [" << index(price, weight) << "]" <<'\n';
+std::cout << "MAX == [" << vivo.max << "]" <<'\n' << "MIN == [" << vivo.min << "]" << '\n' << "AVG == [" << vivo.avg << "]" << '\n' << "MEAN == [" << vivo.mean << "]" << '\n';
+
+return 0;
+}
+//===============================================================================================================================
+ТОЛЬКО МИНМАКС:
+//===============================================================================================================================
+std::pair<double, double> maxv(std::vector<double> &a)
+{
+double max = a[0];
+double min = a[0];
+
+for (int i = 1; i < a.size(); i++)
+{
+if (a[i] > max)
+max = a[i];
+
+if (a[i] < min)
+min = a[i];
+}
+
+std::pair<double, double> minmax(max, min);
+return minmax;
+}
+//===============================================================================================================================
+auto result = maxv(price);
+std::cout << "MAX == [" << result.first << "]" <<'\n' << "MIN == [" << result.second << "]" << '\n';
+//===============================================================================================================================
+	V	11. Напишите функцию maxv(), возвращающую наибольший элемент вектора.
+//===============================================================================================================================
+double maxv(std::vector<double> &a)
+{
+double max = a[0];
+
+for (int i = 1; i < a.size(); i++)
+{
+if (a[i] > max)
+max = a[i];
+}
+
+return max;
+}
+//===============================================================================================================================
+	V	10. Напишите функцию, которая по двум объектам, price и weight, класса vector<double> вычисляет значение (“индекс”), равное сумме всех произведений price[i]*weight[i].
+Заметьте, что должно выполняться условие weight.size()<=price.size().
+//===============================================================================================================================
+#include <iostream>
+#include <vector>
+
+void error(const std::string &s)
+{
+std::cerr << s << '\n';
+}
+
+double index(std::vector<double> &a, std::vector<double> &b)
+{
+double Otvet = 0.0;
+int m;
+
+if (a.size() > b.size())
+m = a.size();
+
+else if (b.size() > a.size())
+m = b.size();
+
+else
+m = a.size();
+
+for (int i = 0; i < m; i++)
+{
+if (!(b.size() <= a.size()))
+{
+error("weight !<= price");
+break;
+}
+Otvet += a[i] * b[i];
+}
+return Otvet;
+}
+
+int main()
+{
+std::vector<double> price;
+std::vector<double> weight;
+
+double priceIn = 0.0;
+double weightIn = 0.0;
+
+while (std::cin >> priceIn >> weightIn)
+{
+price.push_back(priceIn);
+weight.push_back(weightIn);
+}
+
+std:: cout << "Index == [" << index(price, weight) << "]" <<'\n';
+
+
+return 0;
+}
+//===============================================================================================================================
+*/
