@@ -1,0 +1,365 @@
+/*
+#include <iostream>
+#include <vector>
+#include <cstring>
+
+//===============================================================================================================================
+void error(std::string s)
+{
+	throw std::runtime_error(s);
+}
+//===============================================================================================================================
+class Reading_Numbers
+{
+public:
+	char a, b, c, d;
+
+	Reading_Numbers(char ah, char bh, char ch, char dh)
+		:a(ah), b(bh), c(ch), d(dh)
+	{
+	}
+};
+//===============================================================================================================================
+class Reading_Numbers_Stream
+{
+public:
+	Reading_Numbers_Stream();
+	std::vector<char> Set_Numbers();
+	void Compare_Numbers(std::vector<char>& get_numbers);
+	bool numbersGo;
+	bool whileGo;
+
+private:
+
+	const std::string HELLO = "Hello, please enter numbers, from 1 to 4, Press # and Enter for end: ";
+};
+//===============================================================================================================================
+Reading_Numbers_Stream::Reading_Numbers_Stream()
+	:numbersGo(true), whileGo(true)
+{
+}
+//===============================================================================================================================
+std::vector<char> Reading_Numbers_Stream::Set_Numbers()
+{
+	std::vector<char>set_numbers;
+	char G;
+	int count = 0;
+
+	std::cout << HELLO;
+
+	while (whileGo)
+	{
+		std::cin >> G;
+
+		if (G == '#')
+			break;
+
+		set_numbers.push_back(G);
+	}
+	return set_numbers;
+}
+//===============================================================================================================================
+void Reading_Numbers_Stream::Compare_Numbers(std::vector<char>& get_numbers)
+{
+	int i;
+	for (i = 0; i < get_numbers.size(); i++)
+	{
+		if (get_numbers.size() == 4)
+		{
+			std::cout << get_numbers[0] - '0' << " - its thousand, " << get_numbers[1] - '0' << " - its hundred, " << get_numbers[2] - '0' << " - its tens and " << get_numbers[3] - '0' << " its units" << '\n' << '\n';
+			break;
+		}
+
+		if (get_numbers.size() == 3)
+		{
+			std::cout << get_numbers[0] - '0' << " - its hundred, " << get_numbers[1] - '0' << " - its tens and " << get_numbers[2] - '0' << " its units" << '\n' << '\n';
+			break;
+		}
+
+		if (get_numbers.size() == 2)
+		{
+			std::cout << get_numbers[0] - '0' << " - its tens and " << get_numbers[1] - '0' << " its units" << '\n' << '\n';
+			break;
+		}
+
+		if (get_numbers.size() == 1)
+		{
+			std::cout << get_numbers[0] - '0' << " - its units" << '\n' << '\n';
+			break;
+		}
+	}
+}
+//===============================================================================================================================
+int main() try
+{
+	Reading_Numbers_Stream rns;
+	while (rns.numbersGo)
+	{
+		std::vector<char> get_numbers = rns.Set_Numbers();
+		rns.Compare_Numbers(get_numbers);
+	}
+}
+//===============================================================================================================================
+catch (std::exception& e)
+{
+	std::cerr << "" << e.what() << '\n';
+}
+/*
+//===============================================================================================================================
+  V  1. Повторите упр. 12 из главы 5 (игра “Коровы и быки”), используя четыре буквы, а не четыре цифры.
+//===============================================================================================================================
+
+#include <iostream>
+#include <vector>
+#include <chrono>
+#include <random>
+
+//===============================================================================================================================
+void error(std::string s)
+{
+throw std::runtime_error(s);
+}
+//===============================================================================================================================
+class Bull_Cow
+{
+public:
+char c;
+
+Bull_Cow(char ch)
+:c(ch)
+{}
+};
+//===============================================================================================================================
+class Bull_Cow_Stream
+{
+public:
+Bull_Cow_Stream();
+std::vector<char> Get_Comp();
+std::vector<char> Get_User();
+std::vector<char> Compare(std::vector<char> &vecComp, std::vector<char> &vecUser);
+
+bool ContinueGame;
+
+private:
+int bull;
+int cow;
+bool allBulls;
+bool whileGame;
+bool bulls;
+bool cows;
+
+};
+//===============================================================================================================================
+Bull_Cow_Stream::Bull_Cow_Stream()
+:bull(0), cow(0), allBulls(true), whileGame(false), bulls(false), cows(false), ContinueGame(true)
+{}
+//===============================================================================================================================
+std::vector<char> Bull_Cow_Stream::Get_Comp()
+{
+std::vector<char>vecComp;
+int i;
+int min = 97;
+int max = 122;
+
+vecComp.clear();
+
+for (i = 0; i < 4; i++)
+{
+int G = unsigned(std::time(nullptr));
+G = min + ( G % ( max - min + 1 ) );
+vecComp.push_back((char)G);
+}
+
+return vecComp;
+}
+//===============================================================================================================================
+std::vector<char> Bull_Cow_Stream::Get_User()
+{
+std::vector<char>vecUser;
+char Ch;
+int i;
+
+vecUser.clear();
+
+std::cout << "Please enter symbols, through SPACE!" << '\n';
+
+for (i = 0; i<4; i++)
+{
+std::cin >> Ch;
+vecUser.push_back(Ch);
+}
+
+return vecUser;
+}
+//===============================================================================================================================
+std::vector<char> Bull_Cow_Stream::Compare(std::vector<char> &vecComp, std::vector<char> &vecUser)
+{
+int i, j;
+
+bull = 0;
+cow = 0;
+
+for (i = 0; i<4; i++)
+{
+
+bulls = false;
+cows = false;
+
+for (j = 0; j<4; j++)
+{
+if (vecComp[i] == vecUser[j] && i == j && cows == false)
+{
+bull++;
+bulls = true;
+}
+else if (vecComp[i] == vecUser[j] && i != j && bulls == false)
+{
+cow++;
+cows = true;
+}
+
+if (bull == 4)
+{
+allBulls = true;
+ContinueGame = false;
+break;
+}
+if (cow == 4)
+break;
+}
+}
+std::cout << bull << " BULL  ";
+std::cout << cow << " COW  " << '\n';
+
+return vecComp, vecUser;
+}
+//===============================================================================================================================
+int main() try
+{
+Bull_Cow_Stream game;
+
+std::vector<char> Get_vecComp = game.Get_Comp();
+
+while (game.ContinueGame)
+{
+std::vector<char> Get_vecUser = game.Get_User();
+
+game.Compare(Get_vecComp, Get_vecUser);
+}
+std::cout << "Good Nize Brother!" << '\n';
+}
+
+catch (std::exception &e)
+{
+std::cerr << "" << e.what() << '\n';
+}
+//===============================================================================================================================
+  V  2. Напишите программу, считывающую цифры и составляющую из них целые числа. Например, число 123 считывается как последовательность символов 1, 2 и 3.
+Программа должна вывести на экран сообщение: “123 — это 1 сотня, 2 десятки и 3 единицы”. Число должно быть выведено как значение типа int.
+Обработайте числа, состоящие из одной цифры, двух, трех и четырех цифр. Подсказка: для того чтобы получить число 5 из символа '5', вычтите из него символ '0' , иначе говоря, '5'–'0'==5.
+//===============================================================================================================================
+#include <iostream>
+#include <vector>
+#include <cstring>
+//===============================================================================================================================
+void error(std::string s)
+{
+throw std::runtime_error(s);
+}
+//===============================================================================================================================
+class Reading_Numbers
+{
+public:
+char a, b, c, d;
+
+Володя, [29.12.2025 16:48]
+Reading_Numbers(char ah, char bh, char ch, char dh)
+:a(ah), b(bh), c(ch), d(dh)
+{}
+};
+//===============================================================================================================================
+class Reading_Numbers_Stream
+{
+public:
+Reading_Numbers_Stream();
+std::vector<char> Set_Numbers();
+void Compare_Numbers(std::vector<char> &get_numbers);
+bool numbersGo;
+bool whileGo;
+
+private:
+
+const std::string HELLO = "Hello, please enter numbers, from 1 to 4, Press # and Enter for end: ";
+};
+//===============================================================================================================================
+Reading_Numbers_Stream::Reading_Numbers_Stream()
+:numbersGo(true), whileGo(true)
+{}
+//===============================================================================================================================
+std::vector<char> Reading_Numbers_Stream::Set_Numbers()
+{
+std::vector<char>set_numbers;
+char G;
+int count = 0;
+
+std::cout << HELLO;
+
+while(whileGo)
+{
+std::cin >> G;
+
+if (G == '#')
+break;
+
+set_numbers.push_back(G);
+}
+return set_numbers;
+}
+//===============================================================================================================================
+void Reading_Numbers_Stream::Compare_Numbers(std::vector<char> &get_numbers)
+{
+int i;
+for (i = 0; i<get_numbers.size(); i++)
+{
+if (get_numbers.size() == 4)
+{
+std::cout << get_numbers[0] - '0' << " - its thousand, " << get_numbers[1] - '0' << " - its hundred, " << get_numbers[2] - '0' << " - its tens and " << get_numbers[3] - '0' << " its units" << '\n' << '\n';
+break;
+}
+
+if (get_numbers.size() == 3)
+{
+std::cout << get_numbers[0] - '0' << " - its hundred, " << get_numbers[1] - '0' << " - its tens and " << get_numbers[2] - '0' << " its units" << '\n' << '\n';
+break;
+}
+
+if (get_numbers.size() == 2)
+{
+std::cout << get_numbers[0] - '0' << " - its tens and " << get_numbers[1] - '0' << " its units" << '\n' << '\n';
+break;
+}
+
+if (get_numbers.size() == 1)
+{
+std::cout << get_numbers[0] - '0' << " - its units" << '\n' << '\n';
+break;
+}
+}
+}
+//===============================================================================================================================
+int main() try
+{
+Reading_Numbers_Stream rns;
+while(rns.numbersGo)
+{
+std::vector<char> get_numbers = rns.Set_Numbers();
+rns.Compare_Numbers(get_numbers);
+}
+}
+//===============================================================================================================================
+catch (std::exception &e)
+{
+std::cerr << "" << e.what() << '\n';
+}
+//===============================================================================================================================
+*/
