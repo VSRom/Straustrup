@@ -1,0 +1,1078 @@
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <cmath>
+#include <set>
+#include <map>
+#include <string>
+#include <math.h>
+
+int main()
+{
+	std::vector<std::string> names;
+	std::vector<int> scores;
+
+	std::vector<int> vecount;
+	int findscore;
+	std::string name;
+	int score, count = 0;
+
+	bool lastfor = false;
+
+	int i, j = 0, n, k, m, l;
+
+	std::cout << "Please, enter: NAME 'SPACE' SCORES: ";
+
+	while (std::cin >> name, std::cin >> score)
+	{
+		if (name == "Noname" && score == 0)
+			break;
+
+		names.push_back(name);
+		scores.push_back(score);
+	}
+
+	std::cout << '\n';
+
+	for (j = 0; j < names.size(); j++)
+	{
+		for (n = 0; n < names.size(); n++)
+		{
+			if (names[j] == names[n])
+				count++;
+		}
+		vecount.push_back(count);
+		count = 0;
+
+		if (vecount[j] > 1)
+		{
+			std::cout << "Name: " << names[j] << '\t' << "Entered two or more times!" << '\n' << "The duplicate value will not be saved in the system." << '\n' << '\n';
+
+			//		names.erase(names.begin() + j);
+			//		scores.erase(scores.begin() + j);
+		}
+	}
+
+	std::cout << '\n';
+
+label:
+	std::cout << "Please, Enter score to find!" << '\n' << '\n';
+	std::cin >> findscore;
+
+	for (k = 0; k < scores.size(); k++)
+	{
+		if (findscore == scores[k])
+		{
+			std::cout << "Names: " << names[k] << '\n';
+			lastfor = true;
+		}
+	}
+
+	for (l = 0; l < scores.size(); l++)
+	{
+		if (findscore != scores[l] && lastfor == false)
+		{
+			std::cout << "Scores not found! " << '\n' << '\n';
+			break;
+		}
+	}
+	lastfor = false;
+	goto label;
+
+	return 0;
+}
+/*
+//========================================================================================================================================================================================================
+	V	20. Измените программу из упр. 18 так, чтобы при вводе целого числа она выводила все имена студентов, получивших заданное количество баллов или сообщение "score not found".
+//========================================================================================================================================================================================================
+std::vector<std::string> names;
+std::vector<int> scores;
+
+std::vector<int> vecount;
+int findscore;
+std::string name;
+int score, count = 0;
+
+bool lastfor = false;
+
+int i, j = 0, n, k, m, l;
+
+std::cout << "Please, enter: NAME 'SPACE' SCORES: ";
+
+while (std::cin >> name, std::cin >> score)
+{
+if (name == "Noname" && score == 0)
+break;
+
+names.push_back(name);
+scores.push_back(score);
+}
+
+std::cout << '\n';
+
+for (j = 0; j<names.size(); j++)
+{
+for (n = 0; n<names.size(); n++)
+{
+if (names[j] == names[n])
+count++;
+}
+vecount.push_back(count);
+count = 0;
+
+if (vecount[j] > 1)
+{
+std::cout << "Name: "<< names[j] << '\t' << "Entered two or more times!" << '\n' << "The duplicate value will not be saved in the system."<< '\n' << '\n';
+
+//		names.erase(names.begin() + j);
+//		scores.erase(scores.begin() + j);
+}
+}
+
+std::cout << '\n';
+
+label:
+std::cout << "Please, Enter score to find!" << '\n' << '\n';
+std::cin >> findscore;
+
+for (k = 0; k<scores.size(); k++)
+{
+if (findscore == scores[k])
+{
+std::cout << "Names: " << names[k] << '\n';
+lastfor = true;
+}
+}
+
+for (l = 0; l<scores.size(); l++)
+{
+if (findscore != scores[l] && lastfor == false)
+{
+std::cout << "Scores not found! " << '\n' << '\n';
+break;
+}
+}
+lastfor = false;
+goto label;
+//========================================================================================================================================================================================================
+V	19. Измените программу из упр. 18 так, чтобы при вводе имени она выводила соответствующее количество баллов или сообщение "name not found".
+//========================================================================================================================================================================================================
+std::vector<std::string> names;
+std::vector<int> scores;
+
+std::vector<int> vecount;
+std::string findname;
+std::string name;
+int score, count = 0;
+
+bool lastfor = false;
+
+int i, j = 0, n, k, m, l;
+
+std::cout << "Please, enter: NAME 'SPACE' SCORES: ";
+
+while (std::cin >> name, std::cin >> score)
+{
+if (name == "Noname" && score == 0)
+break;
+
+names.push_back(name);
+scores.push_back(score);
+}
+
+std::cout << '\n';
+
+for (j = 0; j<names.size(); j++)
+{
+for (n = 0; n<names.size(); n++)
+{
+if (names[j] == names[n])
+count++;
+}
+vecount.push_back(count);
+count = 0;
+
+if (vecount[j] > 1)
+{
+std::cout << "Name: "<< names[j] << '\t' << "Entered two or more times!" << '\n' << "The duplicate value will not be saved in the system."<< '\n' << '\n';
+
+//		names.erase(names.begin() + j);
+//		scores.erase(scores.begin() + j);
+}
+}
+
+std::cout << '\n';
+
+label:
+std::cout << "Please, Enter name to find!" << '\n' << '\n';
+std::cin >> findname;
+
+for (k = 0; k<names.size(); k++)
+{
+if (findname == names[k])
+{
+std::cout << "Scores: " << scores[k] << '\n' << '\n';
+lastfor = true;
+break;
+}
+}
+
+for (l = 0; l<names.size(); l++)
+{
+if (findname != names[l] && lastfor == false)
+{
+std::cout << "Name not found! " << '\n' << '\n';
+break;
+}
+}
+lastfor = false;
+goto label;
+//========================================================================================================================================================================================================
+V	18. Напишите программу, в которую сначала вводится набор пар, состоящих из имени и значения, например Joe 17 и Barbara 22.
+Для каждой пары занесите имя в вектор names, а число — в вектор scores (в соответствующие позиции, так что если names[7]=="Joe", то scores[7]==17).
+Прекратите ввод, введя строку NoName 0. Убедитесь, что каждое имя уникально, и выведите сообщение об ошибке, если имя введено дважды.
+Выведите на печать все пары (имя, баллы) по одной в строке.
+//========================================================================================================================================================================================================
+std::vector<std::string> names;
+std::vector<int> scores;
+
+std::vector<int> vecount;
+
+std::string name;
+int score, count;
+
+int i, j = 0, n;
+
+std::cout << "Please, enter: NAME 'SPACE' SCORES: ";
+
+while (std::cin >> name, std::cin >> score)
+{
+if (name == "Noname" && score == 0)
+break;
+
+names.push_back(name);
+scores.push_back(score);
+}
+std::cout << '\n';
+for (j = 0; j<names.size(); j++)
+{
+for (n = 0; n<names.size(); n++)
+{
+if (names[j] == names[n])
+{
+std::cout << "Name: "<< names[j] << '\t' << "Entered two or more times!"<< '\n' << '\n';
+names.erase(names.begin() + j);
+scores.erase(scores.begin() + j);
+}
+break;
+}
+
+}
+
+for (i = 0; i<names.size(); i++)
+{
+std::cout << names[i] << '\t' << scores[i] << '\n';
+}
+//========================================================================================================================================================================================================
+	V	17. Напишите программу для решения квадратичных уравнений.
+Квадратичное уравнение имеет вид 2.
+Если вы не знаете формул для решения этого уравнения, проведите дополнительные исследования.
+Напоминаем, что программисты часто проводят такие исследования, прежде чем приступают к решению задачи.
+Для ввода чисел a, b и с используйте переменные типа double.
+Поскольку квадратичное уравнение имеет два решения, выведите оба значения, x1 и x2.
+//========================================================================================================================================================================================================
+double a,b,c;
+double x = 0.0;
+double D = 0.0;
+double Xone = 0.0, Xtwo = 0.0;
+
+std::cout << "Please, enter a, b, c: "; std::cin >> a >> b >> c;
+
+if (c == 0)
+{
+Xone = 0.0;
+Xtwo = -b / a;
+std::cout << "X1 == " << Xone <<'\n' << "X2 == " << Xtwo << '\n' << '\n';
+return 0;
+}
+
+if (b == 0)
+{
+Xone = sqrt(-c / a);
+abs(Xone);
+
+Xtwo = - sqrt(-c / a);
+abs(Xtwo);
+
+std::cout << "X1 == " << Xone <<'\n' << "X2 == " << Xtwo << '\n' << '\n';
+return 0;
+}
+
+D = (b * b) - (4 * a * c);
+
+if ( D == 0 )
+{
+// Решение X1
+Xone = -b / 2 * a;
+std::cout <<"X1 == " << Xone << '\n' << "X2 == X1" << '\n';
+return 0;
+}
+else if (D > 0)
+{
+Xone = ( -b - sqrt(D) ) / ( 2 * a );
+Xtwo = ( -b + sqrt(D) ) / ( 2 * a );
+
+std::cout << "X1 == " << Xone << '\n' << "X2 == " << Xtwo << '\n' << '\n';
+return 0;
+}
+else
+{
+std::cout << "!!!NO!!!" << '\n';
+
+return 0;
+}
+//========================================================================================================================================================================================================
+	V	16. Напишите программу, определяющую наименьшее и наибольшее числа, а также моду последовательности строк.
+//========================================================================================================================================================================================================
+int i, j, n, k;
+int a, b;
+int count = 0;
+std::string A;
+std::string convert_number;
+
+std::vector<int> Vec;
+std::vector<int> VecCount;
+
+std::vector <std::string> lines = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
+std::vector <std::string> converted;
+
+start:
+
+std::cout << "Go to ENTER!!!! : ";
+std::cout << '\n' << '\n';
+
+while (std::cin >> A)
+converted.push_back(A);
+
+// Сравниваем введеные строки с заранее готовыми строками и записываем в новый вектор INT значения из стркоового формата в цифровой переведенные
+for (i = 0; i<lines.size(); i++)
+{
+for (j = 0; j<converted.size(); j++)
+{
+if (lines[i] == converted[j])
+{
+if (lines[i] == "zero")
+{
+a = 0;
+Vec.push_back(a);
+}
+
+if (lines[i] == "one")
+{
+a = 1;
+Vec.push_back(a);
+}
+
+if (lines[i] == "two")
+{
+a = 2;
+Vec.push_back(a);
+}
+
+if (lines[i] == "three")
+{
+a = 3;
+Vec.push_back(a);
+}
+
+if (lines[i] == "four")
+{
+a = 4;
+Vec.push_back(a);
+}
+
+if (lines[i] == "five")
+{
+a = 5;
+Vec.push_back(a);
+}
+
+if (lines[i] == "six")
+{
+a = 6;
+Vec.push_back(a);
+}
+
+if (lines[i] == "seven")
+{
+a = 7;
+Vec.push_back(a);
+}
+
+if (lines[i] == "eight")
+{
+a = 8;
+Vec.push_back(a);
+}
+
+if (lines[i] == "nine")
+{
+a = 9;
+Vec.push_back(a);
+}
+}
+}
+}
+
+
+//Перебираем все числа и подсчитываем сколько раз каждый из них повторяется
+for (n = 0; n<Vec.size(); n++)
+{
+for (k = 0; k<Vec.size(); k++)
+{
+if(Vec[n]==Vec[k])
+count++;
+}
+VecCount.push_back(count);
+count = 0;
+}
+
+
+// Находим максимальный элемент в счетчике (2 вектора содержат на одинаковых позицях числа и кол-во итераций).
+auto it_max = max_element(VecCount.begin(), VecCount.end());
+
+// Считаем от 0 до it_max количество итераций.
+auto index = std::distance(VecCount.begin(), it_max);
+
+// Выводим количество повторений числа, и по ранее найденому индексу обращаемся к элементу чисел, к числу имеющему больше всего повторений.
+std::cout << "Repeat: " << *max_element(VecCount.begin(), VecCount.end()) << " == Number: " << Vec[index] << '\n' << '\n';
+std::cout << "Max value: " << *max_element(Vec.begin(), Vec.end()) << '\n' << "Min value: " << *min_element(Vec.begin(), Vec.end());
+//========================================================================================================================================================================================================
+	V	15. В задании вам было предложено написать программу, которая по заданному набору чисел определяла бы наибольшее и наименьшее числа.
+Число, которое повторяется в последовательности наибольшее количество раз, называется модой. Напишите программу, определяющую моду набора положительных чисел.
+//========================================================================================================================================================================================================
+int i, j;
+
+int count = 0;
+int A;
+std::vector<int> Vec;
+
+std::vector<int> VecCount;
+
+// Предлагаем ввод положительных чисел
+std::cout << "Enter positive numbers: ";
+std::cout << '\n' << '\n';
+
+// Заполнение числами массив
+while (std::cin >> A)
+Vec.push_back(A);
+
+//Перебираем все числа и подсчитываем сколько раз каждый из них повторяется
+for (i = 0; i<Vec.size(); i++)
+{
+for (j = 0; j<Vec.size(); j++)
+{
+if(Vec[i]==Vec[j])
+count++;
+}
+VecCount.push_back(count);
+count = 0;
+}
+
+// Находим максимальный элемент в счетчике (2 вектора содержат на одинаковых позицях числа и кол-во итераций).
+auto it_max = max_element(VecCount.begin(), VecCount.end());
+
+// Считаем от 0 до it_max количество итераций.
+auto index = std::distance(VecCount.begin(), it_max);
+
+// Выводим количество повторений числа, и по ранее найденому индексу обращаемся к элементу чисел к числу имеющему больше всего повторений.
+std::cout << "Repeat: " << *max_element(VecCount.begin(), VecCount.end()) << " == Number: " << Vec[index];
+
+//========================================================================================================================================================================================================
+V	14. Напишите программу, принимающую на вход число n(7) и находящую первые n(7) простых чисел.
+//========================================================================================================================================================================================================
+int i, l, k, f;
+int n, m;
+std::cout << "Enter number n: "; std::cin >> n;
+std::cout << '\n' << '\n';
+
+std::vector<int> vec;
+
+int t;
+
+bool ServiceIF = false;
+bool ServiceFOR = false;
+
+for (i = 0, m = 1; i < n; i++, m++)
+{
+vec.push_back(m);
+}
+
+vec.erase(vec.begin());
+
+for (l = 0, t = 1, i = 0, k = 0; l < vec.size(); i++, t++)
+{
+ServiceIF = false;
+
+if (i > vec.size() || t > vec.size())
+ServiceFOR = true;
+
+for (; k < vec.size(); k++)
+{
+if (vec[k] % vec[i] == 0 && vec[i] != vec[k])
+{
+vec.erase(vec.begin() + k);
+ServiceIF = true;
+}
+if (ServiceFOR == true)
+{
+ServiceIF = true;
+break;
+}
+}
+
+if (ServiceIF == true)
+{
+l++;
+k = 0;
+}
+if (ServiceFOR == true)
+break;
+
+}
+for (f = 0; f < vec.size(); f++)
+{
+std::cout << "[" << f << "] == " << vec[f] << '\n';
+}
+//========================================================================================================================================================================================================
+V	13. Измените программу, описанную в предыдущем упражнении, так, чтобы в нее вводилось число max, а затем найдите все простые числа от 1 до max.
+//========================================================================================================================================================================================================
+int i, k, m, l;
+int max;
+std::cout << "Enter number MAX: "; std::cin >> max;
+std::cout << '\n' << '\n';
+std::vector<int> vec;
+
+bool ForIf = false, AfterIF = false;
+
+int t = 2.0;
+int g;
+int q = 0;
+
+int f = sqrt(max);
+
+// ЗАПОЛНЯЕМ МАССИВ!
+
+for (i = 0, m = 1; i < max; i++, m++)
+{
+vec.push_back(m);
+std::cout << "[" << i << "] == " << vec[i] << '\n';
+}
+
+// Удаляем ненужные элементы
+
+vec.erase(vec.begin());
+
+for (k = 0; k < vec.size(); k++)
+{
+// Проверяем кратен ли текущий итератор следующему числу Вектора и не равен ли он ему же и последняя проверка если было выполнено условие конца метода
+if (vec[k] % t == 0 && vec[k] != t && AfterIF == false)
+{
+ForIf = true;
+
+for (g = k; g < vec.size(); g++)
+{
+if (vec[k] % t == 0)
+{
+vec.erase(vec.begin() + k);
+}
+k++;
+}
+
+t++;
+
+if (ForIf == true)
+{
+k = 0;
+ForIf = false;
+
+}
+}
+
+// Возвращение итеротора на круги своя если Вектор был закончен без захода в удаление чисел вектора
+
+if (k + 1 == vec.size() && AfterIF == false)
+{
+k = 0;
+t++;
+continue;
+}
+// Условие окончания метода
+if (t > f)
+AfterIF = true;
+
+}
+
+std::cout << "!ERATOSFEN!!!ERATOSFEN!!!ERATOSFEN!!!ERATOSFEN!!!ERATOSFEN!!!ERATOSFEN!!!ERATOSFEN!!!ERATOSFEN!!!ERATOSFEN!!!ERATOSFEN!" << '\n';
+
+for (l = 0; l < vec.size(); l++)
+{
+std::cout << "[" << l << "] == " << vec[l] << '\n';
+}
+//========================================================================================================================================================================================================
+V	12. Напишите программу, находящую все простые числа от 1 до 100.
+Для решения этой задачи существует классический метод “Решето Эратосфена”.
+Если этот метод вам неизвестен, поищите его описание в веб.
+Напишите программу на основе этого метода.
+//========================================================================================================================================================================================================
+int i, k, m, l;
+int max;
+//std::cout << "Enter number MAX: "; std::cin >> max;
+std::cout << '\n' << '\n';
+std::vector<int> vec;
+
+bool ForIf = false;
+
+auto new_end = 0;
+
+for(i = 0, m = 1; i<100; i++, m++)
+{
+vec.push_back(m);
+std::cout << "[" << i << "] == "<< vec[i] << '\n';
+}
+
+for(k = 0; k<vec.size(); k++)
+{
+if (vec[k] % 2 == 0 && vec[k] != 2)
+{
+ForIf = true;
+vec.erase(vec.begin() + k);
+}
+
+if (ForIf == true)
+k--;
+ForIf = false;
+
+if (vec[k] % 3 == 0&& vec[k] != 3)
+{
+ForIf = true;
+vec.erase(vec.begin() + k);
+}
+
+if (ForIf == true)
+k--;
+ForIf = false;
+
+if (vec[k] % 5 == 0 && vec[k] != 5)
+{
+ForIf = true;
+vec.erase(vec.begin() + k);
+}
+
+if (ForIf == true)
+k--;
+ForIf = false;
+
+if (vec[k] % 7 == 0 && vec[k] != 7)
+{
+ForIf = true;
+vec.erase(vec.begin() + k);
+}
+
+if (ForIf == true)
+k--;
+ForIf = false;
+
+}
+
+std::cout << "!ERATOSFEN!!!ERATOSFEN!!!ERATOSFEN!!!ERATOSFEN!!!ERATOSFEN!!!ERATOSFEN!!!ERATOSFEN!!!ERATOSFEN!!!ERATOSFEN!!!ERATOSFEN!"<<'\n';
+
+for (l = 0; l<vec.size(); l++)
+{
+std::cout << "[" << l << "] == " << vec[l] << '\n';
+}
+//========================================================================================================================================================================================================
+V	11. Измените программу из предыдущего упражнения так, чтобы в нее вводилось число max, а затем найдите все простые числа от 1 до max.
+//========================================================================================================================================================================================================
+srand(time(0));
+
+int i, k, m;
+int G = 2;
+int max;
+std::cout << "Enter number MAX: "; std::cin >> max;
+std::cout << '\n' << '\n';
+std::vector<int> vec;
+std::vector<int> VecSimpleNumber;
+
+for(i = 0; i<max; i++)
+{
+vec.push_back(G);
+G = (2 + rand() % max);
+}
+
+std::cout << '\n';
+
+sort(vec.begin(), vec.end());
+
+for (k = 0; k<max; k++)
+{
+std::cout << "[" << k << "] == "<< vec[k] << '\n';
+
+if (k % 2 == 0)
+{
+VecSimpleNumber.push_back(k);
+}
+}
+
+std::cout << "CONVERTING TO! CONVERTING TO! CONVERTING TO! CONVERTING TO! CONVERTING TO! CONVERTING TO! CONVERTING TO!"<<'\n';
+
+for (m = 0; m<VecSimpleNumber.size(); m++)
+{
+std::cout << "[" << m << "] = " << VecSimpleNumber[m] << '\n';
+}
+//========================================================================================================================================================================================================
+V	10. Напишите программу, находящую все простые числа от 1 до 100. Для этого можно написать функцию, проверяющую,
+является ли число простым (т.е. делится ли оно на простое число, не превосходящее данное),
+используя вектор простых чисел, записанный в возрастающем порядке (например, если вектор называется primes,
+то primes[0]==2, primes[1]==3, primes[2]==5 и т.д.). Напишите цикл перебора чисел от 1 до 100,
+проверьте каждое из них и сохраните найденные простые числа в векторе. Напишите другой цикл,
+в котором все найденные простые числа выводятся на экран. Сравните полученные результаты с вектором primes.
+Первым простым числом считается число 2.
+//========================================================================================================================================================================================================
+srand(time(0));
+
+int i, k, m;
+int G = 2;
+std::cout << '\n';
+std::vector<int> vec;
+std::vector<int> VecSimpleNumber;
+
+
+
+for(i = 0; i<100; i++)
+{
+vec.push_back(G);
+G = (2 + rand() % 99);
+}
+
+std::cout << '\n';
+
+sort(vec.begin(), vec.end());
+
+for (k = 0; k<100; k++)
+{
+std::cout << "[" << k << "] == "<< vec[k] << '\n';
+
+if (k % 2 == 0)
+{
+VecSimpleNumber.push_back(k);
+}
+
+}
+
+std::cout << "CONVERTING TO! CONVERTING TO! CONVERTING TO! CONVERTING TO! CONVERTING TO! CONVERTING TO! CONVERTING TO!"<<'\n';
+
+for (m = 0; m<VecSimpleNumber.size(); m++)
+{
+std::cout << "[" << m << "] = " << VecSimpleNumber[m] << '\n';
+}
+//========================================================================================================================================================================================================
+V	9. Напишите программу для игры “Камень, бумага, ножницы”. Если вы не знаете правил этой игры, попробуйте выяснить их у друзей или с помощью поисковой машины Google.
+Такие исследования — обычное занятие программистов. Для решения поставленной задачи используйте инструкцию switch. Кроме того,
+машина должна давать случайные ответы (т.е. выбирать камень, бумагу или ножницы на следующем ходу случайным образом). Настоящий случайный датчик написать довольно тяжело,
+поэтому заранее заполните вектор последовательностью новых значений. Если встроить этот вектор в программу, то она всегда будет играть одну и ту же игру,
+поэтому целесообразно позволить пользователю самому вводить некоторые значения. Попробуйте помешать пользователю легко угадывать следующий ход машины.
+//========================================================================================================================================================================================================
+srand(time(0));
+
+std::vector<double> randomNum = {0.0, 0.0, 0.0};
+
+int i, k, j;
+double sum = 0.0;
+char choice[] = {'K', 'N', 'P'};
+char select;
+
+std::cout << "Please, enter the magic numbers ~ 3 and press 'ENTER': == ";
+
+std::cin >> randomNum[0]; std::cin >> randomNum[1]; std::cin >> randomNum[2];
+
+sum = randomNum[0] * randomNum[1] * randomNum[2];
+
+
+
+for (i = 0; i<1000; i++)
+{
+
+for (j = 0; j<1000; j++)
+{
+
+k = (rand() % 3);
+break;
+}
+std::cout << "Please, Enter. Stone - K, Snap - N and Paper - P "; std::cin >> select;
+
+switch(choice[k])
+{
+
+case 'K': std::cout << "Stone!" << '\n'<< '\n';
+
+if (select == 'P')
+{
+std::cout << "CONGRATULATION!!!" << '\n'<< '\n';
+break;
+}
+else if (select == 'K')
+{
+std::cout << "Draw!" << '\n'<< '\n';
+break;
+}
+else if (select == 'N')
+{
+std::cout << "You LOSE!" << '\n'<< '\n';
+break;
+}
+else
+{
+std::cout << "WRONG!";
+break;
+}
+case 'N': std::cout << "Snap!" << '\n'<< '\n';
+
+if (select == 'P')
+{
+std::cout << "You LOSE!" << '\n'<< '\n';
+break;
+}
+
+else if (select == 'K')
+{
+std::cout << "CONGRATULATION!!!!" << '\n'<< '\n';
+break;
+}
+
+else if (select == 'N')
+{
+std::cout << "Draw!" << '\n'<< '\n';
+break;
+}
+else
+{
+std::cout << "WRONG!";
+break;
+}
+case 'P': std::cout << "Paper!" << '\n'<< '\n';
+
+if (select == 'P')
+{
+std::cout << "Draw" << '\n'<< '\n';
+break;
+}
+
+else if (select == 'K')
+{
+std::cout << "You LOSE!" << '\n'<< '\n';
+break;
+}
+
+else if (select == 'N')
+{
+std::cout << "CONGRATULATION!!!" << '\n'<< '\n';
+break;
+}
+else
+{
+std::cout << "WRONG!";
+break;
+}
+}
+}
+//========================================================================================================================================================================================================
+V	8. Легенда гласит, что некий царь захотел поблагодарить изобретателя шахмат и предложил ему попросить любую награду.
+Изобретатель попросил положить на первую клетку одно зерно риса, на вторую — 2, на третью — 4 и т.д., удваивая количество зерен на каждой из 64 клеток.
+На первый взгляд это желание выглядит вполне скромным, но на самом деле в царстве не было такого количества риса! Напишите программу, вычисляющую,
+сколько клеток надо заполнить, чтобы изобретатель получил хотя бы 1000 зерен риса, хотя бы 1 000 000 зерен риса и хотя бы 1 000 000 000 зерен риса.
+Вам, разумеется, понадобится цикл и, вероятно, переменная типа int, для того, чтобы отслеживать номера клеток, количество зерен на текущей клетке и количество зерен на всех предыдущих клетках.
+Мы предлагаем на каждой итерации цикла выводить на экран значения всех этих переменных, чтобы видеть промежуточные результаты.
+//========================================================================================================================================================================================================
+int i, sum = 2, k;
+
+std::vector <int> chisla;
+
+for(i = 1, k = 0; i<10000; i++, k++)
+{
+
+chisla.push_back(sum);
+sum = 2 * chisla[k];
+std::cout << "Total: " << chisla[k] << '\n'<<'\n';
+
+if (chisla[k]>1000 && chisla[k] < 1100)
+{
+std::cout << "For 1000 Corn, need cell: " << i << '\n';
+system("pause");
+}
+
+if (chisla[k]>1000000 && chisla[k] < 1100000)
+{
+std::cout << "For 1000000 Corn, need cell: " << i << '\n';
+system("pause");
+}
+
+if (chisla[k]>1000000000 && chisla[k] < 7000000000)
+{
+std::cout << "For 1000000000 Corn, need cell: " << i << '\n';
+system("pause");
+goto end;
+}
+}
+end:
+//========================================================================================================================================================================================================
+V	7. Модифицируйте мини-калькулятор, описанный в упр. 5, так, чтобы он принимал на вход цифры, записанные в числовом или строковом формате.
+//========================================================================================================================================================================================================
+int a, b;
+
+char oper = 0;
+
+std::string convert_number;
+
+std::vector <std::string> lines = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
+std::vector <std::string> converted = {" ", " "};
+
+start:
+
+std::cout << "Enter A and B and OPERATOR via press button 'SPACE' : "; std::cin >> converted[0] >> converted[1] >> oper;
+
+if (converted[0] == lines[0] || converted[0] == "0")
+a = 0;
+if (converted[0] == lines[1] || converted[0] == "1")
+a = 1;
+if (converted[0] == lines[2] || converted[0] == "2")
+a = 2;
+if (converted[0] == lines[3] || converted[0] == "3")
+a = 3;
+if (converted[0] == lines[4] || converted[0] == "4")
+a = 4;
+if (converted[0] == lines[5] || converted[0] == "5")
+a = 5;
+if (converted[0] == lines[6] || converted[0] == "6")
+a = 6;
+if (converted[0] == lines[7] || converted[0] == "7")
+a = 7;
+if (converted[0] == lines[8] || converted[0] == "8")
+a = 8;
+if (converted[0] == lines[9] || converted[0] == "9")
+a = 9;
+
+if (converted[1] == lines[0] || converted[1] == "0")
+b = 0;
+if (converted[1] == lines[1] || converted[1] == "1")
+b = 1;
+if (converted[1] == lines[2] || converted[1] == "2")
+b = 2;
+if (converted[1] == lines[3] || converted[1] == "3")
+b = 3;
+if (converted[1] == lines[4] || converted[1] == "4")
+b = 4;
+if (converted[1] == lines[5] || converted[1] == "5")
+b = 5;
+if (converted[1] == lines[6] || converted[1] == "6")
+b = 6;
+if (converted[1] == lines[7] || converted[1] == "7")
+b = 7;
+if (converted[1] == lines[8] || converted[1] == "8")
+b = 8;
+if (converted[1] == lines[9] || converted[1] == "9")
+b = 9;
+
+switch(oper)
+{
+case ('+'):	std::cout << "Answer: "<< (double)a + (double)b << '\n'; goto start;
+
+case ('-'):	std::cout << "Answer: "<< (double)a - (double)b << '\n'; goto start;
+
+case ('*'):	std::cout << "Answer: "<< (double)a * (double)b << '\n'; goto start;
+
+case ('/'):	std::cout << "Answer: "<< (double)a / (double)b << '\n'; goto start;
+
+default:
+goto start;
+}
+//========================================================================================================================================================================================================
+V	6. Создайте вектор, хранящий десять строковых значений "zero", "one", ..., "nine". Введите  их  в  программу,  преобразующую  цифру  в  соответствующее строковое представление;
+например, при вводе цифры  7 на экран должна быть выведена строка seven. С помощью этой же программы, используя тот же самый цикл ввода, преобразуйте строковое представление цифры в числовое;
+например, при вводе строки seven на экран должна быть выведена цифра.
+//========================================================================================================================================================================================================
+int convert_number;
+std::vector <std::string> lines = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
+
+std::cout << "Please enter number for convert: "; std::cin >> convert_number;
+
+switch(convert_number)
+{
+case(0): std::cout << "Converted: " << lines[0] << '\n'; break;
+case(1): std::cout << "Converted: " << lines[1] << '\n'; break;
+case(2): std::cout << "Converted: " << lines[2] << '\n'; break;
+case(3): std::cout << "Converted: " << lines[3] << '\n'; break;
+case(4): std::cout << "Converted: " << lines[4] << '\n'; break;
+case(5): std::cout << "Converted: " << lines[5] << '\n'; break;
+case(6): std::cout << "Converted: " << lines[6] << '\n'; break;
+case(7): std::cout << "Converted: " << lines[7] << '\n'; break;
+case(8): std::cout << "Converted: " << lines[8] << '\n'; break;
+case(9): std::cout << "Converted: " << lines[9] << '\n'; break;
+}
+//========================================================================================================================================================================================================
+V	5. Напишите программу, выполняющие самые простые функции калькулятора. Ваш калькулятор должен выполнять четыре основных арифметических операции — сложение, вычитание, умножение и деление.
+Программа должна предлагать пользователю ввести три аргумента: два значения типа double и символ операции. Если входные аргументы равны 35.6, 24.1 и '+',
+то программа должна вывести на экран строку "Сумма 35.6 и 24.1 равна 59.7". В главе 6 мы опишем более сложный калькулятор.
+//========================================================================================================================================================================================================
+double a, b;
+char oper = 0;
+
+start:
+
+std::cout << "Enter A and B and OPERATOR via press button 'SPACE' : "; std::cin >> a >> b >> oper;
+
+switch(oper)
+{
+case ('+'):	std::cout << "Answer: "<< a + b << '\n'; break;
+
+case ('-'):	std::cout << "Answer: "<< a - b << '\n'; break;
+
+case ('*'):	std::cout << "Answer: "<< a * b << '\n'; break;
+
+case ('/'):	std::cout << "Answer: "<< a / b << '\n'; break;
+
+default:
+goto start;
+}
+//========================================================================================================================================================================================================
+V	3. Напишите программу, угадывающую число. Пользователь должен задумать число от 1 до 100, а программа должна задавать вопросы,
+чтобы выяснить, какое число он задумал (например, “Задуманное число меньше 50”). Ваша программа должна уметь идентифицировать число после не более семи попыток.
+Подсказка: используйте операторы < и <=, а также конструкцию if-else.
+//========================================================================================================================================================================================================
+V	2.Считайте последовательности чисел типа double в вектор. Будем считать, что каждое значение представляет собой расстояние между двумя городами, расположенными на определенном маршруте.
+Вычислите и выведите на печать общее расстояние (сумму всех расстояний). Найдите и выведите на печать наименьшее и наибольшее расстояние между двумя соседними городами.
+Найдите и выведите на печать среднее расстояние между двумя соседними городами.
+//========================================================================================================================================================================================================
+while(std::cin >> distance_to_city)
+vec.push_back(distance_to_city);
+
+for(i = 0; i<vec.size(); i++)
+{
+summa_distance += vec[i];
+average = summa_distance / vec.size();
+}
+
+sort(vec.begin(), vec.end());
+
+std::cout << "Smollest among: " << vec[0] << '\n' << '\n';
+
+std::cout << "Latgest among: " << vec[vec.size() - 1] <<'\n' << '\n';
+
+std::cout << "Average distance: " << average << '\n'<< '\n';
+
+std::cout << "Total distance: " << summa_distance << '\n' << '\n';
+//========================================================================================================================================================================================================
+V	1. Допустим, мы определяем медиану последовательности как “число, относительно которого ровно половина элементов меньше, а другая половина — больше”.
+Исправьте программу из раздела 4.6.2 так, чтобы она всегда выводила медиану. Подсказка: медиана не обязана быть элементом последовательности.
+//========================================================================================================================================================================================================
+*/
