@@ -11,7 +11,7 @@ using std::cout;
 using std::vector;
 using std::ostream;
 //===============================================================================================================================
-string book_error(string &enter, string &chisla, vector<int> &start);
+string book_error(string& enter, string& chisla, vector<int>& start);
 //===============================================================================================================================
 void error(string s)
 {
@@ -98,23 +98,23 @@ public:
 	}
 
 	//=======================================================================================================================================
-friend bool operator==(const Book::ISBN &isbn_a, const Book::ISBN &isbn_b)
-{
-	return (isbn_a.I == isbn_b.I && isbn_a.S == isbn_b.S && isbn_a.B == isbn_b.B && isbn_a.N == isbn_b.N);
-}
+	friend bool operator==(const Book::ISBN& isbn_a, const Book::ISBN& isbn_b)
+	{
+		return (isbn_a.I == isbn_b.I && isbn_a.S == isbn_b.S && isbn_a.B == isbn_b.B && isbn_a.N == isbn_b.N);
+	}
 
 
 
-friend bool operator!=(const Book::ISBN &isbn_a, const Book::ISBN &isbn_b)
-{
-	return !(isbn_a == isbn_b);
-}
+	friend bool operator!=(const Book::ISBN& isbn_a, const Book::ISBN& isbn_b)
+	{
+		return !(isbn_a == isbn_b);
+	}
 
 
-friend ostream &operator<<(ostream &os, const Book &isbn)
-{
-	return os << isbn.Name << '\n' << isbn.LastName_Author << '\n' << genre_to_string(isbn.genre) << '\n' << isbn.isbn.I << '-' << isbn.isbn.S << '-' << isbn.isbn.B << '-' << isbn.isbn.N << '\n';
-}
+	friend ostream& operator<<(ostream& os, const Book& isbn)
+	{
+		return os << isbn.Name << '\n' << isbn.LastName_Author << '\n' << genre_to_string(isbn.genre) << '\n' << isbn.isbn.I << '-' << isbn.isbn.S << '-' << isbn.isbn.B << '-' << isbn.isbn.N << '\n';
+	}
 
 	//=======================================================================================================================================
 private:
@@ -241,9 +241,9 @@ string Book::date_author_prav()
 	bool invalid = false;
 	bool valid = false;
 
-	std::cout << "Please, enter date registration author rule in format: MM-DD-YYYY == ";
+	cout << "Please, enter date registration author rule in format: MM-DD-YYYY == ";
 
-	while (std::cin >> date)
+	while (cin >> date)
 	{
 		invalid = false;
 
@@ -385,9 +385,9 @@ string Book::enter_last_name_author()
 	string finish;
 	bool invalid;
 
-	std::cout << "Please, enter last name author: ";
+	cout << "Please, enter last name author: ";
 
-	while (std::cin >> name_author)
+	while (cin >> name_author)
 	{
 		invalid = false;
 
@@ -443,7 +443,7 @@ bool Book::check_book()
 	return book_issued;
 }
 //=======================================================================================================================================
-string book_error(string &enter, string &chisla, vector<int> &start)
+string book_error(string& enter, string& chisla, vector<int>& start)
 {
 	error("ERROR, WRONG FORMAT!");
 	enter = {};
@@ -797,6 +797,8 @@ public:
 	void add_month(int n);
 	void add_year(int n);
 
+	int leap_year(int y);
+
 private:
 	int y;
 	Month m;
@@ -815,18 +817,35 @@ Date::Date(int y, Month m, int d)
 //=======================================================================================================================================
 void Date::init_day(int d)
 {
-	if (d < 1 || d > 31)
+	if (m != 2 && m != 4 && m != 6 && m != 9 && m != 11)
 	{
-		std::cout << y << " " << d << " " << m << "\t";
-		throw std::invalid_argument("Wrong DAY!");
+		if (d < 1 || d > 31)
+		cout << y << " " << d << " " << m << "\t";
 	}
+		throw std::invalid_argument("Wrong DAY!");
+	
+	if (m == 2)
+	{
+		int ves_d = leap_year(y);
+
+		if (d < 1 || d > ves_d)
+			cout << y << " " << d << " " << m << "\t";
+	}
+		throw std::invalid_argument("Wrong DAY!");
+	
+		if (m == 4 || m == 6 || m == 9 || m == 11)
+		{
+			if (d < 1 || d > 30)
+				cout << y << " " << d << " " << m << "\t";
+		}
+		throw std::invalid_argument("Wrong DAY!");
 }
 //=======================================================================================================================================
 void Date::init_month(int m)
 {
 	if (m < 1 || m > 12)
 	{
-		std::cout << y << " " << d << " " << m << "\t";
+		cout << y << " " << d << " " << m << "\t";
 
 		throw std::invalid_argument("Wrong MONTH!");
 	}
@@ -836,12 +855,23 @@ void Date::init_year(int y)
 {
 	if (y < 1800 || y > 2200)
 	{
-		std::cout << y << " " << d << " " << m << "\t";
+		cout << y << " " << d << " " << m << "\t";
 		throw std::invalid_argument("Wrong YEAR!");
 	}
 }
 //=======================================================================================================================================
-std::ostream &operator<<(std::ostream &os, Date &d)
+int Date::leap_year(int y)
+{
+	if (y % 4 == 0 && !(y % 100 == 0) || y % 400 == 0)
+	{
+		cout << "Leap year!" << '\n';
+		return 29;
+	}
+	else
+		return 28;
+}
+//=======================================================================================================================================
+std::ostream& operator<<(std::ostream& os, Date& d)
 {
 	return os << '(' << d.year() << ',' << d.month() << ',' << d.day() << ')';
 }
@@ -887,16 +917,16 @@ void f()
 	try {
 		Date today(1978, Date::jun, 35);
 
-		std::cout << "TODAY == " << today << '\n';
+		cout << "TODAY == " << today << '\n';
 
 		Date tomorrow = today;
 
 		tomorrow.add_day(1);
 
-		std::cout << "TOMORROW == " << tomorrow << '\n';
+		cout << "TOMORROW == " << tomorrow << '\n';
 	}
 
-	catch (std::exception &e)
+	catch (std::exception& e)
 	{
 		std::cerr << "" << e.what() << '\n';
 	}
@@ -906,16 +936,16 @@ void f()
 
 		go_next.add_year(1);
 
-		std::cout << "GO_NEXT == " << go_next << '\n';
+		cout << "GO_NEXT == " << go_next << '\n';
 
 		Date go_month = go_next;
 
 		go_month.add_month(25);
 
-		std::cout << "GO_MONTH == " << go_month << '\n';
+		cout << "GO_MONTH == " << go_month << '\n';
 	}
 
-	catch (std::exception &e)
+	catch (std::exception& e)
 	{
 		std::cerr << "" << e.what() << '\n';
 	}
@@ -947,10 +977,10 @@ public:
 	Patron add_member();
 	void book_issue();
 
-	void check_member(Transaction &Trans, bool &valid_check);
-	void check_book(Transaction &Trans, bool &valid_check, int &index_book);
-	void add_Debtors_NOT_Members(string &name);
-	void check_book_issue(bool &valid_check, int &index_book);
+	void check_member(Transaction& Trans, bool& valid_check);
+	void check_book(Transaction& Trans, bool& valid_check, int& index_book);
+	void add_Debtors_NOT_Members(string& name);
+	void check_book_issue(bool& valid_check, int& index_book);
 
 	bool add_state()
 	{
@@ -971,7 +1001,7 @@ private:
 	bool book_in_Library;
 };
 //=======================================================================================================================================
-void Library::check_member(Transaction &Trans, bool &valid_check)
+void Library::check_member(Transaction& Trans, bool& valid_check)
 {
 	bool valid_check_member = false;
 
@@ -987,7 +1017,7 @@ void Library::check_member(Transaction &Trans, bool &valid_check)
 			if (Vec_Patron_Class[i].paying() == true)
 			{
 				cout << "Human is pay for membership" << '\n';
-				
+
 				valid_check = true;
 			}
 
@@ -1008,7 +1038,7 @@ void Library::check_member(Transaction &Trans, bool &valid_check)
 	}
 }
 //=======================================================================================================================================
-void Library::check_book(Transaction &Trans, bool &valid_check, int &index_book)
+void Library::check_book(Transaction& Trans, bool& valid_check, int& index_book)
 {
 	bool valid_check_book_isbn = false;
 
@@ -1034,7 +1064,7 @@ void Library::check_book(Transaction &Trans, bool &valid_check, int &index_book)
 	}
 }
 //=======================================================================================================================================
-void Library::check_book_issue(bool &valid_check, int &index_book)
+void Library::check_book_issue(bool& valid_check, int& index_book)
 {
 	bool issued = Vec_Book_Class[index_book].get_book_issued();
 
@@ -1051,7 +1081,7 @@ void Library::check_book_issue(bool &valid_check, int &index_book)
 	}
 }
 //=======================================================================================================================================
-void Library::add_Debtors_NOT_Members(string &name)
+void Library::add_Debtors_NOT_Members(string& name)
 {
 	bool debtors = false;
 	for (int i = 0; i < Debtors_NOT_Members.size(); i++)
@@ -1104,7 +1134,7 @@ void Library::book_issue()
 
 	if (valid_check == true)
 		check_book(Trans, valid_check, index_book);
-	
+
 	if (valid_check == true)
 		check_book_issue(valid_check, index_book);
 
@@ -1114,17 +1144,18 @@ void Library::book_issue()
 //=======================================================================================================================================
 int main()
 {
-	Library StartLibrary;
-
-	StartLibrary.add_book();
-	StartLibrary.add_member();
-	StartLibrary.book_issue();
+	f();
+	//	Library StartLibrary;
+	//	
+	//	StartLibrary.add_book();
+	//	StartLibrary.add_member();
+	//	StartLibrary.book_issue();
 
 	return 0;
 }
 //=======================================================================================================================================
 /*
-	10.	Реализуйте функцию leapyear() из раздела 9.8.
+	V	10.	Реализуйте функцию leap_year() из раздела 9.8.
 //=======================================================================================================================================
 	V	9. Создайте класс Library. Включите в него векторы классов Book и Patron. Включите также структуру Transaction и предусмотрите в ней члены классов Book, Patron и Date.
 Создайте вектор объектов класса Transaction. Создайте функции, добавляющие записи о книгах и клиентах библиотеки, а также о состоянии книг.
@@ -1167,5 +1198,3 @@ friend ostream &operator<<(ostream &os, const Book &isbn)
 
 //=======================================================================================================================================
 */
-
-
