@@ -11,7 +11,7 @@ using std::cout;
 using std::vector;
 using std::ostream;
 //===============================================================================================================================
-string book_error(string& enter, string& chisla, vector<int>& start);
+string book_error(string &enter, string &chisla, vector<int> &start);
 //===============================================================================================================================
 void error(string s)
 {
@@ -98,20 +98,20 @@ public:
 	}
 
 	//=======================================================================================================================================
-	friend bool operator==(const Book::ISBN& isbn_a, const Book::ISBN& isbn_b)
+	friend bool operator==(const Book::ISBN &isbn_a, const Book::ISBN &isbn_b)
 	{
 		return (isbn_a.I == isbn_b.I && isbn_a.S == isbn_b.S && isbn_a.B == isbn_b.B && isbn_a.N == isbn_b.N);
 	}
 
 
 
-	friend bool operator!=(const Book::ISBN& isbn_a, const Book::ISBN& isbn_b)
+	friend bool operator!=(const Book::ISBN &isbn_a, const Book::ISBN &isbn_b)
 	{
 		return !(isbn_a == isbn_b);
 	}
 
 
-	friend ostream& operator<<(ostream& os, const Book& isbn)
+	friend ostream &operator<<(ostream &os, const Book &isbn)
 	{
 		return os << isbn.Name << '\n' << isbn.LastName_Author << '\n' << genre_to_string(isbn.genre) << '\n' << isbn.isbn.I << '-' << isbn.isbn.S << '-' << isbn.isbn.B << '-' << isbn.isbn.N << '\n';
 	}
@@ -443,7 +443,7 @@ bool Book::check_book()
 	return book_issued;
 }
 //=======================================================================================================================================
-string book_error(string& enter, string& chisla, vector<int>& start)
+string book_error(string &enter, string &chisla, vector<int> &start)
 {
 	error("ERROR, WRONG FORMAT!");
 	enter = {};
@@ -768,6 +768,11 @@ public:
 		jan = 1, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec
 	};
 
+	enum Day_Of_Week
+	{
+		sun = 0, mon, tue, wed, thu, fri, sat
+	};
+
 	Date(int y, Month m, int d);
 
 	Date()
@@ -799,12 +804,22 @@ public:
 
 	int leap_year(int y);
 
+	int next_workday();
+	void week_of_year();
+
+	int determine_month();
+	int determine_year();
+	int formula();
+
 private:
 	int y;
 	Month m;
 	int d;
 
+	Day_Of_Week Day;
+
 	bool init;
+	bool leap_y = false;
 };
 //=======================================================================================================================================
 Date::Date(int y, Month m, int d)
@@ -820,25 +835,25 @@ void Date::init_day(int d)
 	if (m != 2 && m != 4 && m != 6 && m != 9 && m != 11)
 	{
 		if (d < 1 || d > 31)
-		cout << y << " " << d << " " << m << "\t";
-	}
+			cout << y << " " << d << " " << m << "\t";
 		throw std::invalid_argument("Wrong DAY!");
-	
+	}
+
 	if (m == 2)
 	{
 		int ves_d = leap_year(y);
 
 		if (d < 1 || d > ves_d)
 			cout << y << " " << d << " " << m << "\t";
+		throw std::invalid_argument("Wrong DAY!");
 	}
+
+	if (m == 4 || m == 6 || m == 9 || m == 11)
+	{
+		if (d < 1 || d > 30)
+			cout << y << " " << d << " " << m << "\t";
 		throw std::invalid_argument("Wrong DAY!");
-	
-		if (m == 4 || m == 6 || m == 9 || m == 11)
-		{
-			if (d < 1 || d > 30)
-				cout << y << " " << d << " " << m << "\t";
-		}
-		throw std::invalid_argument("Wrong DAY!");
+	}
 }
 //=======================================================================================================================================
 void Date::init_month(int m)
@@ -865,13 +880,15 @@ int Date::leap_year(int y)
 	if (y % 4 == 0 && !(y % 100 == 0) || y % 400 == 0)
 	{
 		cout << "Leap year!" << '\n';
+		leap_y = true;
 		return 29;
 	}
 	else
+		leap_y = false;
 		return 28;
 }
 //=======================================================================================================================================
-std::ostream& operator<<(std::ostream& os, Date& d)
+std::ostream &operator<<(std::ostream &os, Date &d)
 {
 	return os << '(' << d.year() << ',' << d.month() << ',' << d.day() << ')';
 }
@@ -884,7 +901,7 @@ void Date::add_day(int n)
 	ves += n;
 	init_day(ves);
 
-	d = ves;
+	d = Day_Of_Week(ves);
 }
 //=======================================================================================================================================
 void Date::add_month(int n)
@@ -912,10 +929,111 @@ void Date::add_year(int n)
 	y = ves;
 }
 //=======================================================================================================================================
+void Date::week_of_year()
+{
+
+}
+//=======================================================================================================================================
+int Date::next_workday()
+{
+	switch (formula())
+	{
+		case sun:
+		{
+			cout << "sunday";
+			break;
+		}
+		case mon:
+		{
+			cout << "monday";
+			break;
+		}
+		case tue:
+		{
+			cout << "tuesday";
+			break;
+		}
+		case wed:
+		{
+			cout << "wednesday";
+			break;
+		}
+		case thu:
+		{
+			cout << "thursday";
+			break;
+		}
+		case fri:
+		{
+			cout << "friday";
+			break;
+		}
+		case sat:
+		{
+			cout << "saturday";
+			break;
+		}
+	}
+}
+//=======================================================================================================================================
+int Date::determine_month()
+{
+
+		switch (m)
+		{
+		case jan:
+			{
+				if (leap_y == false)
+					return 0;
+				else
+					return 6;
+			}
+		case feb:
+			{
+				if (leap_y == false)
+					return 3;
+				else
+					return 2;
+			}
+		case mar: return 3;
+		case apr: return 6;
+		case may: return 1;
+		case jun: return 4;
+		case jul: return 6;
+		case aug: return 2;
+		case sep: return 5;
+		case oct: return 0;
+		case nov: return 3;
+		case dec: return 5;
+		}
+}
+//=======================================================================================================================================
+int Date::determine_year()
+{
+	int det = y % 100;
+
+	return (det + det / 4) % 7;
+}
+//=======================================================================================================================================
+int Date::formula()
+{
+	int det_month = determine_month();
+	int det_year = determine_year();
+	int code_vek = 0;
+
+	if (y > 1900 && y < 2000)
+		code_vek = 0;
+
+	if (y > 2000 && y < 2100)
+		code_vek = 6;
+
+	return (d + det_month + det_year + code_vek) % 7;
+}
+//=======================================================================================================================================
 void f()
 {
 	try {
-		Date today(1978, Date::jun, 35);
+		Date today(1978, Date::jun, Date::mon);
 
 		cout << "TODAY == " << today << '\n';
 
@@ -926,13 +1044,13 @@ void f()
 		cout << "TOMORROW == " << tomorrow << '\n';
 	}
 
-	catch (std::exception& e)
+	catch (std::exception &e)
 	{
 		std::cerr << "" << e.what() << '\n';
 	}
 
 	try {
-		Date go_next(1978, Date::jul, 29);
+		Date go_next(1978, Date::jul, Date::fri);
 
 		go_next.add_year(1);
 
@@ -945,7 +1063,7 @@ void f()
 		cout << "GO_MONTH == " << go_month << '\n';
 	}
 
-	catch (std::exception& e)
+	catch (std::exception &e)
 	{
 		std::cerr << "" << e.what() << '\n';
 	}
@@ -955,7 +1073,7 @@ void f()
 //=======================================================================================================================================
 class Library
 {
-public:
+public: 
 	//=======================================================================================================================================
 	struct Transaction
 	{
@@ -977,10 +1095,10 @@ public:
 	Patron add_member();
 	void book_issue();
 
-	void check_member(Transaction& Trans, bool& valid_check);
-	void check_book(Transaction& Trans, bool& valid_check, int& index_book);
-	void add_Debtors_NOT_Members(string& name);
-	void check_book_issue(bool& valid_check, int& index_book);
+	void check_member(Transaction &Trans, bool &valid_check);
+	void check_book(Transaction &Trans, bool &valid_check, int &index_book);
+	void add_Debtors_NOT_Members(string &name);
+	void check_book_issue(bool &valid_check, int &index_book);
 
 	bool add_state()
 	{
@@ -1001,7 +1119,7 @@ private:
 	bool book_in_Library;
 };
 //=======================================================================================================================================
-void Library::check_member(Transaction& Trans, bool& valid_check)
+void Library::check_member(Transaction &Trans, bool &valid_check)
 {
 	bool valid_check_member = false;
 
@@ -1038,7 +1156,7 @@ void Library::check_member(Transaction& Trans, bool& valid_check)
 	}
 }
 //=======================================================================================================================================
-void Library::check_book(Transaction& Trans, bool& valid_check, int& index_book)
+void Library::check_book(Transaction &Trans, bool &valid_check, int &index_book)
 {
 	bool valid_check_book_isbn = false;
 
@@ -1064,7 +1182,7 @@ void Library::check_book(Transaction& Trans, bool& valid_check, int& index_book)
 	}
 }
 //=======================================================================================================================================
-void Library::check_book_issue(bool& valid_check, int& index_book)
+void Library::check_book_issue(bool &valid_check, int &index_book)
 {
 	bool issued = Vec_Book_Class[index_book].get_book_issued();
 
@@ -1081,7 +1199,7 @@ void Library::check_book_issue(bool& valid_check, int& index_book)
 	}
 }
 //=======================================================================================================================================
-void Library::add_Debtors_NOT_Members(string& name)
+void Library::add_Debtors_NOT_Members(string &name)
 {
 	bool debtors = false;
 	for (int i = 0; i < Debtors_NOT_Members.size(); i++)
@@ -1144,12 +1262,11 @@ void Library::book_issue()
 //=======================================================================================================================================
 int main()
 {
-	f();
-	//	Library StartLibrary;
-	//	
-	//	StartLibrary.add_book();
-	//	StartLibrary.add_member();
-	//	StartLibrary.book_issue();
+	Library StartLibrary;
+	
+	StartLibrary.add_book();
+	StartLibrary.add_member();
+	StartLibrary.book_issue();
 
 	return 0;
 }
