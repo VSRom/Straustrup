@@ -6,19 +6,14 @@
 #include <cctype>
 #include <chrono>
 
-using std::string;
-using std::cin;
-using std::cout;
-using std::vector;
-using std::ostream;
 //===============================================================================================================================
-string book_error(string &enter, string &chisla, vector<int> &start);
+std::string book_error(std::string &enter, std::string &chisla, std::vector<int> &start);
 //===============================================================================================================================
-void error(string s)
+void error(std::string s)
 {
 	std::cerr << s << '\n';
-	cin.clear();
-	cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	std::cin.clear();
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 //====================================================================================================================================
 ////															CLASS BOOK
@@ -34,7 +29,7 @@ public:
 	};
 	//====================================================================================================================================
 	Genre enter_genre();
-	static string genre_to_string(Book::Genre g);
+	static std::string genre_to_string(Book::Genre g);
 
 	Genre get_genre()
 	{
@@ -44,37 +39,37 @@ public:
 	struct ISBN
 	{
 		int I, S, B;
-		string N;
+		std::string N;
 
 		ISBN()
 			: I(), S(), B(), N{}
 		{
 		}
 
-		ISBN(int i, int s, int b, string n)
+		ISBN(int i, int s, int b, std::string n)
 			: I(i), S(s), B(b), N(n)
 		{
 		}
 	};
 	//====================================================================================================================================
-	string enter_name();
-	string date_author_prav();
-	string enter_last_name_author();
+	std::string enter_name();
+	std::string date_author_prav();
+	std::string enter_last_name_author();
 
 
 	bool check_book();
 	//====================================================================================================================================
-	string get_name()
+	std::string get_name()
 	{
 		return this->Name;
 	}
 
-	string get_date_author()
+	std::string get_date_author()
 	{
 		return this->Register_Author_Prav;
 	}
 
-	string get_last_name()
+	std::string get_last_name()
 	{
 		return this->LastName_Author;
 	}
@@ -89,7 +84,7 @@ public:
 		return this->book_issued = issued;
 	}
 	//====================================================================================================================================
-	vector<ISBN> vec_isbn;
+	std::vector<ISBN> vec_isbn;
 
 	ISBN enter_isbn();
 
@@ -112,16 +107,16 @@ public:
 	}
 
 
-	friend ostream &operator<<(ostream &os, const Book &isbn)
+	friend std::ostream &operator<<(std::ostream &os, const Book &isbn)
 	{
 		return os << isbn.Name << '\n' << isbn.LastName_Author << '\n' << genre_to_string(isbn.genre) << '\n' << isbn.isbn.I << '-' << isbn.isbn.S << '-' << isbn.isbn.B << '-' << isbn.isbn.N << '\n';
 	}
 
 	//====================================================================================================================================
 private:
-	string Name;
-	string Register_Author_Prav;
-	string LastName_Author;
+	std::string Name;
+	std::string Register_Author_Prav;
+	std::string LastName_Author;
 	Book::ISBN isbn;
 
 	Genre genre;
@@ -137,8 +132,8 @@ Book::Genre Book::enter_genre()
 {
 	int genre;
 
-	cout << "Please, enter genre book from the list: " << '\n' << "fantasy == 0, prose == 1, periodicals == 2, biography == 3, childrens_literature == 4" << '\n' << "Here: == ";
-	while (cin >> genre)
+	std::cout << "Please, enter genre book from the list: " << '\n' << "fantasy == 0, prose == 1, periodicals == 2, biography == 3, childrens_literature == 4" << '\n' << "Here: == ";
+	while (std::cin >> genre)
 	{
 		if (genre == 0)
 		{
@@ -177,7 +172,7 @@ Book::Genre Book::enter_genre()
 	return this->genre;
 }
 //====================================================================================================================================
-string Book::genre_to_string(Book::Genre g)
+std::string Book::genre_to_string(Book::Genre g)
 {
 	switch (g)
 	{
@@ -192,16 +187,16 @@ string Book::genre_to_string(Book::Genre g)
 	}
 }
 //====================================================================================================================================
-string Book::enter_name()
+std::string Book::enter_name()
 {
-	string name;
-	string finish;
+	std::string name;
+	std::string finish;
 
 	bool invalid;
 
-	cout << "Please, enter name book: ";
+	std::cout << "Please, enter name book: ";
 
-	while (cin >> name)
+	while (std::cin >> name)
 	{
 		invalid = false;
 
@@ -229,22 +224,22 @@ string Book::enter_name()
 	return this->Name;
 }
 //====================================================================================================================================
-string Book::date_author_prav()
+std::string Book::date_author_prav()
 {
-	string date;
-	string chisla;
-	string finish;
+	std::string date;
+	std::string chisla;
+	std::string finish;
 
-	vector<int> start;
+	std::vector<int> start;
 
 	int chislaPLUS;
 
 	bool invalid = false;
 	bool valid = false;
 
-	cout << "Please, enter date registration author rule in format: MM-DD-YYYY == ";
+	std::cout << "Please, enter date registration author rule in format: MM-DD-YYYY == ";
 
-	while (cin >> date)
+	while (std::cin >> date)
 	{
 		invalid = false;
 
@@ -380,15 +375,15 @@ string Book::date_author_prav()
 	return this->Register_Author_Prav;
 }
 //====================================================================================================================================
-string Book::enter_last_name_author()
+std::string Book::enter_last_name_author()
 {
-	string name_author;
-	string finish;
+	std::string name_author;
+	std::string finish;
 	bool invalid;
 
-	cout << "Please, enter last name author: ";
+	std::cout << "Please, enter last name author: ";
 
-	while (cin >> name_author)
+	while (std::cin >> name_author)
 	{
 		invalid = false;
 
@@ -418,11 +413,11 @@ string Book::enter_last_name_author()
 //====================================================================================================================================
 bool Book::check_book()
 {
-	string book_is;
+	std::string book_is;
 
-	cout << "Has the book been issued? Y/N" << '\n';
+	std::cout << "Has the book been issued? Y/N" << '\n';
 
-	while (cin >> book_is)
+	while (std::cin >> book_is)
 	{
 		if (book_is == "Y")
 		{
@@ -444,7 +439,7 @@ bool Book::check_book()
 	return book_issued;
 }
 //====================================================================================================================================
-string book_error(string &enter, string &chisla, vector<int> &start)
+std::string book_error(std::string &enter, std::string &chisla, std::vector<int> &start)
 {
 	error("ERROR, WRONG FORMAT!");
 	enter = {};
@@ -459,18 +454,18 @@ Book::ISBN parse_isbn()
 	int I = 0;
 	int S = 0;
 	int B = 0;
-	string N;
-	string input;
+	std::string N;
+	std::string input;
 
-	vector<int> start;     // Содержит все позиции где стоит знак '-'
-	string chisla;
+	std::vector<int> start;     // Содержит все позиции где стоит знак '-'
+	std::string chisla;
 
 	bool valid = false;
 	bool invalid = false;
 
-	cout << "Please, enter isbn code in format int-int-int-charORint: == ";
+	std::cout << "Please, enter isbn code in format int-int-int-charORint: == ";
 
-	while (cin >> input)
+	while (std::cin >> input)
 	{
 
 		for (int i = 0; i < input.size(); i++)
@@ -588,7 +583,7 @@ Book::ISBN parse_isbn()
 Book::ISBN Book::enter_isbn()
 {
 	this->isbn = parse_isbn();
-	cout << '\n';
+	std::cout << '\n';
 
 	return this->isbn;
 }
@@ -599,7 +594,7 @@ class Patron
 {
 public:
 	Patron();
-	string get_name()
+	std::string get_name()
 	{
 		return this->Name;
 	}
@@ -621,12 +616,12 @@ public:
 
 	double establishing_amount_membership_fee();
 	void mark_pay();
-	string enter_name_human();
+	std::string enter_name_human();
 	int enter_library_card();
 
 private:
 
-	string Name;
+	std::string Name;
 	int Library_Card;
 	double Membership_Fee;
 	bool pay;
@@ -641,11 +636,11 @@ int parse_library_card()
 {
 	int enter_card;
 
-	cout << "Please, enter number of library card: ";
+	std::cout << "Please, enter number of library card: ";
 
-	while (cin >> enter_card)
+	while (std::cin >> enter_card)
 	{
-		if (cin.fail())
+		if (std::cin.fail())
 		{
 			error("Wrong amount!");
 			continue;
@@ -666,9 +661,9 @@ int parse_library_card()
 //====================================================================================================================================
 void Patron::mark_pay()
 {
-	string payining;
-	cout << "Please, enter payment is human: Y/N?" << '\n';
-	while (cin >> payining)
+	std::string payining;
+	std::cout << "Please, enter payment is human: Y/N?" << '\n';
+	while (std::cin >> payining)
 	{
 		if (payining == "Y")
 		{
@@ -694,10 +689,10 @@ double Patron::establishing_amount_membership_fee()
 {
 	double payPay;
 
-	cout << "Please, enter amount membership fee: ";
-	while (cin >> payPay)
+	std::cout << "Please, enter amount membership fee: ";
+	while (std::cin >> payPay)
 	{
-		if (cin.fail())
+		if (std::cin.fail())
 		{
 			error("Wrong amount!");
 			continue;
@@ -717,14 +712,14 @@ double Patron::establishing_amount_membership_fee()
 	return this->Membership_Fee;
 }
 //====================================================================================================================================
-string Patron::enter_name_human()
+std::string Patron::enter_name_human()
 {
-	string enter_name;
-	string finish;
+	std::string enter_name;
+	std::string finish;
 	bool invalid;
 
-	cout << "Please, name its human library guest: ";
-	while (cin >> enter_name)
+	std::cout << "Please, name its human library guest: ";
+	while (std::cin >> enter_name)
 	{
 		invalid = false;
 
@@ -838,7 +833,7 @@ void Date::init_day(int d)
 	if (m != 2 && m != 4 && m != 6 && m != 9 && m != 11)
 	{
 		if (d < 1 || d > 31)
-			cout << y << " " << d << " " << m << "\t";
+			std::cout << y << " " << d << " " << m << "\t";
 		throw std::invalid_argument("Wrong DAY!");
 	}
 
@@ -847,14 +842,14 @@ void Date::init_day(int d)
 		int ves_d = leap_year(y);
 
 		if (d < 1 || d > ves_d)
-			cout << y << " " << d << " " << m << "\t";
+			std::cout << y << " " << d << " " << m << "\t";
 		throw std::invalid_argument("Wrong DAY!");
 	}
 
 	if (m == 4 || m == 6 || m == 9 || m == 11)
 	{
 		if (d < 1 || d > 30)
-			cout << y << " " << d << " " << m << "\t";
+			std::cout << y << " " << d << " " << m << "\t";
 		throw std::invalid_argument("Wrong DAY!");
 	}
 
@@ -864,7 +859,7 @@ void Date::init_month(int m)
 {
 	if (m < 1 || m > 12)
 	{
-		cout << y << " " << d << " " << m << "\t";
+		std::cout << y << " " << d << " " << m << "\t";
 
 		throw std::invalid_argument("Wrong MONTH!");
 	}
@@ -874,7 +869,7 @@ void Date::init_year(int y)
 {
 	if (y < 1900 || y > 2099)
 	{
-		cout << y << " " << d << " " << m << "\t";
+		std::cout << y << " " << d << " " << m << "\t";
 		throw std::invalid_argument("Wrong YEAR!");
 	}
 }
@@ -883,7 +878,7 @@ int Date::leap_year(int y)
 {
 	if (y % 4 == 0 && !(y % 100 == 0) || y % 400 == 0)
 	{
-		cout << "Leap year!" << '\n';
+		std::cout << "Leap year!" << '\n';
 		leap_y = true;
 		return 29;
 	}
@@ -990,37 +985,37 @@ int Date::next_workday()
 	{
 		case sun:
 		{
-			cout << "Today - sunday, next work day - tomorrow." << '\n';
+			std::cout << "Today - sunday, next work day - tomorrow." << '\n';
 			return 1;
 		}
 		case mon:
 		{
-			cout << "Today - monday, next work day - tomorrow." << '\n';
+			std::cout << "Today - monday, next work day - tomorrow." << '\n';
 			return 1;
 		}
 		case tue:
 		{
-			cout << "Today - tuesday, next work day - tomorrow." << '\n';
+			std::cout << "Today - tuesday, next work day - tomorrow." << '\n';
 			return 1;
 		}
 		case wed:
 		{
-			cout << "Today - wednesday, next work day - tomorrow." << '\n';
+			std::cout << "Today - wednesday, next work day - tomorrow." << '\n';
 			return 1;
 		}
 		case thu:
 		{
-			cout << "Today - thursday, next work day - tomorrow." << '\n';
+			std::cout << "Today - thursday, next work day - tomorrow." << '\n';
 			return 1;
 		}
 		case fri:
 		{
-			cout << "Today - friday, next work day - in 2 days." << '\n';
+			std::cout << "Today - friday, next work day - in 2 days." << '\n';
 			return 3;
 		}
 		case sat:
 		{
-			cout << "Today - saturday, next work day - in 1 day." << '\n';
+			std::cout << "Today - saturday, next work day - in 1 day." << '\n';
 			return 2;
 		}
 	}
@@ -1087,13 +1082,13 @@ void f()
 	try {
 		Date today(1978, Date::jun, 19);
 
-		cout << "TODAY == " << today << '\n';
+		std::cout << "TODAY == " << today << '\n';
 
 		Date tomorrow = today;
 
 		tomorrow.add_day(tomorrow.next_workday());
 
-		cout << "TOMORROW == " << tomorrow << '\n';
+		std::cout << "TOMORROW == " << tomorrow << '\n';
 	}
 
 	catch (std::exception &e)
@@ -1106,13 +1101,13 @@ void f()
 
 		go_next.add_year(1);
 
-		cout << "GO_NEXT == " << go_next << '\n';
+		std::cout << "GO_NEXT == " << go_next << '\n';
 
 		Date go_month = go_next;
 
 		go_month.add_month(25);
 
-		cout << "GO_MONTH == " << go_month << '\n';
+		std::cout << "GO_MONTH == " << go_month << '\n';
 	}
 
 	catch (std::exception &e)
@@ -1149,7 +1144,7 @@ public:
 
 	void check_member(Transaction &Trans, bool &valid_check);
 	void check_book(Transaction &Trans, bool &valid_check, int &index_book);
-	void add_Debtors_NOT_Members(string &name);
+	void add_Debtors_NOT_Members(std::string &name);
 	void check_book_issue(bool &valid_check, int &index_book);
 
 	bool add_state()
@@ -1157,16 +1152,16 @@ public:
 		return this->book_in_Library;
 	}
 
-	vector<string> get_Debtors_NOT_Members()
+	std::vector<std::string> get_Debtors_NOT_Members()
 	{
 		return this->Debtors_NOT_Members;
 	}
 
 private:
-	vector<Book> Vec_Book_Class;
-	vector<Patron> Vec_Patron_Class;
-	vector<Transaction> Vec_Trans_Struct;
-	vector<string> Debtors_NOT_Members;
+	std::vector<Book> Vec_Book_Class;
+	std::vector<Patron> Vec_Patron_Class;
+	std::vector<Transaction> Vec_Trans_Struct;
+	std::vector<std::string> Debtors_NOT_Members;
 
 	bool book_in_Library;
 };
@@ -1181,21 +1176,21 @@ void Library::check_member(Transaction &Trans, bool &valid_check)
 	{
 		if (Trans.FK_Library_Card == Vec_Patron_Class[i].get_library_card())
 		{
-			cout << "Is human issue Library under number == [" << i << "]" << '\n';
+			std::cout << "Is human issue Library under number == [" << i << "]" << '\n';
 			valid_check_member = true;
 
 			if (Vec_Patron_Class[i].paying() == true)
 			{
-				cout << "Human is pay for membership" << '\n';
+				std::cout << "Human is pay for membership" << '\n';
 
 				valid_check = true;
 			}
 
 			else if (Vec_Patron_Class[i].paying() == false)
 			{
-				string NAME = Vec_Patron_Class[i].get_name();
+				std::string NAME = Vec_Patron_Class[i].get_name();
 				add_Debtors_NOT_Members(NAME);
-				cout << "Human is NOT pay for membership" << '\n';
+				std::cout << "Human is NOT pay for membership" << '\n';
 				valid_check = false;
 			}
 		}
@@ -1218,7 +1213,7 @@ void Library::check_book(Transaction &Trans, bool &valid_check, int &index_book)
 	{
 		if (Trans.FK_Book_Isbn == Vec_Book_Class[i].get_isbn())
 		{
-			cout << "The book belongs to the library under number == [" << i << "]" << '\n';
+			std::cout << "The book belongs to the library under number == [" << i << "]" << '\n';
 
 			valid_check_book_isbn = true;
 			index_book = i;
@@ -1240,7 +1235,7 @@ void Library::check_book_issue(bool &valid_check, int &index_book)
 
 	if (issued == false)
 	{
-		cout << "Can borrow a book!" << '\n';
+		std::cout << "Can borrow a book!" << '\n';
 		issued = true;
 		Vec_Book_Class[index_book].set_book_issued(issued);
 	}
@@ -1251,7 +1246,7 @@ void Library::check_book_issue(bool &valid_check, int &index_book)
 	}
 }
 //====================================================================================================================================
-void Library::add_Debtors_NOT_Members(string &name)
+void Library::add_Debtors_NOT_Members(std::string &name)
 {
 	bool debtors = false;
 	for (int i = 0; i < Debtors_NOT_Members.size(); i++)
@@ -1364,9 +1359,9 @@ friend bool operator!=(const Book::ISBN &isbn_a, const Book::ISBN &isbn_b)
 	return !(isbn_a == isbn_b);
 }
 
-friend ostream &operator<<(ostream &os, const Book &isbn)
+friend std::ostream &operator<<(std::ostream &os, const Book &isbn)
 {
-	return os << isbn.Name << '\n' << isbn.LastName_Author << '\n' << genre_to_string(isbn.genre) << '\n' << isbn.isbn.I << '-' << isbn.isbn.S << '-' << isbn.isbn.B << '-' << isbn.isbn.N << '\n';
+	return os << isbn.Name << '\n' << isbn.LastName_Author << '\n' << genre_to_std::string(isbn.genre) << '\n' << isbn.isbn.I << '-' << isbn.isbn.S << '-' << isbn.isbn.B << '-' << isbn.isbn.N << '\n';
 }
 //====================================================================================================================================
 	V	5. Для выполнения этого и нескольких следующих упражнений необходимо разработать и реализовать класс Book, который является частью программного обеспечения библиотеки.
