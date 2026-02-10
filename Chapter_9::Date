@@ -1,0 +1,414 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <cctype>
+#include <chrono>
+
+//====================================================================================================================================
+class Date
+{
+public:
+	enum Month
+	{
+		jan = 1, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec
+	};
+
+	enum Day_Of_Week
+	{
+		sun = 0, mon, tue, wed, thu, fri, sat
+	};
+
+	Date(int y, Month m, int d);
+
+	Date()
+	{
+	}
+
+	Month month() const
+	{
+		return m;
+	}
+
+	int day() const
+	{
+		return d;
+	}
+
+	int year() const
+	{
+		return y;
+	}
+
+	void init_day(int d);
+	void init_month(int m);
+	void init_year(int y);
+
+	void add_day(int n);
+	void add_month(int n);
+	void add_year(int n);
+
+	int leap_year(int y);
+
+	int next_workday();
+	int determine_month();
+	int determine_year();
+	int formula_workday();
+
+	int week_of_year();
+	int count_days_in_month();
+	int numbers_days_month(int i);
+
+	long count_days(Date &A, Date &B);	// , Date &B
+	void f();
+
+private:
+	int y;
+	Month m;
+	int d;
+
+	long count_day;
+
+
+	//	Day_Of_Week Day;
+
+	bool init;
+	bool leap_y = false;
+};
+//====================================================================================================================================
+Date::Date(int y, Month m, int d)
+	: y(y), m(m), d(d)
+{
+	init_year(y);
+	init_month(m);
+	init_day(d);
+}
+//====================================================================================================================================
+long Date::count_days(Date &A, Date &B)	// , 
+{
+	long N = 0;
+
+	int gmA = A.m;
+	int gyA = A.y;
+	int gdA = A.d;
+
+	int gmB = B.m;
+	int gyB = B.y;
+	int gdB = B.d;
+	int ly = 0;
+
+	int L = (gyB - gyA) * 12 + (gmB - 1);
+
+	bool check_leap_year = false;
+	bool reset_count = false;
+
+	for (int i = 1; i <= L; i++)
+	{
+		reset_count = false;
+
+		if (check_leap_year == false)
+		{
+			leap_year(gyA);
+			if (leap_y == true)
+				ly++;
+			check_leap_year = true;
+		}
+
+		if (i > 12)
+		{
+			gyA++;
+
+			i = 0;
+			L -= 12;
+			reset_count = true;
+			check_leap_year = false;
+		}
+
+		if (reset_count == false)
+			N += numbers_days_month(i);
+		else
+			continue;
+	}
+	std::cout << "There were " << ly << " leap years." << '\n';
+
+	return N + gdB - 1;		// Вычитаем день погрешности - 1
+}
+//====================================================================================================================================
+void Date::init_day(int d)
+{
+	if (m != 2 && m != 4 && m != 6 && m != 9 && m != 11)
+	{
+		if (d < 1 || d > 31)
+		{
+			std::cout << y << " " << d << " " << m << "\t";
+			throw std::invalid_argument("Wrong DAY!");
+		}
+	}
+
+	if (m == 2)
+	{
+		int ves_d = leap_year(y);
+
+		if (d < 1 || d > ves_d)
+		{
+			std::cout << y << " " << d << " " << m << "\t";
+			throw std::invalid_argument("Wrong DAY!");
+		}
+	}
+
+	if (m == 4 || m == 6 || m == 9 || m == 11)
+	{
+		if (d < 1 || d > 30)
+		{
+			std::cout << y << " " << d << " " << m << "\t";
+			throw std::invalid_argument("Wrong DAY!");
+		}
+	}
+
+}
+//====================================================================================================================================
+void Date::init_month(int m)
+{
+	if (m < 1 || m > 12)
+	{
+		std::cout << y << " " << d << " " << m << "\t";
+		throw std::invalid_argument("Wrong MONTH!");
+	}
+}
+//====================================================================================================================================
+void Date::init_year(int y)
+{
+	if (y < 1900 || y > 2099)
+	{
+		std::cout << y << " " << d << " " << m << "\t";
+		throw std::invalid_argument("Wrong YEAR!");
+	}
+}
+//====================================================================================================================================
+int Date::leap_year(int y)
+{
+	if (y % 4 == 0 && !(y % 100 == 0) || y % 400 == 0)
+	{
+		//	std::cout << "Leap year!" << '\n';
+		leap_y = true;
+		return 29;
+	}
+	else
+		leap_y = false;
+	return 28;
+}
+//====================================================================================================================================
+std::ostream& operator<<(std::ostream& os, Date& d)
+{
+	return os << '(' << d.year() << ',' << d.month() << ',' << d.day() << ')';
+}
+//====================================================================================================================================
+void Date::add_day(int n)
+{
+	int ves = d;
+	init_day(ves);
+
+	ves += n;
+	init_day(ves);
+
+	d = ves;
+}
+//====================================================================================================================================
+void Date::add_month(int n)
+{
+
+	int ves = (int)m;
+	init_month(ves);
+
+	ves += n;
+
+	init_month(ves);
+
+	m = Month(ves);
+}
+//====================================================================================================================================
+void Date::add_year(int n)
+{
+
+	int ves = y;
+	init_year(ves);
+
+	ves += n;
+
+	init_year(ves);
+	y = ves;
+}
+//====================================================================================================================================
+int Date::week_of_year()
+{
+	int N = 0;
+	int week_year = 0;
+
+	N = count_days_in_month();
+
+	return week_year = (N - 1) / 7 + 1;
+}
+//====================================================================================================================================
+int Date::numbers_days_month(int i)
+{
+	switch (i)
+	{
+	case jan:
+	case mar:
+	case may:
+	case jul:
+	case aug:
+	case oct:
+	case dec:
+		return 31;
+	case apr:
+	case jun:
+	case sep:
+	case nov:
+		return 30;
+	case feb:
+	{
+		if (leap_y == true)
+			return 29;
+		else
+			return 28;
+	}
+	}
+}
+//====================================================================================================================================
+int Date::count_days_in_month()
+{
+	int N = 0;
+	int g = m;
+	int L = 0;
+
+	for (int i = 1; i < g; i++)
+	{
+		N += numbers_days_month(i);
+	}
+
+	return N + d;
+}
+//====================================================================================================================================
+int Date::next_workday()
+{
+	switch (formula_workday())
+	{
+	case sun:
+	{
+		std::cout << "Today - sunday, next work day - tomorrow." << '\n';
+		return 1;
+	}
+	case mon:
+	{
+		std::cout << "Today - monday, next work day - tomorrow." << '\n';
+		return 1;
+	}
+	case tue:
+	{
+		std::cout << "Today - tuesday, next work day - tomorrow." << '\n';
+		return 1;
+	}
+	case wed:
+	{
+		std::cout << "Today - wednesday, next work day - tomorrow." << '\n';
+		return 1;
+	}
+	case thu:
+	{
+		std::cout << "Today - thursday, next work day - tomorrow." << '\n';
+		return 1;
+	}
+	case fri:
+	{
+		std::cout << "Today - friday, next work day - in 2 days." << '\n';
+		return 3;
+	}
+	case sat:
+	{
+		std::cout << "Today - saturday, next work day - in 1 day." << '\n';
+		return 2;
+	}
+	}
+}
+//====================================================================================================================================
+int Date::determine_month()
+{
+	switch (m)
+	{
+	case jan:
+	{
+		if (leap_y == false)
+			return 0;
+		else
+			return 6;
+	}
+	case feb:
+	{
+		if (leap_y == false)
+			return 3;
+		else
+			return 2;
+	}
+	case mar:
+	case nov:
+		return 3;
+	case apr:
+	case jul:
+		return 6;
+	case may: return 1;
+	case jun: return 4;
+	case aug: return 2;
+	case sep:
+	case dec:
+		return 5;
+	case oct: return 0;
+	}
+}
+//====================================================================================================================================
+int Date::determine_year()
+{
+	int det = y % 100;
+
+	return (det + det / 4) % 7;
+}
+//====================================================================================================================================
+int Date::formula_workday()
+{
+	int det_month = determine_month();
+	int det_year = determine_year();
+	int code_vek = 0;
+
+	if (y >= 1900 && y < 2000)
+		code_vek = 0;
+
+	if (y >= 2000 && y < 2100)
+		code_vek = 6;
+
+	return (d + det_month + det_year + code_vek) % 7;
+}
+//====================================================================================================================================
+void Date::f()
+{
+	Date Null_Day(1970, Date::jan, 1);
+
+	Date Pull_Day(2024, Date::jul, 29);
+
+
+	std::cout << count_days(Null_Day, Pull_Day) << " days have passed since January 1, 1970";
+}
+//====================================================================================================================================
+int main()
+{
+	Date test;
+	test.f();
+}
+//====================================================================================================================================
+/*
+//====================================================================================================================================
+	12. Измените представление класса Date и пронумеруйте дни, прошедшие с 1 января 1970 года(так называемый нулевой день), с помощью переменной типа long 
+и переработайте функции из раздела 9.8.Предусмотрите идентификацию дат, выходящих за пределы допустимого диапазона(отбрасывайте все даты,
+предшествующие нулевому дню, т.е.не допускайте отрицательных дней).
+//====================================================================================================================================
+*/
