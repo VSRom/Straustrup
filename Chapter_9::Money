@@ -1,0 +1,390 @@
+#include <iostream>
+#include <cmath>
+
+//=====================================================================================================================================
+class Money
+{
+public:
+
+	Money(long cent)
+		: cent(cent)
+	{ }
+//=====================================================================================================================================
+	Money()
+	{ }
+//=====================================================================================================================================
+
+	friend std::ostream &operator<<(std::ostream &os, const Money &M)
+	{
+		int dollar = M.cent / 100;
+		int cent = M.cent % 100;
+
+		return os << "$" << dollar << "." << cent << '\n';
+	}
+	
+	friend std::istream &operator>>(std::istream &is, Money &M)
+	{
+		return is >> M.DollarIntCent;
+	}
+
+	Money &operator=(const Money &M)
+	{
+		if (this != &M)
+		{
+			this->cent = M.cent;
+		}
+		return *this;
+	}
+
+	friend Money operator+(const Money &M, const Money &Mm)
+	{
+		Money result;
+
+		result.cent = M.cent + Mm.cent;
+
+		return result;
+	}
+
+	friend Money operator-(const Money &M, const Money &Mm)
+	{
+		Money result;
+
+		result.cent = M.cent - Mm.cent;
+
+		return result;
+	}
+
+	friend Money operator*(const Money &M, const long &scalar)
+	{
+		Money result;
+		result.cent = M.cent * scalar;
+
+		return result;
+	}
+
+	friend Money operator/(const Money &M, const long &scalar)
+	{
+		Money result;
+
+		result = long( M.cent / scalar );
+
+		return result;
+	}
+
+	friend bool operator==(const Money &M, const Money &Mm)
+	{
+		if (M.cent == Mm.cent)
+			return true;
+		else
+			return false;
+	}
+
+	long Enter();
+	long Cents_Div_Mul(Money &MoneyCin);
+	Money Cents_Sum_Dif(Money &MoneyCin);
+
+private:
+	long cent;
+	double DollarIntCent;
+	bool check_int = false;
+};
+
+//=====================================================================================================================================
+long Money::Cents_Div_Mul(Money &MoneyCin)
+{
+	if (std::floor(MoneyCin.DollarIntCent) == MoneyCin.DollarIntCent)
+		check_int = true;
+	else
+		check_int = false;
+
+	long cents = 0.0;
+	int celay = (int)MoneyCin.DollarIntCent;
+
+	if (check_int == false)
+	{
+	int drobnay = int((MoneyCin.DollarIntCent - celay) * 1000);
+	int drobnay2 = int((MoneyCin.DollarIntCent - celay) * 100);
+
+	int last_Dig = drobnay % 10;
+
+		if (last_Dig >= 5 && last_Dig != 0)
+			drobnay2++;
+	
+		cents = (celay * 100) + drobnay2;
+	}
+	else
+	{
+		return celay;
+	}
+
+	return cents;
+}
+//=====================================================================================================================================
+Money Money::Cents_Sum_Dif(Money &MoneyCin)
+{
+	if (std::floor(MoneyCin.DollarIntCent) == MoneyCin.DollarIntCent)
+		check_int = true;
+	else
+		check_int = false;
+
+	long cents = 0.0;
+	int celay = (int)MoneyCin.DollarIntCent;
+	int drobnay = int((MoneyCin.DollarIntCent - celay) * 1000);
+
+	return cents;
+}
+//=====================================================================================================================================
+long Money::Enter()
+{
+	Money MoneyCin1, MoneyCin2;
+	char G;
+	long cin1, cin2;
+
+
+
+	while (std::cin >> MoneyCin1 >> G >> MoneyCin2)
+	{
+		if (G == '*' || G == '/')
+		{
+			cin1 = Cents_Div_Mul(MoneyCin1);
+			cin2 = Cents_Div_Mul(MoneyCin2);
+		}
+		else if (G == '+' || G == '-')
+		{
+			cin1 = Cents_Sum_Dif(MoneyCin1);
+			cin2 = Cents_Sum_Dif(MoneyCin2);
+		}
+
+
+
+		switch (G)
+		{
+			case '+': std::cout << (Money)cin1 + (Money)cin2 << '\n'; break;
+			case '-': std::cout << (Money)cin1 - (Money)cin2 << '\n'; break;
+			case '/': std::cout << (Money)cin1 / (long)cin2 << '\n'; break;
+			case '*': std::cout << (Money)cin1 * (long)cin2 << '\n'; break;
+		}
+
+	}
+	return cin1;
+}
+//=====================================================================================================================================
+int main()
+{
+	Money mon;
+	mon.Enter();
+}
+//=====================================================================================================================================
+
+
+
+
+
+
+
+/*
+//=====================================================================================================================================
+	14. Разработайте и реализуйте класс Money для вычислений, связанных с долларами и центами,
+точность которых определяется по правилу округления 4 / 5 (0, 5 цента округляется вверх,
+все, что меньше 0, 5, округляется вниз).Денежные суммы должны представляться в центах
+с помощью переменной типа long, но ввод и вывод должны использовать доллары и центы,
+например $123.45.Не беспокойтесь о суммах, выходящих за пределы диапазона типа long.
+//=====================================================================================================================================
+*/
+MONEY-2
+
+#include <iostream>
+#include <cmath>
+
+//=====================================================================================================================================
+class Money
+{
+public:
+
+	Money(long cent)
+		: cent(cent)
+	{
+	}
+	//=====================================================================================================================================
+	Money()
+	{
+	}
+	//=====================================================================================================================================
+
+	friend std::ostream &operator<<(std::ostream &os, const Money &M)
+	{
+		int dollar = M.cent / 100;
+		int cent = M.cent % 100;
+
+		return os << "$" << dollar << "." << cent << '\n';
+	}
+
+	friend std::istream &operator>>(std::istream &is, Money &M)
+	{
+		return is >> M.DollarIntCent;
+	}
+
+	Money &operator=(const Money &M)
+	{
+		if (this != &M)
+		{
+			this->cent = M.cent;
+		}
+		return *this;
+	}
+
+	friend Money operator+(const Money &M, const Money &Mm)
+	{
+		Money result;
+
+		result.cent = M.cent + Mm.cent;
+
+		return result;
+	}
+
+	friend Money operator-(const Money &M, const Money &Mm)
+	{
+		Money result;
+
+		result.cent = M.cent - Mm.cent;
+
+		return result;
+	}
+
+	friend Money operator*(const Money &M, const long &scalar)
+	{
+		Money result;
+		result.cent = M.cent * scalar;
+
+		return result;
+	}
+
+	friend Money operator/(const Money &M, const long &scalar)
+	{
+		Money result;
+
+		result = long(M.cent / scalar);
+
+		return result;
+	}
+
+	friend bool operator==(const Money &M, const Money &Mm)
+	{
+		if (M.cent == Mm.cent)
+			return true;
+		else
+			return false;
+	}
+
+	long Enter();
+	long Cents_Div_Mul(Money &MoneyCin);
+	Money Cents_Sum_Dif(Money &MoneyCin);
+
+private:
+	long cent;
+	double DollarIntCent;
+	bool check_int = false;
+};
+
+//=====================================================================================================================================
+long Money::Cents_Div_Mul(Money &MoneyCin)
+{
+	if (std::floor(MoneyCin.DollarIntCent) == MoneyCin.DollarIntCent)
+		check_int = true;
+	else
+		check_int = false;
+
+	long cents = 0.0;
+	int celay = (int)MoneyCin.DollarIntCent;
+
+	if (check_int == false)
+	{
+		int drobnay = int((MoneyCin.DollarIntCent - celay) * 1000);
+		int drobnay2 = int((MoneyCin.DollarIntCent - celay) * 100);
+
+		int last_Dig = drobnay % 10;
+
+		if (last_Dig >= 5 && last_Dig != 0)
+			drobnay2++;
+
+		cents = (celay * 100) + drobnay2;
+	}
+	else
+	{
+		return celay;
+	}
+
+	return cents;
+}
+//=====================================================================================================================================
+Money Money::Cents_Sum_Dif(Money &MoneyCin)
+{
+	if (std::floor(MoneyCin.DollarIntCent) == MoneyCin.DollarIntCent)
+		check_int = true;
+	else
+		check_int = false;
+
+	long cents = 0.0;
+	int celay = (int)MoneyCin.DollarIntCent;
+	int drobnay = int((MoneyCin.DollarIntCent - celay) * 1000);
+
+	return cents;
+}
+//=====================================================================================================================================
+long Money::Enter()
+{
+	Money MoneyCin1, MoneyCin2;
+	char G;
+	long cin1, cin2;
+
+
+
+	while (std::cin >> MoneyCin1 >> G >> MoneyCin2)
+	{
+	//	if (G == '*' || G == '/')
+	//	{
+	//		
+	//	}
+	//	else if (G == '+' || G == '-')
+	//	{
+	//		cin1 = Cents_Sum_Dif(MoneyCin1);
+	//		cin2 = Cents_Sum_Dif(MoneyCin2);
+	//	}
+
+		cin1 = Cents_Div_Mul(MoneyCin1);
+		cin2 = Cents_Div_Mul(MoneyCin2);
+
+		switch (G)
+		{
+			case '+': std::cout << (Money)cin1 + (Money)cin2 << '\n'; break;
+			case '-': std::cout << (Money)cin1 - (Money)cin2 << '\n'; break;
+			case '/': std::cout << (Money)cin1 / (long)cin2 << '\n'; break;
+			case '*': std::cout << (Money)cin1 * (long)cin2 << '\n'; break;
+		}
+
+	}
+	return cin1;
+}
+//=====================================================================================================================================
+int main()
+{
+	Money mon;
+	mon.Enter();
+}
+//=====================================================================================================================================
+
+
+
+
+
+
+
+/*
+//=====================================================================================================================================
+	14. Разработайте и реализуйте класс Money для вычислений, связанных с долларами и центами,
+точность которых определяется по правилу округления 4 / 5 (0, 5 цента округляется вверх,
+все, что меньше 0, 5, округляется вниз).Денежные суммы должны представляться в центах
+с помощью переменной типа long, но ввод и вывод должны использовать доллары и центы,
+например $123.45.Не беспокойтесь о суммах, выходящих за пределы диапазона типа long.
+//=====================================================================================================================================
+*/
