@@ -1,14 +1,15 @@
 
 #include <iostream>
 #include <cctype>
+#include <iomanip>
 
 //=====================================================================================================================================
 class Money
 {
 public:
 
-	Money(long cent)
-		: cent(cent)
+	Money(long cent, char valuta)
+		: cent(cent), valuta(valuta)
 	{
 	}
 //=====================================================================================================================================
@@ -18,92 +19,217 @@ public:
 //=====================================================================================================================================
 	friend std::ostream &operator<<(std::ostream &os, const Money &M)
 	{
+
 		double dollar = M.cent / 100;
 		double cent = M.cent % 100;
 
-		return os << "$" << dollar << "." << cent << '\n';
+		return os << M.valuta << dollar << "." << std::setw(2) << std::setfill('0') << cent << '\n';
 	}
-
+//=====================================================================================================================================
 	friend std::istream &operator>>(std::istream &is, Money &M)
 	{
 		char op;
-		double D1, D2;
-		char V1, V2;
+		double D;
+		char V;
 		double scalar;
-		is >> V1 >> D1;
 
-		D1 *= 100;
+		V = M.char_to_string(is, M);
+		M.valuta = V;
 
-		is >> op;
-		M.cent = D1;
+		is >> D;
+		//	Нужно верная конвертация из double в long
+		M.cent = static_cast<long>(D * 100.0 + 0.5);
 
-		char next = is.peek();
-
-		if (isdigit(next))
-		{
-			is >> scalar;
-
-			if (op == '*')
-				M.cent *= scalar;
-
-			if (op == '/')
-				M.cent /= scalar;
-		}
-
-		else
-		{
-			is >> V2 >> D2;
-			D2 *= 100;
-
-			if(op == '+')
-			M.cent += D2;
-
-			if (op == '-')
-				M.cent -= D2;
-		}
-
-
-		// сделать switch с указанием на enum для евро долларов канадских крон датских долларов
+	//	char next = is.peek();
+	//
+	//	if (isdigit(next))
+	//	{
+	//		is >> scalar;
+	//	}
+	//
+	//	if (isalpha(next))
+	//	{
+	//		
+	//		is >> V;
+	//	}
+	//
+	//	is >> D;
 
 		return is;
 	}
-
+//=====================================================================================================================================
 	Money Enter();
-	Money Out(Money &M);
+	double Rounding(double &D);
+	char char_to_string(std::istream &is, Money &M);
+	double Exchange(char &val, double &D);
+
+	Money Operations(Money &M, Money &Mm, char &op);
 
 private:
-	long cent = 0;
+	long cent = 0.0;
+	char valuta;
+	double scalar = 0;
 };
 //=====================================================================================================================================
-Money Money::Out(Money &M)
+Money Money::Operations(Money &M, Money &Mm, char &op)
 {
-	double D = M.cent;
-	int celay = (int)D;
+	Money result;
+	double MD, D1, D2;
 
-	int drobnay = int((D - celay) * 1000);
+		MD = M.Exchange(M.valuta, D1);
+		MD *= 100;
+		
+		if (M.scalar != 0)
+		{
+			if (op == '*')
+			{
+				MD *= scalar;
+				MD = M.Rounding(MD);
+				M.cent = MD * 100;
+			}
 
-	int drobnay_2 = int((D - celay) * 100);
+			if (op == '/')
+			{
+				MD /= scalar;
+				MD = M.Rounding(MD);
+				M.cent = MD * 100;
+			}
+		}
+		else
+		{
+			D1 = M.Exchange(M.valuta, D1);
+			D2 = Mm.Exchange(Mm.valuta, D2);
 
-	int last_dig = drobnay % 10;
+			D1 *= 100;
+			D1 = M.Rounding(D1);
+
+			D2 *= 100;
+			D2 = Mm.Rounding(D2);
+
+			if (op == '+')
+			{
+				MD = D1 + D2;
+				MD = M.Rounding(MD);
+				M.cent = MD * 100;
+			}
+
+			if (op == '-')
+			{
+				MD = D1 - D2;
+				MD = M.Rounding(MD);
+				M.cent = MD * 100;
+			}
+		}
+	return result;
+}
+//=====================================================================================================================================
+char Money::char_to_string(std::istream &is, Money &M)
+{
+	std::string val;
+	char current;
+
+	is.get(current);
+
+	if (isalpha(current))
+	{
+		val += current;
+
+		
+		is.get(current);
+
+		if (isalpha(current))
+		{
+			val += current;
+
+			is.get(current);
+
+			if (isalpha(current))
+			{
+				val += current;
+			}
+		}
+	}
+
+	if (val == "USD")
+		return 'U';
+
+	if (val == "DKK")
+		return 'D';
+
+	if (val == "EUR")
+		return 'E';
+
+	if (val == "RUB")
+		return 'R';
+
+	if (val == "CNY")
+		return 'C';
+
+	if (val == "GBP")
+		return 'G';
+
+	if (val == "CHF")
+		return 'F';
+}
+//=====================================================================================================================================
+double Money::Exchange(char &valuta, double &D)
+{
+	double DKK_Ex = 0.158;
+	double EUR_Ex = 1.05;
+	double RUB_Ex = 0.013;
+	double GBP_Ex = 1.7554;
+	double CNY_Ex = 0.1449;
+	double CHF_Ex = 1.3;
+
+	switch (valuta)
+	{
+	case 'U': return D;
+	case 'D': return D *= DKK_Ex;
+	case 'E': return D *= EUR_Ex;
+	case 'R': return D *= RUB_Ex;
+	case 'G': return D *= GBP_Ex;
+	case 'C': return D *= CNY_Ex;
+	case 'F': return D *= CHF_Ex;
+	default:
+		return D;
+	}
+
+	return D;
+}
+//=====================================================================================================================================
+double Money::Rounding(double &D)
+{
+	int D_round = (int)D;
+
+	int D_interval1 = (D - D_round) * 1000;
+	int D_interval2 = (D - D_round) * 100;
+
+	int last_dig = D_interval1 % 10;
 
 	if (last_dig >= 5 && last_dig != 0)
-		drobnay_2++;
+		D_interval2++;
 
-	M.cent = celay * 100 + drobnay_2;
+	double cents = (D_round * 100) + D_interval2;
 
-		return M;
+	return cents;
 }
 //=====================================================================================================================================
 Money Money::Enter()
 {
-	Money GoCin;
+	Money GoCin1, GoCin2, result;
+	std::string valuta;
+	char op;
 
-	while (std::cin >> GoCin)
+	while (std::cin >> GoCin1 >> op >>  GoCin2)
 	{
-		Out(GoCin);
-		std::cout << GoCin << "\n";
-	} 
-	return GoCin;
+		std::cout << "In valute? USD, DKK, EUR, RUB, CNY, GBP, CHF == "; std::cin >> valuta;
+
+		result.Operations(GoCin1, GoCin2, op);
+
+		std::cout << result << "\n";
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	}
+	return result;
 }
 //=====================================================================================================================================
 int main()
