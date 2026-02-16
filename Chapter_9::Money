@@ -33,17 +33,12 @@ public:
 	friend std::istream &operator>>(std::istream &is, Money &M)
 	{
 		char op = 'NULL';
-		double D = 0.0;
-
-
-
+		double D;
+\
 		M.valuta = M.char_to_string(is, M);
 
 		if (M.valuta == 'L')
-		{
-			is >> M.scalar;
 			return is;
-		}
 
 		else
 		{
@@ -73,17 +68,17 @@ Money Money::Operations(Money &M, Money &Mm, char &op)
 	double D1 = M.cent;
 	double convert_D1 = M.Exchange(M.valuta, D1);
 
-	if (M.scalar != 0)
+	if (Mm.scalar != 0)
 	{
 		if (op == '*')
 		{
-			convert_D1 *= scalar;
+			convert_D1 *= Mm.scalar;
 			result.cent = convert_D1;
 		}
 
 		if (op == '/')
 		{
-			convert_D1 /= scalar;
+			convert_D1 /= Mm.scalar;
 			result.cent = convert_D1;
 		}
 	}
@@ -121,34 +116,27 @@ char Money::char_to_string(std::istream &is, Money &M)
 
 	is.get(current);
 
-	while(isdigit(current))
+	while (isdigit(current))
 	{
 		val += current;
 		is.get(current);
 	}
-	
+
 	if (val != "")
 	{
 		string_to_double(M, val);
+		is.putback(current);
 		return 'L';
 	}
 
 
-	if (isalpha(current))
+	while (isalpha(current))
 	{
-		for (int i = 0; i < 3;)
-		{
-			val += current;
-			is.get(current);
-	
-			if (isalpha(current))
-				i++;
-	
-			else
-				break;
-		}
+		val += current;
+		is.get(current);
 	}
-	
+
+	is.putback(current);
 
 	if (val == "USD")
 		return 'U';
@@ -183,15 +171,15 @@ double Money::Exchange(char &valuta, double &D)
 
 	switch (valuta)
 	{
-		case 'U': return D;
-		case 'D': return D *= DKK_Ex;
-		case 'E': return D *= EUR_Ex;
-		case 'R': return D *= RUB_Ex;
-		case 'G': return D *= GBP_Ex;
-		case 'C': return D *= CNY_Ex;
-		case 'F': return D *= CHF_Ex;
-		default:
-			return D;
+	case 'U': return D;
+	case 'D': return D *= DKK_Ex;
+	case 'E': return D *= EUR_Ex;
+	case 'R': return D *= RUB_Ex;
+	case 'G': return D *= GBP_Ex;
+	case 'C': return D *= CNY_Ex;
+	case 'F': return D *= CHF_Ex;
+	default:
+		return D;
 	}
 
 	return D;
@@ -199,21 +187,21 @@ double Money::Exchange(char &valuta, double &D)
 //=====================================================================================================================================
 double Money::Rounding(double &D)
 {
-//																													int D_round = (int)D;
-//																												
-//																													int D_interval1 = (D - D_round) * 100;
-//																													int D_interval2 = (D - D_round) * 100;
-//																												
-//																													int last_dig = D_interval1 % 10;
-//																												
-//																													if (last_dig >= 5 && last_dig != 0)
-//																													{
-//																														D_interval2++;
-//																														double cents = (D_round * 100) + D_interval2;
-//																														return cents;
-//																													}
+	//													int D_round = (int)D;
+	//												
+	//													int D_interval1 = (D - D_round) * 100;
+	//													int D_interval2 = (D - D_round) * 100;
+	//												
+	//													int last_dig = D_interval1 % 10;
+	//												
+	//													if (last_dig >= 5 && last_dig != 0)
+	//													{
+	//														D_interval2++;
+	//														double cents = (D_round * 100) + D_interval2;
+	//														return cents;
+	//													}
 
-//	int last_dig = (int)D % 10;
+	//	int last_dig = (int)D % 10;
 
 
 	return D;
@@ -228,6 +216,7 @@ Money Money::Enter()
 	while (std::cin >> GoCin1 >> op >> GoCin2)
 	{
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
 		result = result.Operations(GoCin1, GoCin2, op);
 		std::cout << result << "\n";
 	}
