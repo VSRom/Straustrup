@@ -22,41 +22,23 @@ public:
 
 		double dollar = M.cent / 100;
 		double cent = M.cent % 100;
+		std::string valuta = M.valuta_out;
 
 
-
-		return os << M.valuta_out << dollar << "." << std::setw(2) << std::setfill('0') << cent << '\n';
+		return os << valuta << dollar << "." << std::setw(2) << std::setfill('0') << cent << '\n';
 	}
 	//=====================================================================================================================================
 	friend std::istream &operator>>(std::istream &is, Money &M)
 	{
-		char op;
-		double D;
-		double scalar;
+		char op = 'NULL';
+		double D = 0.0;
+		double scalar = 0.0;
 
 		M.valuta = M.char_to_string(is, M);
 
 		is >> D;
 
 		M.cent = D * 100;
-
-		//	Нужно верная конвертация из double в long
-		//	M.cent = static_cast<long>(D + 0.5);
-
-		//	char next = is.peek();
-		//
-		//	if (isdigit(next))
-		//	{
-		//		is >> scalar;
-		//	}
-		//
-		//	if (isalpha(next))
-		//	{
-		//		
-		//		is >> V;
-		//	}
-		//
-		//	is >> D;
 
 		return is;
 	}
@@ -70,17 +52,16 @@ public:
 
 private:
 	long cent = 0.0;
-	char valuta;
+	char valuta = 'NULL';
 	double scalar = 0;
-	std::string valuta_out;
+	std::string valuta_out = {};
 };
 //=====================================================================================================================================
 Money Money::Operations(Money &M, Money &Mm, char &op)
 {
-	Money result;
-	double MD, D1, D2;
-	D1 = M.cent;
-	MD = M.Exchange(M.valuta, D1);
+	Money result = {};
+	double D1 = M.cent;
+	double MD = M.Exchange(M.valuta, D1);
 
 	if (M.scalar != 0)
 	{
@@ -100,7 +81,7 @@ Money Money::Operations(Money &M, Money &Mm, char &op)
 	}
 	else
 	{
-		D2 = Mm.cent;
+		double D2 = Mm.cent;
 		D2 = Mm.Exchange(Mm.valuta, D2);
 		D1 = M.Rounding(D1);
 
@@ -125,8 +106,8 @@ Money Money::Operations(Money &M, Money &Mm, char &op)
 //=====================================================================================================================================
 char Money::char_to_string(std::istream &is, Money &M)
 {
-	std::string val;
-	char current;
+	std::string val = {};
+	char current = 'NULL';
 
 	is.get(current);
 
@@ -219,8 +200,8 @@ double Money::Rounding(double &D)
 Money Money::Enter()
 {
 	Money GoCin1, GoCin2, result;
-	std::string valuta;
-	char op;
+	std::string valuta = {};
+	char op = 'NULL';
 
 	while (std::cin >> GoCin1 >> op >> GoCin2)
 	{
