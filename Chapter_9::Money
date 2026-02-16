@@ -12,52 +12,55 @@ public:
 		: cent(cent), valuta(valuta)
 	{
 	}
-//=====================================================================================================================================
+	//=====================================================================================================================================
 	Money()
 	{
 	}
-//=====================================================================================================================================
+	//=====================================================================================================================================
 	friend std::ostream &operator<<(std::ostream &os, const Money &M)
 	{
 
 		double dollar = M.cent / 100;
 		double cent = M.cent % 100;
 
-		return os << M.valuta << dollar << "." << std::setw(2) << std::setfill('0') << cent << '\n';
+
+
+		return os << M.valuta_out << dollar << "." << std::setw(2) << std::setfill('0') << cent << '\n';
 	}
-//=====================================================================================================================================
+	//=====================================================================================================================================
 	friend std::istream &operator>>(std::istream &is, Money &M)
 	{
 		char op;
 		double D;
-		char V;
 		double scalar;
 
-		V = M.char_to_string(is, M);
-		M.valuta = V;
+		M.valuta = M.char_to_string(is, M);
 
 		is >> D;
-		//	Нужно верная конвертация из double в long
-		M.cent = static_cast<long>(D * 100.0 + 0.5);
 
-	//	char next = is.peek();
-	//
-	//	if (isdigit(next))
-	//	{
-	//		is >> scalar;
-	//	}
-	//
-	//	if (isalpha(next))
-	//	{
-	//		
-	//		is >> V;
-	//	}
-	//
-	//	is >> D;
+		M.cent = D * 100;
+
+		//	Нужно верная конвертация из double в long
+		//	M.cent = static_cast<long>(D + 0.5);
+
+		//	char next = is.peek();
+		//
+		//	if (isdigit(next))
+		//	{
+		//		is >> scalar;
+		//	}
+		//
+		//	if (isalpha(next))
+		//	{
+		//		
+		//		is >> V;
+		//	}
+		//
+		//	is >> D;
 
 		return is;
 	}
-//=====================================================================================================================================
+	//=====================================================================================================================================
 	Money Enter();
 	double Rounding(double &D);
 	char char_to_string(std::istream &is, Money &M);
@@ -69,57 +72,54 @@ private:
 	long cent = 0.0;
 	char valuta;
 	double scalar = 0;
+	std::string valuta_out;
 };
 //=====================================================================================================================================
 Money Money::Operations(Money &M, Money &Mm, char &op)
 {
 	Money result;
 	double MD, D1, D2;
+	D1 = M.cent;
+	MD = M.Exchange(M.valuta, D1);
 
-		MD = M.Exchange(M.valuta, D1);
-		MD *= 100;
-		
-		if (M.scalar != 0)
+	if (M.scalar != 0)
+	{
+		if (op == '*')
 		{
-			if (op == '*')
-			{
-				MD *= scalar;
-				MD = M.Rounding(MD);
-				M.cent = MD * 100;
-			}
-
-			if (op == '/')
-			{
-				MD /= scalar;
-				MD = M.Rounding(MD);
-				M.cent = MD * 100;
-			}
+			MD *= scalar;
+			MD = M.Rounding(MD);
+			result.cent = MD;
 		}
-		else
+
+		if (op == '/')
 		{
-			D1 = M.Exchange(M.valuta, D1);
-			D2 = Mm.Exchange(Mm.valuta, D2);
-
-			D1 *= 100;
-			D1 = M.Rounding(D1);
-
-			D2 *= 100;
-			D2 = Mm.Rounding(D2);
-
-			if (op == '+')
-			{
-				MD = D1 + D2;
-				MD = M.Rounding(MD);
-				M.cent = MD * 100;
-			}
-
-			if (op == '-')
-			{
-				MD = D1 - D2;
-				MD = M.Rounding(MD);
-				M.cent = MD * 100;
-			}
+			MD /= scalar;
+			MD = M.Rounding(MD);
+			result.cent = MD;
 		}
+	}
+	else
+	{
+		D2 = Mm.cent;
+		D2 = Mm.Exchange(Mm.valuta, D2);
+		D1 = M.Rounding(D1);
+
+		D2 = Mm.Rounding(D2);
+
+		if (op == '+')
+		{
+			MD = D1 + D2;
+			MD = M.Rounding(MD);
+			result.cent = MD;
+		}
+
+		if (op == '-')
+		{
+			MD = D1 - D2;
+			MD = M.Rounding(MD);
+			result.cent = MD;
+		}
+	}
 	return result;
 }
 //=====================================================================================================================================
@@ -134,7 +134,7 @@ char Money::char_to_string(std::istream &is, Money &M)
 	{
 		val += current;
 
-		
+
 		is.get(current);
 
 		if (isalpha(current))
@@ -183,15 +183,15 @@ double Money::Exchange(char &valuta, double &D)
 
 	switch (valuta)
 	{
-	case 'U': return D;
-	case 'D': return D *= DKK_Ex;
-	case 'E': return D *= EUR_Ex;
-	case 'R': return D *= RUB_Ex;
-	case 'G': return D *= GBP_Ex;
-	case 'C': return D *= CNY_Ex;
-	case 'F': return D *= CHF_Ex;
-	default:
-		return D;
+		case 'U': return D;
+		case 'D': return D *= DKK_Ex;
+		case 'E': return D *= EUR_Ex;
+		case 'R': return D *= RUB_Ex;
+		case 'G': return D *= GBP_Ex;
+		case 'C': return D *= CNY_Ex;
+		case 'F': return D *= CHF_Ex;
+		default:
+			return D;
 	}
 
 	return D;
@@ -207,11 +207,13 @@ double Money::Rounding(double &D)
 	int last_dig = D_interval1 % 10;
 
 	if (last_dig >= 5 && last_dig != 0)
+	{
 		D_interval2++;
+		double cents = (D_round * 100) + D_interval2;
+		return cents;
+	}
 
-	double cents = (D_round * 100) + D_interval2;
-
-	return cents;
+	return D;
 }
 //=====================================================================================================================================
 Money Money::Enter()
@@ -220,11 +222,11 @@ Money Money::Enter()
 	std::string valuta;
 	char op;
 
-	while (std::cin >> GoCin1 >> op >>  GoCin2)
+	while (std::cin >> GoCin1 >> op >> GoCin2)
 	{
 		std::cout << "In valute? USD, DKK, EUR, RUB, CNY, GBP, CHF == "; std::cin >> valuta;
-
-		result.Operations(GoCin1, GoCin2, op);
+		result.valuta_out = valuta;
+		result = result.Operations(GoCin1, GoCin2, op);
 
 		std::cout << result << "\n";
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
