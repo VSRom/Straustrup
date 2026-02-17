@@ -133,26 +133,16 @@ double Money::string_to_double(Money &M, std::string &val)
 //=====================================================================================================================================
 std::string Money::switch_char(const char &val)
 {
-	if (val == 'U')
-		return "USD";
-
-	if (val == 'D')
-		return "DKK";
-
-	if (val == 'E')
-		return "EUR";
-
-	if (val == 'R')
-		return "RUB";
-
-	if (val == 'C')
-		return "CNY";
-
-	if (val == 'G')
-		return "GBP";
-
-	if (val == 'F')
-		return "CHF";
+	switch (val)
+	{
+		case 'U': return "USD";
+		case 'D': return "DKK";
+		case 'E': return "EUR";
+		case 'R': return "RUB";
+		case 'C': return "CNY";
+		case 'G': return "GBP";
+		case 'F': return "CHF";
+	}
 }
 //=====================================================================================================================================
 char Money::switch_string(std::string &val)
@@ -272,7 +262,7 @@ Money Money::Enter()
 int main() try
 {
 	Money mon;
-	mon.Enter();	//	lab-6R
+	mon.Enter();
 }
 catch (const std::exception &e)
 {
