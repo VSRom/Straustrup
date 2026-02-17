@@ -2,8 +2,7 @@
 #include <iostream>
 #include <cctype>
 #include <iomanip>
-
-
+#include <stdexcept>
 //=====================================================================================================================================
 class Money
 {
@@ -57,7 +56,7 @@ public:
 
 private:
 	long cent = 0.0;
-	char valuta = 'NULL';
+	char valuta = 'L';
 	double scalar = 0;
 	std::string valuta_out = {};
 };
@@ -73,12 +72,18 @@ Money Money::Operations(Money &M, Money &Mm, char &op)
 	{
 		if (op == '*')
 		{
+			if (Mm.scalar == 0)
+				throw std::invalid_argument("Error! Wrong scalar");
+
 			H_convert_D1 *= Mm.scalar;
 			result.cent = Rounding(H_convert_D1);
 		}
 
 		if (op == '/')
 		{
+			if (Mm.scalar == 0)
+				throw std::invalid_argument("Error! Wrong scalar");
+
 			H_convert_D1 /= Mm.scalar;
 			result.cent = Rounding(H_convert_D1);
 		}
@@ -91,12 +96,19 @@ Money Money::Operations(Money &M, Money &Mm, char &op)
 
 		if (op == '+')
 		{
+			if (Mm.valuta == 'L')
+				throw std::invalid_argument("Error! Wrong currency");
+
+
 			H_convert_D1 += D2;
 			result.cent = Rounding(H_convert_D1);
 		}
 
 		if (op == '-')
 		{
+			if (Mm.valuta == 'L')
+				throw std::invalid_argument("Error! Wrong currency")
+
 			H_convert_D1 -= D2;
 			result.cent = Rounding(H_convert_D1);
 		}
@@ -219,10 +231,15 @@ Money Money::Enter()
 	return result;
 }
 //=====================================================================================================================================
-int main()
+int main() try
 {
 	Money mon;
 	mon.Enter();	//	lab-6R
+}
+catch (const std::exception &e)
+{
+	std::cerr << "!!! " << e.what() << '\n';
+	return 1;
 }
 //=====================================================================================================================================
 /*
