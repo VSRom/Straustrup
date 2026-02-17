@@ -21,9 +21,10 @@ public:
 	{
 		double dollar = result.cent / 100;
 		double cent = result.cent % 100;
-		std::string valuta = result.valuta_out;
+		
+		std::string valuta = switch_char(result.valuta_out_R);
 
-		return os << valuta << dollar << "." << std::setw(2) << std::setfill('0') << cent << '\n';
+		return os << valuta << " - " << dollar << "." << std::setw(2) << std::setfill('0') << cent << '\n';
 	}
 	//=====================================================================================================================================
 	friend std::istream &operator>>(std::istream &is, Money &M)
@@ -33,7 +34,7 @@ public:
 		char op = 'NULL';
 		double D;
 		
-			M.valuta = M.char_to_string(is, M);
+		M.valuta = M.char_to_string(is, M);
 
 		if (M.valuta == 'L')
 			return is;
@@ -41,6 +42,10 @@ public:
 		else
 		{
 			is >> D;
+
+			if (D < 0)
+				throw std::invalid_argument("Error! D < 0");
+
 			double H = D * 100;
 			M.cent = M.Rounding(H);
 			return is;
@@ -51,22 +56,26 @@ public:
 	long Rounding(double &D);
 	char char_to_string(std::istream &is, Money &M);
 	double Exchange(char &val, double &D);
-	Money Operations(Money &M, Money &Mm, char &op);
+	Money Operations(Money &M, Money &Mm, char &op, char &VO);
 	double string_to_double(Money &M, std::string &val);
+	char switch_string(std::string &val);
+	static std::string switch_char(const char &val);
 
 private:
 	long cent = 0.0;
 	char valuta = 'L';
 	double scalar = 0;
-	std::string valuta_out = {};
+	char valuta_out_R = {};
 };
 //=====================================================================================================================================
-Money Money::Operations(Money &M, Money &Mm, char &op)
+Money Money::Operations(Money &M, Money &Mm, char &op, char &VO)
 {
 	Money result = {};
 	double D1 = M.cent;
-	double convert_D1 = M.Exchange(M.valuta, D1);
+	double convert_D1 = M.Exchange(VO, D1);
 	double H_convert_D1 = M.Rounding(convert_D1);
+	
+	result.valuta_out_R = VO;
 
 	if (Mm.scalar != 0)
 	{
@@ -91,7 +100,7 @@ Money Money::Operations(Money &M, Money &Mm, char &op)
 	else
 	{
 		double D2 = Mm.cent;
-		D2 = Mm.Exchange(Mm.valuta, D2);
+		D2 = Mm.Exchange(VO, D2);
 		double H_convert_D2 = Mm.Rounding(D2);
 
 		if (op == '+')
@@ -107,7 +116,7 @@ Money Money::Operations(Money &M, Money &Mm, char &op)
 		if (op == '-')
 		{
 			if (Mm.valuta == 'L')
-				throw std::invalid_argument("Error! Wrong currency")
+				throw std::invalid_argument("Error! Wrong currency");
 
 			H_convert_D1 -= D2;
 			result.cent = Rounding(H_convert_D1);
@@ -120,6 +129,54 @@ double Money::string_to_double(Money &M, std::string &val)
 {
 	M.scalar = std::stod(val);
 	return M.scalar;
+}
+//=====================================================================================================================================
+std::string Money::switch_char(const char &val)
+{
+	if (val == 'U')
+		return "USD";
+
+	if (val == 'D')
+		return "DKK";
+
+	if (val == 'E')
+		return "EUR";
+
+	if (val == 'R')
+		return "RUB";
+
+	if (val == 'C')
+		return "CNY";
+
+	if (val == 'G')
+		return "GBP";
+
+	if (val == 'F')
+		return "CHF";
+}
+//=====================================================================================================================================
+char Money::switch_string(std::string &val)
+{
+	if (val == "USD")
+		return 'U';
+
+	if (val == "DKK")
+		return 'D';
+
+	if (val == "EUR")
+		return 'E';
+
+	if (val == "RUB")
+		return 'R';
+
+	if (val == "CNY")
+		return 'C';
+
+	if (val == "GBP")
+		return 'G';
+
+	if (val == "CHF")
+		return 'F';
 }
 //=====================================================================================================================================
 char Money::char_to_string(std::istream &is, Money &M)
@@ -152,26 +209,7 @@ char Money::char_to_string(std::istream &is, Money &M)
 
 	is.putback(current);
 
-	if (val == "USD")
-		return 'U';
-
-	if (val == "DKK")
-		return 'D';
-
-	if (val == "EUR")
-		return 'E';
-
-	if (val == "RUB")
-		return 'R';
-
-	if (val == "CNY")
-		return 'C';
-
-	if (val == "GBP")
-		return 'G';
-
-	if (val == "CHF")
-		return 'F';
+	switch_string(val);
 }
 //=====================================================================================================================================
 double Money::Exchange(char &valuta, double &D)
@@ -203,9 +241,9 @@ long Money::Rounding(double &D)
 {
 	long cent_R = D;
 	int D_round = (int)D;
-	double D_interval1 = (D - D_round);		// Получаю дробь
+	double D_interval1 = (D - D_round);
 
-	if (D_interval1 >= 0.5)		// Проверяю дробь на приведение к 1 или без изменений
+	if (D_interval1 >= 0.5)
 	{
 		cent_R++;
 		return cent_R;
@@ -218,14 +256,14 @@ Money Money::Enter()
 {
 	Money GoCin1, GoCin2, result;
 	std::string valuta = {};
+	std::string valuta_out = {};
 	char op = 'NULL';
 
 	while (std::cin >> GoCin1 >> op >> GoCin2)
 	{
-	//	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
-		std::cout << "Please, enter сurrency for converting? USD, CHF, EUR, DKK, RUB, GBP, CNY == "; std::cin >> result.valuta_out;
-		result = result.Operations(GoCin1, GoCin2, op);
+		std::cout << "Please, enter сurrency for converting? USD, CHF, EUR, DKK, RUB, GBP, CNY == "; std::cin >> valuta_out;
+		char VO = switch_string(valuta_out);
+		result = result.Operations(GoCin1, GoCin2, op, VO);
 		std::cout << result << "\n";
 	}
 	return result;
