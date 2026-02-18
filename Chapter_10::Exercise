@@ -20,8 +20,19 @@ public:
 	friend std::istream &operator>>(std::istream &is, Point &P)
 	{
 		is >> std::ws;
+		char ch;
 
-		return is >> P.x >> P.y;
+
+			is >> ch;
+			if (ch != '(') is.setstate(std::ios::failbit);
+			is >> P.x;
+			is >> ch;
+			if (ch != ',') is.setstate(std::ios::failbit);
+			is >> P.y;
+			is >> ch;
+			if (ch != ')') is.setstate(std::ios::failbit);
+
+		return is;
 	}
 	//====================================================================================================================================
 	friend std::ostream &operator<<(std::ostream &os, Point &P)
@@ -31,19 +42,33 @@ public:
 	//====================================================================================================================================
 	friend std::ostream &operator<<(std::ostream &os, std::vector<Point> &P)
 	{
-		for (int i = 0; i < P.size(); i++)
-			return os << "XY - [" << i << "] == " << P[i] << '\n';
+		for (int i = 1; i < P.size() + 1; i++)
+			os << "XY - [" << i << "] == " << P[i - 1] << '\n';
+
+		return os;
 	}
 	//====================================================================================================================================
-	//	double in_file();
-	//	double out_file();
+	friend bool operator==(const std::vector<Point> P, const std::vector<Point> PP)
+	{
+		for (int i = 0; i < P.size(); i++)
+		{
+			if (P[i].x != PP[i].x || P[i].y != PP[i].y)
+				return false;
+			else return true;
+		}
+
+	}
+	//====================================================================================================================================
+	friend bool operator!=(const std::vector<Point> P, const std::vector<Point> PP)
+	{
+		return !(P == PP);
+	}
+	//====================================================================================================================================
+	void out_file(std::vector<Point> &original_points);
 	std::vector<Point> Enter();
 	std::vector<Point> Out(std::vector<Point> &OP);
-
-	double get_x()
-	{
-		return x;
-	}
+	std::vector<Point> in_file();
+	void Double_Out_Comparison(std::vector<Point> &OP, std::vector<Point> &IP);
 
 private:
 	std::vector<Point> points;
@@ -52,32 +77,41 @@ private:
 	double y = 0;
 };
 //========================================================================================================================================
-//					double Point::in_file()
-//					{
-//						//	std::cout << "Пожалуйста, введите имя файла: "; std::cin >> name;
-//						Point p;
-//						std::string name = "in_files/inf.txt";
-//						std::ifstream ist(name.c_str()); // в C++11 можно не использовать c_str() //	== const char *c_name = name.c_str();  // "data.txt\0"
-//						// Для старых библиотек так же может требоваться писать .c_str()
-//					
-//						if (!ist) error(" Невозможно открыть файл для ввода ", name);
-//					
-//						while (ist >> p) 
-//							points.push_back(p);
-//					}
-//					//========================================================================================================================================
-//					double Point::out_file()
-//					{
-//						std::string oname = "out_files/outf.txt";
-//						//	std::cout << "Пожалуйста, введите имя файла для вывода: "; 	std::cin >> oname;
-//					
-//						std::ofstream ost(oname);
-//					
-//						if (!ost) error("Невозможно открыть файл вывода ", oname);
-//					
-//						for (int i = 0; i < points.size(); ++i)
-//							ost << '(' << points[i].x << ',' << points[i].y << ")\n";
-//					}
+void Point::out_file(std::vector<Point> &original_points)
+{
+	std::string oname = "mydata.txt";
+	//	std::cout << "Пожалуйста, введите имя файла для вывода: "; 	std::cin >> oname;
+
+	std::ofstream ost(oname);
+
+	if (!ost) error("Unable to open output file ", oname);
+
+	for (int i = 0; i < original_points.size(); ++i)
+		ost << '(' << original_points[i].x << ',' << original_points[i].y << ")\n";
+
+	ost.close();
+}
+//========================================================================================================================================
+std::vector<Point> Point::in_file()
+{
+	std::vector<Point> processed_points;
+	Point PP;
+	std::string name = "mydata.txt";
+
+	std::ifstream ist(name.c_str()); // в C++11 можно не использовать c_str() //	== const char *c_name = name.c_str();  // "data.txt\0"
+	// Для старых библиотек так же может требоваться писать .c_str()
+
+	if (!ist) error(" Unable to open output file ", name);
+
+	//	ist.open(name, std::ios_base::in);
+
+	while (ist >> PP)
+		processed_points.push_back(PP);
+
+	if (ist.eof()) return processed_points;
+
+	return processed_points;
+}
 //========================================================================================================================================
 //					void fill_from_file(std::vector<Point>&points, std::string & name)
 //					{
@@ -94,7 +128,9 @@ std::vector<Point> Point::Enter()
 
 	for (int i = 0; i < 7; i++)
 	{
-		std::cout << "Please, enter pair(X Y) == "; std::cin >> p;
+		std::cout << "Please, enter pair(X Y) == "; std::cin >> x >> y;
+		p.x = x;
+		p.y = y;
 		original_points.push_back(p);
 	}
 	std::cout << '\n';
@@ -103,18 +139,29 @@ std::vector<Point> Point::Enter()
 //========================================================================================================================================
 std::vector<Point> Point::Out(std::vector<Point> &OP)
 {
-	for (int i = 0; i < OP.size(); i++)
-	{
-		std::cout << OP[i];
-	}
+	std::cout << OP;
 	return OP;
+}
+//========================================================================================================================================
+void Point::Double_Out_Comparison(std::vector<Point> &OP, std::vector<Point> &IP)
+{
+		if (OP != IP)
+			std::cout << "Error! Something is wrong" << '\n';
 }
 //========================================================================================================================================
 int main()
 {
+	setlocale(LC_ALL, "Rus");
 	Point P;
 	std::vector<Point> OP = P.Enter();
+	P.out_file(OP);
+	std::vector<Point> IP = P.in_file();
+
 	P.Out(OP);
+	std::cout << '\n' << '\n';
+	P.Out(IP);
+
+	P.Double_Out_Comparison(OP, IP);
 }
 //========================================================================================================================================
 /*
@@ -137,13 +184,12 @@ fs.open("foo", ios_base::in); // открываем файл для ввода
 fs.open("foo", ios_base::out); // невыполнено: поток ifs уже открыт
 if (!fs) error("невозможно");
 //========================================================================================================================================
-	V	1. Разработайте программу, работающую с точками (см. раздел 10.4). Начните с определения типа данных Point, имеющего два члена — координаты x и y.
-	V	2. Используя код и обсуждение из раздела 10.4, предложите пользователю ввести семь пар (x,y). После ввода данных запишите их в вектор объектов класса Point с именем original_points.
-	V	3. Выведите на печать данные из объекта original_points, чтобы увидеть, как они выглядят.
-//========================================================================================================================================
-4. Откройте поток ofstream и выведите все точки в файл mydata.txt. В системе Windows для облегчения просмотра данных с помощью простого текстового редактора (например, WordPad) лучше использовать расширение файла .txt.
-5. Закройте поток ofstream, а затем откройте поток ifstream для файла mydata.txt. Введите данные из файла mydata.txt и запишите их в новый вектор с именем processed_points.
-6. Выведите на печать данные из обоих векторов.
-7. Сравните эти два вектора и выведите на печать сообщение Что-то не так !, если количество элементов или значений элементов в векторах не совпадает.
+V	1. Разработайте программу, работающую с точками (см. раздел 10.4). Начните с определения типа данных Point, имеющего два члена — координаты x и y.
+V	2. Используя код и обсуждение из раздела 10.4, предложите пользователю ввести семь пар (x,y). После ввода данных запишите их в вектор объектов класса Point с именем original_points.
+V	3. Выведите на печать данные из объекта original_points, чтобы увидеть, как они выглядят.
+V	4. Откройте поток ofstream и выведите все точки в файл mydata.txt. В системе Windows для облегчения просмотра данных с помощью простого текстового редактора (например, WordPad) лучше использовать расширение файла .txt.
+V	5. Закройте поток ofstream, а затем откройте поток ifstream для файла mydata.txt. Введите данные из файла mydata.txt и запишите их в новый вектор с именем processed_points.
+V	6. Выведите на печать данные из обоих векторов.
+V	7. Сравните эти два вектора и выведите на печать сообщение Что-то не так !, если количество элементов или значений элементов в векторах не совпадает.
 //========================================================================================================================================
 */
