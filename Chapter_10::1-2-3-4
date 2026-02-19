@@ -1,4 +1,170 @@
 //==============================================================================================//==============================================================================================
+V	4. Модифицируйте программу store_temps.cpp из упр. 2, включив в нее суффикс c для шкалы Цельсия и суффикс f для шкалы Фаренгейта.
+Затем модифицируйте программу temp_stats.cpp, чтобы перед записью в вектор проверить каждое показание, преобразовать показание
+из шкалы Цельсия в шкалу Фаренгейта.
+//==============================================================================================//==============================================================================================
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <algorithm>
+//========================================================================================================================================
+void error(std::string s, std::string &name)
+{
+	std::cerr << s << " " << name << '\n';
+}
+//==============================================================================================
+struct Reading
+{
+	friend std::istream &operator>>(std::istream &is, Reading &R)			// temp_stats
+	{
+		is >> std::ws;
+		char ch;
+
+		is >> ch;
+		if (ch != '(') is.setstate(std::ios::failbit);
+		is >> R.hour;
+		is >> ch;
+		if (ch != ',') is.setstate(std::ios::failbit);
+		is >> R.temperature;
+		is >> ch;
+		if (ch != '=') is.setstate(std::ios::failbit);
+		is >> R.scale;
+		
+			if (R.scale == 'c')
+			{
+				double F = 1.8 * R.temperature + 32;
+				R.scale = 'f';
+				R.temperature = F;
+			}
+
+		is >> ch;
+		if (ch != ')') is.setstate(std::ios::failbit);
+
+		return is;
+	}
+	//==============================================================================================
+	double get_temp()
+	{
+		return temperature;
+	}
+	//==============================================================================================
+	Reading(int h, double t, char s)
+		:hour(h), temperature(t), scale(s)
+	{
+	}
+
+	Reading()
+	{
+	}
+
+	void in_file(std::vector<Reading> &R);
+	std::vector<Reading> out_file();
+
+private:
+	int hour = 0;
+	double temperature = 0.0;
+	char scale = '\0';
+};
+//==============================================================================================
+void Reading::in_file(std::vector<Reading> &R)					// store_temps
+{
+	std::string oname = "raw_temps.txt";
+
+	std::ofstream ost(oname);
+
+	if (!ost) error(" Unable to open output file ", oname);
+
+	for (int i = 0; i < R.size(); i++)
+	{
+		ost << "(" << R[i].hour << ", " << R[i].temperature << " = " <<R[i].scale << ")\n";
+	}
+}
+//==============================================================================================
+std::vector<Reading> Reading::out_file()							// temp_stats
+{
+	std::vector<Reading> temps = {};
+	Reading TT;
+	std::string name = "raw_temps.txt";
+
+	std::ifstream ist(name);
+
+	if (!ist) error(" Unable to open output file ", name);
+
+	while (ist >> TT)
+	{
+
+		temps.push_back(TT);
+	}
+
+	if (ist.eof()) return temps;
+
+	return temps;
+}
+//==============================================================================================
+double average(std::vector<Reading> &R)							// temp_stats
+{
+	double G = 0.0;
+	int Gs = 0;
+
+	for (int i = 0; i < R.size(); i++)
+	{
+		G += R[i].get_temp();
+		Gs++;
+	}
+
+	double avg = G / Gs;
+
+	return avg;
+}
+//==============================================================================================
+double median(std::vector<Reading> &R)							// temp_stats
+{
+	double medi = 0.0;
+	int med = 0;
+	std::vector<double> tempera;
+
+	for (int i = 0; i < R.size(); i++)
+	{
+		double TT = R[i].get_temp();
+		tempera.push_back(TT);
+	}
+
+	std::sort(tempera.begin(), tempera.end());
+
+	if (tempera.size() % 2 != 0)
+	{
+		int P = tempera.size() / 2;
+		medi = tempera[P];
+	}
+
+	if (tempera.size() % 2 == 0)
+	{
+		int P = tempera.size() / 2;
+		int Pp = P + 1;
+		medi = (tempera[P] + tempera[Pp]) / 2;
+	}
+
+	return medi;
+}
+//==============================================================================================
+int main()
+{
+	Reading R;
+	std::vector<Reading> Roll = R.out_file();
+	std::cout << "AVERAGE == [" << average(Roll) << "]\n" << "MEDIAN == [" << median(Roll) << "]\n";			// temp_stats
+
+
+	//		Reading Rr;
+	//		std::vector<Reading> R = { {7, 28.6, 'c'}, {8, 32.7, 'f'}, {10, 28.6, 'c'}, {11, 32.7, 'f'}, {12, 18.6, 'c'}, {13, 62.7, 'c'}, {14, 58.6, 'c'}, {15, 98.6, 'f'},
+	//			{16, 72.7, 'c'}, {17, 68.6, 'c'}, {18, 12.7, 'c'}, {15, 8.6, 'c'}, {14, 32.7, 'c'}, {3, 26, 'c'}, {2, 24.7, 'c'}, {9, 28.6, 'c'}, {7, 32.7, 'f'}, {19, 28.6, 'c'}, {18, 22.7, 'c'},
+	//			{15, 28.6, 'f'}, {11, 32.7, 'c'}, {23, 28.6, 'f'}, {20, 14.7, 'c'}, {12, 28.6, 'c'}, {19, 32.7, 'c'}, {14, 19.6, 'c'}, {18, 32.7, 'c'}, {15, 28.6, 'c'}, {16, 32.7, 'c'},
+	//			{15, 28.6, 'c'}, {12, 32.7, 'c'}, {18, 29.6, 'c'}, {17, 32.7, 'c'}, {16, 28.6, 'c'}, {15, 38.7, 'c'}, {14, 28.6, 'c'}, {7, 32.7, 'c'}, {9, 24.6, 'c'}, {8, 32.7, 'c'},
+	//			{6, 28.6, 'c'}, {5, 38.7, 'c'}, {4, 28.6, 'c'}, {3, 32.7, 'c'}, {2, 28.6, 'c'}, {1, 32.7, 'c'}, {21, 28.6, 'c'}, {22, 32.7, 'c'}, {23, 32.7, 'c'} };						// store_temps
+	//		
+	//		Rr.in_file(R);
+}
+//==============================================================================================//==============================================================================================
 //  V  3. Напишите программу, считывающую данные из файла raw_temps.txt, созданного в упр. 2,
 в вектор, а затем вычислите среднее и медиану температур.Назовите программу temp_stats.cpp.
 //==============================================================================================//==============================================================================================
