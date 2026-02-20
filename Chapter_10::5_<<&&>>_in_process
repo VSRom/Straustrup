@@ -1,0 +1,272 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <array>
+
+void end_of_loop(std::istream &ist, char term, const std::string &message);
+int month_to_int(std::string s);
+//========================================================================================================================================
+void error1(std::string s)
+{
+	std::cerr << s << '\n';
+}
+//========================================================================================================================================
+void error2(std::string s, std::string name)
+{
+	std::cerr << s << name << '\n';
+}
+//========================================================================================================================================
+void error3(std::string s, int num)
+{
+	std::cerr << s << num << '\n';
+}
+//========================================================================================================================================
+struct Reading
+{
+	friend std::istream &operator>>(std::istream &is, Reading &r)
+	{
+		char ch1;
+
+		if (is >> ch1 && ch1 != '(')
+		{
+			is.unget();							
+			is.clear(std::ios_base::failbit);
+			return is;
+		}
+
+		char ch2;
+		int d;
+		int h;
+		double t;
+
+		is >> d >> h >> t >> ch2;
+
+		if (!is || ch2 != ')') error1("Bad write");
+
+		r.day = d;
+		r.hour = h;
+		r.temperature = t;
+
+		return is;
+	}
+	
+	friend std::ostream &operator<<(std::ostream &ofs, Reading &r)
+	{
+
+	}
+
+	int day;
+	int hour;
+	double temperature;
+};
+bool is_valid(const Reading &r);
+//========================================================================================================================================
+struct Month
+{
+
+	friend std::istream &operator>>(std::istream &is, Month &m)			
+	{
+		char ch = 0;
+
+		if (is >> ch && ch != '{')
+		{
+			is.unget();
+			is.clear(std::ios_base::failbit);
+			return is;
+		}
+
+		std::string month_marker;
+		std::string mm;
+
+		is >> month_marker >> mm;
+
+		if (!is || month_marker != "month")
+			error1("Wrong begin Month");
+
+		m.month = month_to_int(mm);
+
+		Reading r;
+		int duplicates = 0;
+		int invalids = 0;
+
+		is >> r;
+
+		if (is_valid(r))
+		{
+			m.d_h_t.push_back(r);
+		}
+
+		if (invalids)
+			error3("Wrong readings in Month", invalids);
+
+		if (duplicates)
+			error3("Repeated readings in Month", duplicates);
+
+		end_of_loop(is, '}', "Wrong end Month");
+
+		return is;
+	}
+
+	friend std::ostream &operator<<(std::ostream &ofs, Month &m)
+	{
+
+	}
+
+	std::vector<Reading> d_h_t;
+	int month;
+
+};
+//========================================================================================================================================
+struct Year
+{
+	friend std::istream &operator>>(std::istream &is, Year &y)
+	{
+		char ch;
+		is >> ch;
+		if (ch != '{')
+		{
+			is.unget();
+			is.clear(std::ios::failbit);
+			return is;
+		}
+
+		std::string year_marker;
+		int yy;
+
+		is >> year_marker >> yy;
+
+		if (!is || year_marker != "year")
+			error1("Wrong begin Year");
+
+		y.year = yy;
+
+		while (true)
+		{
+			Month m;
+			if (!(is >> m))
+				break;
+
+			y.month[m.month] = m;
+		}
+
+		end_of_loop(is, '}', "Wrong end Year");
+		return is;
+	}
+
+	friend std::ostream &operator<<(std::ostream &ofs, Year &y)
+	{
+
+	}
+//========================================================================================================================================
+	int year;
+	std::array<Month, 12> month;
+};
+
+//========================================================================================================================================
+void init_input_tbl(std::vector<std::string> &tbl)
+{
+	tbl.push_back("jan");
+	tbl.push_back("feb");
+	tbl.push_back("mar");
+	tbl.push_back("apr");
+	tbl.push_back("may");
+	tbl.push_back("jun");
+	tbl.push_back("jul");
+	tbl.push_back("aug");
+	tbl.push_back("sep");
+	tbl.push_back("oct");
+	tbl.push_back("nov");
+	tbl.push_back("dec");
+}
+//========================================================================================================================================
+std::vector<std::string> month_input_tbl;
+//========================================================================================================================================
+int month_to_int(std::string s)
+{
+	if (month_input_tbl.empty())
+	init_input_tbl(month_input_tbl);
+
+	for (int i = 0; i < 12; ++i)
+		if (month_input_tbl[i] == s) return i;
+
+	return -1;
+}
+//========================================================================================================================================
+void end_of_loop(std::istream &ist, char term, const std::string &message)
+{
+	if (ist.fail())
+	{
+		ist.clear();
+
+		char ch;
+
+		if (ist >> ch && ch == term) return; // все хорошо
+		error1(message);
+	}
+}
+//========================================================================================================================================
+bool is_valid(const Reading &r)
+{
+	const int implausible_min = -200;
+	const int implausible_max = 200;
+
+	if (r.day < 1 || 31 < r.day)
+		return false;
+
+	if (r.hour < 0 || 23 < r.hour)
+		return false;
+
+	if (r.temperature < implausible_min || implausible_max < r.temperature)
+		return false;
+
+	return true;
+}
+//========================================================================================================================================
+void print_year(std::ofstream &ofs, Year &Y)
+{
+	for (int i = 0; i < Y.month.size(); i++)
+		ofs << "(" << Y.year << ") - (" << Y.month[i].d_h_t[i].day << " - " << Y.month[i].d_h_t[i].hour << " - " << Y.month[i].d_h_t[i].temperature << ")" << Y.month;  // Wrong, need << operators
+}
+//========================================================================================================================================
+int main()
+{
+	// open the file for input: (Enter into the file)
+
+	std::string name_in = "file_in.txt";
+	std::ifstream ifs(name_in);
+	
+	if (!ifs) error2(" Don`t open file! ", name_in);
+	
+	ifs.exceptions(ifs.exceptions() | std::ios_base::badbit);
+	
+	
+	// open the file for reading: (Take from the file)
+
+	std::string name_out = "file_out.txt";
+	std::ofstream ofs(name_out);
+
+	if (!ofs) error2(" Don`t open file! ", name_out);
+
+	std::vector<Year> ys;
+
+	while (true)
+	{
+		Year y;
+
+		if (!(ifs >> y))
+			break;
+
+		ys.push_back(y);
+	}
+
+	std::cout << " Counted: " << ys.size() << " records by year.\n";
+
+	for (int i = 0; i < ys.size(); ++i)
+		print_year(ofs, ys[i]);
+
+	return 0;
+}
+//========================================================================================================================================
+//	5. Напишите функцию print_year(), упомянутую в разделе 10.11.2.
