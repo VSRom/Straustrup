@@ -31,7 +31,7 @@ struct Reading
 
 		if (is >> ch1 && ch1 != '(')
 		{
-			is.unget();							
+			is.unget();
 			is.clear(std::ios_base::failbit);
 			return is;
 		}
@@ -51,22 +51,24 @@ struct Reading
 
 		return is;
 	}
-	
-	friend std::ostream &operator<<(std::ostream &ofs, Reading &r)
-	{
 
-	}
+//	friend std::ostream &operator<<(std::ostream &ofs, Reading &r)
+//	{
+//		return ofs << "(" << r.hour << " h - " << r.day << " d - " << r.temperature << " t)" << '\n';
+//	}
 
 	int day;
 	int hour;
 	double temperature;
 };
 bool is_valid(const Reading &r);
+std::string int_to_string(int &m);
+std::vector<std::string> month_input_tbl;
 //========================================================================================================================================
 struct Month
 {
 
-	friend std::istream &operator>>(std::istream &is, Month &m)			
+	friend std::istream &operator>>(std::istream &is, Month &m)
 	{
 		char ch = 0;
 
@@ -111,13 +113,22 @@ struct Month
 
 	friend std::ostream &operator<<(std::ostream &ofs, Month &m)
 	{
-
+		return ofs << "month: " << int_to_string(m.month);
 	}
 
 	std::vector<Reading> d_h_t;
 	int month;
 
 };
+//========================================================================================================================================
+std::string int_to_string(int &m)
+{
+	for (int i = 0; i < 12; ++i)
+	{
+		if (i == m)
+			return month_input_tbl[i];
+	}
+}
 //========================================================================================================================================
 struct Year
 {
@@ -154,16 +165,10 @@ struct Year
 		end_of_loop(is, '}', "Wrong end Year");
 		return is;
 	}
-
-	friend std::ostream &operator<<(std::ostream &ofs, Year &y)
-	{
-
-	}
 //========================================================================================================================================
 	int year;
 	std::array<Month, 12> month;
 };
-
 //========================================================================================================================================
 void init_input_tbl(std::vector<std::string> &tbl)
 {
@@ -181,12 +186,10 @@ void init_input_tbl(std::vector<std::string> &tbl)
 	tbl.push_back("dec");
 }
 //========================================================================================================================================
-std::vector<std::string> month_input_tbl;
-//========================================================================================================================================
 int month_to_int(std::string s)
 {
 	if (month_input_tbl.empty())
-	init_input_tbl(month_input_tbl);
+		init_input_tbl(month_input_tbl);
 
 	for (int i = 0; i < 12; ++i)
 		if (month_input_tbl[i] == s) return i;
@@ -226,8 +229,13 @@ bool is_valid(const Reading &r)
 //========================================================================================================================================
 void print_year(std::ofstream &ofs, Year &Y)
 {
-	for (int i = 0; i < Y.month.size(); i++)
-		ofs << "(" << Y.year << ") - (" << Y.month[i].d_h_t[i].day << " - " << Y.month[i].d_h_t[i].hour << " - " << Y.month[i].d_h_t[i].temperature << ")" << Y.month;  // Wrong, need << operators
+		for (int i = 0; i < Y.month.size(); i++)
+		{
+			for (int j = 0; j < Y.month[i].d_h_t.size(); j++)
+			{
+				ofs << '\n\n' << "year: " << Y.year << '\n' << Y.month[i] << '\n'  << "day: " << Y.month[i].d_h_t[j].day << " hour : " << Y.month[i].d_h_t[j].hour << '\n' << "temperatura : " << Y.month[i].d_h_t[j].temperature;
+			}
+		}
 }
 //========================================================================================================================================
 int main()
@@ -236,12 +244,11 @@ int main()
 
 	std::string name_in = "file_in.txt";
 	std::ifstream ifs(name_in);
-	
+
 	if (!ifs) error2(" Don`t open file! ", name_in);
-	
+
 	ifs.exceptions(ifs.exceptions() | std::ios_base::badbit);
-	
-	
+
 	// open the file for reading: (Take from the file)
 
 	std::string name_out = "file_out.txt";
