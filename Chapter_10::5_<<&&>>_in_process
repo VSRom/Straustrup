@@ -6,7 +6,9 @@
 #include <array>
 
 void end_of_loop(std::istream &ist, char term, const std::string &message);
-int month_to_int(std::string s);
+int month_to_int(std::string &s);
+std::string int_to_string(int &m);
+std::vector<std::string> month_input_tbl;
 //========================================================================================================================================
 void error1(std::string s)
 {
@@ -36,14 +38,24 @@ struct Reading
 			return is;
 		}
 
-		char ch2;
+		char ch2, ch3;
 		int d;
 		int h;
 		double t;
 
-		is >> d >> h >> t >> ch2;
+		is >> d >> h >> t >> ch2 >> ch3;
 
 		if (!is || ch2 != ')') error1("Bad write");
+
+		if (ch3 != '(')
+		{
+			is.unget();
+			is.clear(std::ios::failbit);
+
+			return is;
+		}
+
+		is.unget();
 
 		r.day = d;
 		r.hour = h;
@@ -52,18 +64,16 @@ struct Reading
 		return is;
 	}
 
-//	friend std::ostream &operator<<(std::ostream &ofs, Reading &r)
-//	{
-//		return ofs << "(" << r.hour << " h - " << r.day << " d - " << r.temperature << " t)" << '\n';
-//	}
+	friend std::ostream &operator<<(std::ostream &ofs, Reading &r)
+	{
+		return ofs << "(" << r.hour << " h - " << r.day << " d - " << r.temperature << " t)" << '\n';
+	}
 
 	int day;
 	int hour;
 	double temperature;
 };
 bool is_valid(const Reading &r);
-std::string int_to_string(int &m);
-std::vector<std::string> month_input_tbl;
 //========================================================================================================================================
 struct Month
 {
@@ -89,31 +99,50 @@ struct Month
 
 		m.month = month_to_int(mm);
 
-		Reading r;
-		int duplicates = 0;
-		int invalids = 0;
-
-		is >> r;
-
-		if (is_valid(r))
+		while (true)
 		{
-			m.d_h_t.push_back(r);
+			Reading r;
+			int duplicates = 0;
+			int invalids = 0;
+
+			while (is >> r)
+			{
+				if (is_valid(r))
+				{
+					m.d_h_t.push_back(r);
+				}
+
+			//	char ch1;
+			//	if (is >> ch1 && ch1 != '{')
+			//	{
+			//		is.unget();
+			//	}
+			}
+				
+
+			
+
+			if (invalids)
+				error3("Wrong readings in Month", invalids);
+
+			if (duplicates)
+				error3("Repeated readings in Month", duplicates);
 		}
 
-		if (invalids)
-			error3("Wrong readings in Month", invalids);
-
-		if (duplicates)
-			error3("Repeated readings in Month", duplicates);
-
 		end_of_loop(is, '}', "Wrong end Month");
-
 		return is;
 	}
 
 	friend std::ostream &operator<<(std::ostream &ofs, Month &m)
 	{
-		return ofs << "month: " << int_to_string(m.month);
+		 ofs << "month: " << int_to_string(m.month) << '\n';
+
+		 for (int i = 0; i < m.d_h_t.size(); i++)
+		 {
+			 ofs << m.d_h_t[i];
+		 }
+
+		 return ofs;
 	}
 
 	std::vector<Reading> d_h_t;
@@ -139,7 +168,8 @@ struct Year
 		if (ch != '{')
 		{
 			is.unget();
-			is.clear(std::ios::failbit);
+		//	is.clear(std::ios::failbit);
+
 			return is;
 		}
 
@@ -186,7 +216,7 @@ void init_input_tbl(std::vector<std::string> &tbl)
 	tbl.push_back("dec");
 }
 //========================================================================================================================================
-int month_to_int(std::string s)
+int month_to_int(std::string &s)
 {
 	if (month_input_tbl.empty())
 		init_input_tbl(month_input_tbl);
@@ -229,13 +259,13 @@ bool is_valid(const Reading &r)
 //========================================================================================================================================
 void print_year(std::ofstream &ofs, Year &Y)
 {
-		for (int i = 0; i < Y.month.size(); i++)
+	for (int i = 0; i < Y.month.size(); i++)
+	{
+		for (int j = 0; j < Y.month[i].d_h_t.size(); j++)
 		{
-			for (int j = 0; j < Y.month[i].d_h_t.size(); j++)
-			{
-				ofs << '\n\n' << "year: " << Y.year << '\n' << Y.month[i] << '\n'  << "day: " << Y.month[i].d_h_t[j].day << " hour : " << Y.month[i].d_h_t[j].hour << '\n' << "temperatura : " << Y.month[i].d_h_t[j].temperature;
-			}
+			ofs << "year: " << Y.year << '\n' << Y.month[i] << '\n'  << "day: " << Y.month[i].d_h_t[j].day << " hour : " << Y.month[i].d_h_t[j].hour << '\n' << "temperatura : " << Y.month[i].d_h_t[j].temperature;
 		}
+	}
 }
 //========================================================================================================================================
 int main()
