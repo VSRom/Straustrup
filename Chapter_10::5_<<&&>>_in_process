@@ -38,24 +38,19 @@ struct Reading
 			return is;
 		}
 
-		char ch2, ch3;
+		char ch2;
 		int d;
 		int h;
 		double t;
 
-		is >> d >> h >> t >> ch2 >> ch3;
+		is >> d >> h >> t >> ch2;
 
-		if (!is || ch2 != ')') error1("Bad write");
-
-		if (ch3 != '(')
+		if (!is || ch2 != ')') //error1("Bad write");
 		{
 			is.unget();
-			is.clear(std::ios::failbit);
-
+			is.clear(std::ios_base::failbit);
 			return is;
 		}
-
-		is.unget();
 
 		r.day = d;
 		r.hour = h;
@@ -77,7 +72,6 @@ bool is_valid(const Reading &r);
 //========================================================================================================================================
 struct Month
 {
-
 	friend std::istream &operator>>(std::istream &is, Month &m)
 	{
 		char ch = 0;
@@ -99,35 +93,21 @@ struct Month
 
 		m.month = month_to_int(mm);
 
-		while (true)
-		{
 			Reading r;
-			int duplicates = 0;
-			int invalids = 0;
 
-			while (is >> r)
+			while (true)
 			{
+				if (!(is >> r))
+					break;
+
 				if (is_valid(r))
 				{
 					m.d_h_t.push_back(r);
 				}
-
-			//	char ch1;
-			//	if (is >> ch1 && ch1 != '{')
-			//	{
-			//		is.unget();
-			//	}
-			}
 				
-
-			
-
-			if (invalids)
-				error3("Wrong readings in Month", invalids);
-
-			if (duplicates)
-				error3("Repeated readings in Month", duplicates);
-		}
+				else
+					break;
+			}
 
 		end_of_loop(is, '}', "Wrong end Month");
 		return is;
@@ -135,7 +115,7 @@ struct Month
 
 	friend std::ostream &operator<<(std::ostream &ofs, Month &m)
 	{
-		 ofs << "month: " << int_to_string(m.month) << '\n';
+		ofs << "month: " << int_to_string(m.month) << '\n';
 
 		 for (int i = 0; i < m.d_h_t.size(); i++)
 		 {
@@ -147,7 +127,6 @@ struct Month
 
 	std::vector<Reading> d_h_t;
 	int month;
-
 };
 //========================================================================================================================================
 std::string int_to_string(int &m)
@@ -168,7 +147,7 @@ struct Year
 		if (ch != '{')
 		{
 			is.unget();
-		//	is.clear(std::ios::failbit);
+			is.clear(std::ios::failbit);
 
 			return is;
 		}
@@ -189,15 +168,26 @@ struct Year
 			if (!(is >> m))
 				break;
 
-			y.month[m.month] = m;
+			y.month.push_back(m);
 		}
 
 		end_of_loop(is, '}', "Wrong end Year");
 		return is;
 	}
-//========================================================================================================================================
-	int year;
-	std::array<Month, 12> month;
+
+	friend std::ostream &operator<<(std::ostream &ofs, Year &Y)
+	{
+		ofs << Y.year << '\n';
+
+		for (int i = 0; i < Y.month.size(); i++)
+		{
+			ofs << Y.month[i] << '\n';
+		}
+		return ofs;
+	}
+
+	int year = 0;
+	std::vector<Month> month;
 };
 //========================================================================================================================================
 void init_input_tbl(std::vector<std::string> &tbl)
@@ -259,13 +249,7 @@ bool is_valid(const Reading &r)
 //========================================================================================================================================
 void print_year(std::ofstream &ofs, Year &Y)
 {
-	for (int i = 0; i < Y.month.size(); i++)
-	{
-		for (int j = 0; j < Y.month[i].d_h_t.size(); j++)
-		{
-			ofs << "year: " << Y.year << '\n' << Y.month[i] << '\n'  << "day: " << Y.month[i].d_h_t[j].day << " hour : " << Y.month[i].d_h_t[j].hour << '\n' << "temperatura : " << Y.month[i].d_h_t[j].temperature;
-		}
-	}
+	ofs << "Year: " << Y;
 }
 //========================================================================================================================================
 int main()
@@ -300,10 +284,10 @@ int main()
 
 	std::cout << " Counted: " << ys.size() << " records by year.\n";
 
-	for (int i = 0; i < ys.size(); ++i)
+	for (int i = 0; i < ys.size(); i++)
 		print_year(ofs, ys[i]);
 
 	return 0;
 }
 //========================================================================================================================================
-//	5. Напишите функцию print_year(), упомянутую в разделе 10.11.2.
+//	V	5. Напишите функцию print_year(), упомянутую в разделе 10.11.2.
