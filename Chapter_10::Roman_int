@@ -1,0 +1,94 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+int roman_switch(char &sbl);
+//====================================================================================================================
+class Roman_int
+{
+public:
+	friend std::istream &operator>>(std::istream &is, Roman_int &r)
+	{
+		char ch, next;
+		int ch_to_int, res = 0;
+		bool riverse = false;
+
+		while (is >> ch)
+		{
+			r.roman_num += ch;
+
+			ch_to_int = roman_switch(ch);
+
+			next = std::cin.peek();
+
+			int next_to_int = roman_switch(next);
+
+			if (next_to_int <= ch_to_int)
+			{
+				if (riverse == true)
+					res += next_to_int;
+
+				else
+					res += ch_to_int;
+			}
+
+			if (next_to_int > ch_to_int)
+			{
+				res += next_to_int - ch_to_int;
+				riverse = true;
+			}
+
+			if (next == '\n')
+			{
+				r.romint = res;
+				break;
+			}
+		}
+		return is;
+	}
+
+	friend std::ostream &operator<<(std::ostream &os, Roman_int &r)
+	{
+		return os << "Roman == [" << r.roman_num << "] - equal == [" << r.romint << "]" << '\n';
+	}
+
+	int as_int();
+
+private:
+	int romint = 0;
+	std::string roman_num = {};
+};
+//===================================================================================================================
+int Roman_int::as_int()
+{
+	Roman_int r;
+	r.roman_num;
+
+
+	return 0;
+}
+//===================================================================================================================
+int roman_switch(char &sbl)
+{
+	switch (sbl)
+	{
+		case 'I': return 1;
+		case 'V': return 5;
+		case 'X': return 10;
+		case 'L': return 50;
+		case 'C': return 100;
+		case 'D': return 500;
+		case 'M': return 1000;
+
+		default:
+			return 0;
+	}
+}
+//===================================================================================================================
+int main()
+{
+	Roman_int r;
+	std::cout << "Please, enter Roman int: ";  std::cin >> r;
+
+	std::cout << r; 
+}
+//====================================================================================================================
