@@ -1,4 +1,3 @@
-/*
 #include <iostream>
 #include <vector>
 #include <string>
@@ -25,16 +24,14 @@ public:
 
 	Variable(string n, double v, bool c, bool f)
 		:name(n), value(v), is_const(c), is_fated(f)
-	{
-	}
+	{ }
 };
 //===============================================================================================================================
 //	vector<Variable> var_table;
 //===============================================================================================================================
 Variable::Variable()
 	:name{}, value(0.0), is_const(false), is_fated(false)
-{
-}
+{ }
 //===============================================================================================================================
 void error(string s)
 {
@@ -74,9 +71,7 @@ public:
 };
 //===============================================================================================================================
 Table::Table()
-
-{
-}
+{ }
 //===============================================================================================================================
 Table tabletka;
 //===============================================================================================================================
@@ -120,7 +115,6 @@ bool Symbol_Table::is_declared(string var)
 //===============================================================================================================================
 double Table::define(string var, double val, bool is_const, bool is_fated)
 {
-
 	if (sybT.is_declared(var))
 	{
 		error("Error: Variable is const");
@@ -173,8 +167,7 @@ public:
 //===============================================================================================================================
 class Token_stream
 {
-public: // Пользовательский интерфейс
-
+public:
 	Token_stream(std::istream &inp);
 
 	std::istream &input;
@@ -195,14 +188,13 @@ private: // Детали реализации
 //===============================================================================================================================
 Token_stream::Token_stream(std::istream &inp)
 	:input(inp), full(false), buffer{ '\0' } // В буфере нет ни одного объекта
-{
-}
+{ }
 //===============================================================================================================================
 double expression(Token_stream &ts);
 double term(Token_stream &ts);
 double factorial(double left);
 //===============================================================================================================================
-Token_stream ts;
+Token_stream ts(std::cin);
 //===============================================================================================================================
 const char name = 'a';	// Лексему name
 const string ignoreName = "n";
@@ -247,68 +239,68 @@ Token Token_stream::get()
 
 	switch (ch)
 	{
-	case ';': case 'quit': case '(': case ')': case '{': case '}': case '#': case ' ': case '|':
-	case '+': case '-': case '*': case '/': case '!': case '%': case '=': case ',': case 'H':
-		return Token(ch); // пусть каждый символ представляет себя сам
+		case ';': case 'quit': case '(': case ')': case '{': case '}': case '#': case ' ': case '|':
+		case '+': case '-': case '*': case '/': case '!': case '%': case '=': case ',': case 'H':
+			return Token(ch); // пусть каждый символ представляет себя сам
 
-	case '.':
-	case '0': case '1': case '2': case '3': case '4':
-	case '5': case '6': case '7': case '8': case '9':
-	{
-		cin.putback(ch); // возвращем цифру обратно в поток ввода
-
-		double val;
-		cin >> val; // считываем число с плавающей точкой
-		return Token(number, val); // пусть символ '8' означает "число"
-	}
-	default:
-
-		if (!isalpha(ch) && !isdigit(ch) && !isspace(ch))
+		case '.':
+		case '0': case '1': case '2': case '3': case '4':
+		case '5': case '6': case '7': case '8': case '9':
 		{
-			string s;
-			s += ch;
+			cin.putback(ch); // возвращем цифру обратно в поток ввода
 
-			//	if (cin.get(ch) && (!isalpha(ch) && !isdigit(ch) && !isspace(ch)))	// Считываем все следующие буквы или цифры
-			//		s += ch;
-			if (cin.get(ch) && (isalpha(ch)))
+			double val;
+			cin >> val; // считываем число с плавающей точкой
+			return Token(number, val); // пусть символ '8' означает "число"
+		}
+		default:
+
+			if (!isalpha(ch) && !isdigit(ch) && !isspace(ch))
+			{
+				string s;
 				s += ch;
 
-			cin.putback(ch);
+				//	if (cin.get(ch) && (!isalpha(ch) && !isdigit(ch) && !isspace(ch)))	// Считываем все следующие буквы или цифры
+				//		s += ch;
+				if (cin.get(ch) && (isalpha(ch)))
+					s += ch;
 
-			if (s == useStroke) return Token(print);
+				cin.putback(ch);
 
-			//	if (ch == ignoreName) return Token(print);
-		}
+				if (s == useStroke) return Token(print);
 
-		if (isalpha(ch))	// Является ли лексема введная буквой?
-		{
-			string s;
-			s += ch;
+				//	if (ch == ignoreName) return Token(print);
+			}
 
-			while (cin.get(ch) && (isalpha(ch) || isdigit(ch)) || ch == underscore)
+			if (isalpha(ch))	// Является ли лексема введная буквой?
+			{
+				string s;
 				s += ch;
 
-			cin.putback(ch);
+				while (cin.get(ch) && (isalpha(ch) || isdigit(ch)) || ch == underscore)
+					s += ch;
 
-			// Проверяем какие буквы в нашей строке s
-			// При совпадение со строками присваиваем значение символьное для использование в switch
+				cin.putback(ch);
 
-			if (s == useSqrt) return Token(uSqrt);	// Ключевое слово sqrt
+				// Проверяем какие буквы в нашей строке s
+				// При совпадение со строками присваиваем значение символьное для использование в switch
 
-			if (s == usePow) return Token(uPow);
+				if (s == useSqrt) return Token(uSqrt);	// Ключевое слово sqrt
 
-			if (s == useQuit) return Token(quit);
+				if (s == usePow) return Token(uPow);
 
-			if (s == ignoreName) return Token(print);
+				if (s == useQuit) return Token(quit);
 
-			if (s == useHelpi) return Token(helpi);
+				if (s == ignoreName) return Token(print);
 
-			if (s == useConst) return Token(uConst);
+				if (s == useHelpi) return Token(helpi);
 
-			if (ch == let || s == useLet) return Token(let);
-			return Token(name, s);
-		}
-		error("Error Bad Token!");
+				if (s == useConst) return Token(uConst);
+
+				if (ch == let || s == useLet) return Token(let);
+				return Token(name, s);
+			}
+			error("Error Bad Token!");
 	}
 }
 //===============================================================================================================================
@@ -360,102 +352,102 @@ double primary(Token_stream &ts)
 
 	switch (t.kind)
 	{
-	case modus:
-	{
+		case modus:
+		{
 
-		if (t.kind != '|')					error("fabs(module) it`s looks like |x(double)|");
+			if (t.kind != '|')					error("fabs(module) it`s looks like |x(double)|");
 
-		t = ts.get();
+			t = ts.get();
 
-		double d = expression(ts);
+			double d = expression(ts);
 
-		t = ts.get();
+			t = ts.get();
 
-		if (t.kind != '|')					error("fabs(module) it`s looks like |x(double)|");
+			if (t.kind != '|')					error("fabs(module) it`s looks like |x(double)|");
 
-		return std::fabs(d);
-	}
-	case uPow:
-	{
-		t = ts.get();
+			return std::fabs(d);
+		}
+		case uPow:
+		{
+			t = ts.get();
 
-		if (t.kind != '(')					error("pow it`s looks like pow( x(double),i(int) )");
+			if (t.kind != '(')					error("pow it`s looks like pow( x(double),i(int) )");
 
-		t = ts.get();
-		double x = t.value;
+			t = ts.get();
+			double x = t.value;
 
-		t = ts.get();
-		if (t.kind != ',')					error("pow it`s looks like pow( x(double),i(int) )");
+			t = ts.get();
+			if (t.kind != ',')					error("pow it`s looks like pow( x(double),i(int) )");
 
-		t = ts.get();
-		int i = gsl::narrow<int>(t.value);	// Исключение если второе число не целое
+			t = ts.get();
+			int i = gsl::narrow<int>(t.value);	// Исключение если второе число не целое
 
-		double d = powpow(x, i);
+			double d = powpow(x, i);
 
-		t = ts.get();	// Берем символ после уравнения
+			t = ts.get();	// Берем символ после уравнения
 
-		if (t.kind != ')')	// Проверяем является ли символ после уравнения закрывающейся скобкой
-			error("pow it`s looks like pow( x(double),i(int) )");
+			if (t.kind != ')')	// Проверяем является ли символ после уравнения закрывающейся скобкой
+				error("pow it`s looks like pow( x(double),i(int) )");
 
-		return d;	// Вернем pow в случае успеха в обоих случаях
-	}
-	case uSqrt:
-	{
-		t = ts.get();	// Получаем следующий элемент
+			return d;	// Вернем pow в случае успеха в обоих случаях
+		}
+		case uSqrt:
+		{
+			t = ts.get();	// Получаем следующий элемент
 
-		if (t.kind != '(')	// Является ли элемент после sqrt - '('
-			error("sqrt it`s looks like sqrt(x)");
+			if (t.kind != '(')	// Является ли элемент после sqrt - '('
+				error("sqrt it`s looks like sqrt(x)");
 
-		double d = expression(ts);	// Если является считаем внутри скобок уравнение
+			double d = expression(ts);	// Если является считаем внутри скобок уравнение
 
-		if (d <= 0) error("sqrt cannot be negative");
-		t = ts.get();	// Берем символ после уравнения
+			if (d <= 0) error("sqrt cannot be negative");
+			t = ts.get();	// Берем символ после уравнения
 
-		if (t.kind != ')')	// Проверяем является ли символ после уравнения закрывающейся скобкой
-			error("please, don`t forget == ( ***** )");
+			if (t.kind != ')')	// Проверяем является ли символ после уравнения закрывающейся скобкой
+				error("please, don`t forget == ( ***** )");
 
-		return sqrt(d);	// Вернем корень в случае успеха в обоих случаях
-	}
+			return sqrt(d);	// Вернем корень в случае успеха в обоих случаях
+		}
 
-	case '(':
-	{
-		double d = expression(ts);
-		t = ts.get();
+		case '(':
+		{
+			double d = expression(ts);
+			t = ts.get();
 
-		if (t.kind != ')')
-			error("please, don`t forget == ( ***** )");
+			if (t.kind != ')')
+				error("please, don`t forget == ( ***** )");
 
-		return d;
-	}
+			return d;
+		}
 
-	case '{':
-	{
-		double d = expression(ts);
-		t = ts.get();
+		case '{':
+		{
+			double d = expression(ts);
+			t = ts.get();
 
-		if (t.kind != '}')
-			error("please, don`t forget == { ( ***** ) }");
+			if (t.kind != '}')
+				error("please, don`t forget == { ( ***** ) }");
 
-		return d;
-	}
+			return d;
+		}
 
-	case '-':
-		return -primary(ts);
+		case '-':
+			return -primary(ts);
 
-	case name:
-		return tabletka.get(t.name);
+		case name:
+			return tabletka.get(t.name);
 
-	case number:
-		return t.value;
+		case number:
+			return t.value;
 
-	case helpi:
-	{
-		ts.helping();
-		ts.calculate();
-	}
+		case helpi:
+		{
+			ts.helping();
+			ts.calculate();
+		}
 
-	default:
-		error("Primary Exprected!");
+		default:
+			error("Primary Exprected!");
 	}
 }
 //===============================================================================================================================
@@ -495,38 +487,38 @@ double term(Token_stream &ts)
 		Token t = ts.get();
 
 		switch (t.kind) {
-		case '*':
-		{
-			left *= primary(ts);
-			break;
-		}
+			case '*':
+			{
+				left *= primary(ts);
+				break;
+			}
 
-		case '/':
-		{
-			double d = primary(ts);
-			if (d == 0) error("Division");
-			left /= d;
-			break;
-		}
+			case '/':
+			{
+				double d = primary(ts);
+				if (d == 0) error("Division");
+				left /= d;
+				break;
+			}
 
-		case '%':
-		{
-			double d = primary(ts);
-			int i1 = int(left);
-			if (i1 != left)
-				error("Left operand % don`t int");
+			case '%':
+			{
+				double d = primary(ts);
+				int i1 = int(left);
+				if (i1 != left)
+					error("Left operand % don`t int");
 
-			int i2 = int(d);
-			if (i2 != d)
-				error("Right operand % don`t int");
+				int i2 = int(d);
+				if (i2 != d)
+					error("Right operand % don`t int");
 
-			if (i2 == 0) error("%: division by zero");
-			left = i1 % i2;
-			break;
-		}
-		default:
-			ts.putback(t);  // Помещаем объект t обратно в поток лексем
-			return left;
+				if (i2 == 0) error("%: division by zero");
+				left = i1 % i2;
+				break;
+			}
+			default:
+				ts.putback(t);  // Помещаем объект t обратно в поток лексем
+				return left;
 		}
 	}
 }
@@ -542,20 +534,20 @@ double expression(Token_stream &ts)
 
 		switch (t.kind)
 		{
-		case '+':
-		{ // Вычисляем и добавляем Терм
-			left += term(ts);
-			break;
-		}
-		case '-':
-		{
-			// Вычисляем и вычитаем Терм
-			left -= term(ts);
-			break;
-		}
-		default:
-			ts.putback(t);  // Помещаем объект t обратно в поток лексем
-			return left;    // Символов + и - нет, возвращаем ответ
+			case '+':
+			{ // Вычисляем и добавляем Терм
+				left += term(ts);
+				break;
+			}
+			case '-':
+			{
+				// Вычисляем и вычитаем Терм
+				left -= term(ts);
+				break;
+			}
+			default:
+				ts.putback(t);  // Помещаем объект t обратно в поток лексем
+				return left;    // Символов + и - нет, возвращаем ответ
 		}
 	}
 }
@@ -599,15 +591,15 @@ double Token_stream::statement()
 
 	switch (t.kind)
 	{
-	case uConst:
-		return declaration(true, true);
+		case uConst:
+			return declaration(true, true);
 
-	case let:
-		return declaration(false, true);
+		case let:
+			return declaration(false, true);
 
-	default:
-		ts.putback(t);
-		return expression(ts);
+		default:
+			ts.putback(t);
+			return expression(ts);
 	}
 }
 //===============================================================================================================================
@@ -630,7 +622,7 @@ void Token_stream::calculate()
 		ts.putback(t);
 		cout << result << statement() << '\n';
 	}
-	catch (std::exception& e)
+	catch (std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
 		clean_up_mess();
@@ -648,7 +640,7 @@ int main()try
 
 	ts.calculate();
 }
-catch (std::exception& e) {
+catch (std::exception &e) {
 	std::cerr << e.what() << std::endl;
 	return 1;
 }
@@ -656,4 +648,4 @@ catch (...) {
 	std::cerr << "exception \n";
 	return 2;
 }
-*/
+//===============================================================================================================================
