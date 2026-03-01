@@ -1,0 +1,70 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+//========================================================================================================================================
+void error(std::string s, std::string &name)
+{
+	std::cerr << s << " " << name << '\n';
+}
+//========================================================================================================================================
+std::string one_file()
+{
+	std::string isname_one = "onefile.txt";
+
+	std::ifstream ist(isname_one);
+
+	std::string lineist;
+
+	if (!ist) error(" Unable to open output file ", isname_one);
+
+	while (std::getline(ist, lineist))
+
+		if (ist.eof())
+			return lineist;
+
+	return lineist;
+}
+//========================================================================================================================================
+std::string two_file()
+{
+	std::string isname_two = "twofile.txt";
+
+	std::ifstream ist(isname_two);
+
+	std::string lineist;
+
+	if (!ist) error(" Unable to open output file ", isname_two);
+
+	while (std::getline(ist, lineist))
+
+		if (ist.eof())
+			return lineist;
+
+	return lineist;
+}
+//========================================================================================================================================
+int main()
+{
+	//	std::string oneF = one_file();
+	//	std::string twoF = two_file();
+
+	std::ifstream file1("onefile.txt", std::ios::binary);
+	std::ifstream file2("twofile.txt", std::ios::binary);
+
+	std::string out_name_file = "outFile.txt";
+
+	std::ofstream ost(out_name_file, std::ios::binary);
+
+	if (!ost) error(" Unable to open output file ", out_name_file);
+
+	ost << file1.rdbuf() << '\n' << file2.rdbuf();
+}
+//========================================================================================================================================
+/*
+//========================================================================================================================================
+	V	8. Напишите программу, принимающую на вход имена двух файлов и создающую новый файл,
+содержащий первый файл, за которым следует второй; иначе говоря, программа должна
+конкатенировать два файла.
+//========================================================================================================================================
+*/
