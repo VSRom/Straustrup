@@ -1,0 +1,52 @@
+/*
+	V	11. Напишите программу, вычисляющую сумму целых чисел, хранящихся в текстовом файле и разделенных пробелами и словами.
+Например, после ввода строки “bears: 17 elephants 9 end” результат должен быть равен 26.
+*/
+
+#include <iostream>
+#include <fstream>
+#include <cctype>
+#include <string>
+
+//========================================================================================================================================
+void error(std::string s, std::string &name)
+{
+	std::cerr << s << " " << name << '\n';
+}
+//========================================================================================================================================
+void Input_File(double &result_sum_FILE)
+{
+	std::string file_sum = "File_sum.txt";
+	char symbol = '\0';
+	std::string sym_result = {};
+
+	std::ifstream FS(file_sum);
+
+	if (!FS) error(" Unable to open output file ", file_sum);
+
+	while (FS.get(symbol))
+	{
+		if (isdigit(symbol))
+		{
+			for (int i = 0; isdigit(symbol); i++)
+			{
+				sym_result += symbol;
+				FS.get(symbol);
+			}
+			result_sum_FILE += std::stoi(sym_result);
+			sym_result = {};
+		}
+	}
+}
+//========================================================================================================================================
+int main()
+{
+	double result_sum_FILE = 0.0;
+
+	Input_File(result_sum_FILE);
+
+	std::cout << result_sum_FILE;
+
+	return 0;
+}
+//========================================================================================================================================
