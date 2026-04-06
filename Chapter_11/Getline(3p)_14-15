@@ -1,0 +1,76 @@
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <fstream>
+#include <iomanip>
+#include <algorithm>
+//===============================================================================================
+void recurse(std::ofstream &ost, std::vector<int> &Numbers, int &i, int &j)
+{
+	ost << Numbers[i] << " " << j << '\n';
+	j = 1;
+}
+//===============================================================================================
+void recurse(std::ofstream &ost, std::vector<std::string> &Numbers, int &i)
+{
+	ost << std::scientific << std::setprecision(8) << std::setw(20) << Numbers[i] << '\n';
+}
+//===============================================================================================
+int main()
+{
+	std::vector<int> Numbers;
+	std::vector<std::string> result;
+	std::string num;
+	int num_r;
+	std::string in_name = "15_Read_Num.txt";
+	std::ifstream ist(in_name);
+	std::string out_name = "15_Out_num";
+	std::ofstream ost(out_name);
+	int j = 1;
+
+	if (!ist) std::cout << "Error reading file: " << in_name << '\n';
+	if (!ost) std::cout << "Error reading file: " << out_name << '\n';
+
+	while (getline(ist, num, ' '))
+	{
+		num_r = std::stoi(num);
+		Numbers.push_back(num_r);
+	}
+
+	std::sort(Numbers.begin(), Numbers.end());
+
+	for (int i = 0; i < Numbers.size(); i++)
+	{
+		while (i + 1 < Numbers.size() && Numbers[i] == Numbers[i + 1])
+		{
+			j++;
+			i++;
+		}
+		if (j == 1 || i == 0)
+			ost << Numbers[i] << '\n';
+
+		else
+		recurse(ost, Numbers, i, j);
+		
+	}
+
+	return {};
+}
+//===============================================================================================
+/*
+//===============================================================================================
+	V	14. Напишите программу, считывающую из файла числа, разделенные пробелами,
+и выводящую в другой файл числа, используя научный формат и точность,
+равную восьми в четырех полях по двадцать символов в строке.
+//===============================================================================================
+	15. Напишите программу, считывающую из файла числа, разделенные пробелами,
+выводящую их в порядке возрастания по одному числу в строке. Каждое число должно
+быть записано только один раз, если обнаружится дубликат, то необходимо вывести
+количество таких дубликатов в строке. Например, срока “7 5 5 7 3 117 5” примет следующий вид:
+3
+5 3
+7 2
+117
+//===============================================================================================
+*/
