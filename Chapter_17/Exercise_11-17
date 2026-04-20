@@ -15,7 +15,7 @@ public:
 
 	Link *insert(Link *n);				// вставляет n перед данным объектом
 
-	//	Link *add(Link *n);					// вставляет n после данного объекта
+	Link *add(Link *n);					// вставляет n после данного объекта
 
 	Link *erase();						// удаляет данный объект из списка
 
@@ -29,11 +29,10 @@ public:
 		return succ;
 	}
 
-	//	
-	//	Link *previous() const
-	//	{
-	//		return prev;
-	//	}
+	Link *previous() const
+	{
+		return prev;
+	}
 
 private:
 
@@ -95,10 +94,24 @@ Link *Link::erase()
 	return this->succ;
 }
 //=======================================================================================================================
-//	Link *add(Link *p, Link *n) // вставляет n после p; возвращает n
-//	{
-//		// напоминает insert (см. упр. 11)
-//	}
+Link *Link::add(Link *n) // вставляет n после p; возвращает n
+{
+	if (n == 0)
+		return this;						// ничего не вставляем
+
+	if (this == 0)
+		return n;							// ничего не вставляем
+
+	this->prev = n;				// n следует за p	????????????????????????????
+
+	//	if (succ)
+	//		succ->prev = succ;
+
+	succ = n;					// p становится предшественником n	????????????
+
+	return n;
+	// напоминает insert (см. упр. 11)
+}
 //=======================================================================================================================
 Link *Link::insert(Link *n)
 // вставляет n перед p; возвращает n
@@ -109,12 +122,12 @@ Link *Link::insert(Link *n)
 	if (this == 0)
 		return n;							// ничего не вставляем
 
-	n->succ = this;						// p следует за n
+	n->succ = this;						// prev следует за succ(n)
 
 	if (prev)
 		prev->succ = n;
 
-	prev = n;								// n становится предшественником p
+	prev = n;								// succ(n) становится предшественником prev
 
 	return n;
 }
@@ -136,7 +149,6 @@ void print_all(Link *p)
 int main()
 {
 	Link *norse_gods = new Link("Thor");
-
 	norse_gods = norse_gods->insert(new Link("Odin"));
 	norse_gods = norse_gods->insert(new Link("Zeus"));
 	norse_gods = norse_gods->insert(new Link("Freia"));
@@ -145,17 +157,19 @@ int main()
 	greek_gods = greek_gods->insert(new Link("Athena"));
 	greek_gods = greek_gods->insert(new Link("Mars"));
 	greek_gods = greek_gods->insert(new Link("Poseidon"));
+	greek_gods = greek_gods->add(new Link("Beshanin"));
+	greek_gods = greek_gods->add(new Link("Semen"));
 
-	Link *p = greek_gods->find("Mars");
-	if (p) p->value = "Ares";
-
-	Link *p2 = norse_gods->find("Zeus");
-	if (p2)
-	{
-		if (p2 == norse_gods) norse_gods = p2->next();
-		p2->erase();
-		greek_gods = greek_gods->insert(p2);
-	}
+	//	Link *p = greek_gods->find("Mars");
+	//	if (p) p->value = "Ares";
+	//	
+	//	Link *p2 = norse_gods->find("Zeus");
+	//	if (p2)
+	//	{
+	//		if (p2 == norse_gods) norse_gods = p2->next();
+	//		p2->erase();
+	//		greek_gods = greek_gods->insert(p2);
+	//	}
 
 	print_all(norse_gods);
 	std::cout << "\n";
