@@ -8,45 +8,46 @@ class Link
 public:
 	std::string value;
 
-	Link(const std::string& v, Link* p = 0, Link* s = 0)
+	Link(const std::string &v, Link *p = 0, Link *s = 0)
 		:value(v), prev(p), succ(s)
 	{
 	}
 
-	Link* insert(Link* n);				// вставляет n перед данным объектом
+	Link *insert(Link *n);				// вставляет n перед данным объектом
 
-	Link* add(Link* n);					// вставляет n после данного объекта
+	Link *add(Link *n);					// вставляет n после данного объекта
 
-	Link* erase();						// удаляет данный объект из списка
+	Link *erase();						// удаляет данный объект из списка
 
-	Link* find(const std::string& s);		// находит s в списке
+	Link *find(const std::string &s);		// находит s в списке
 
-	Link* advance(int n) const;			// удаляет n позиций из списка
+	Link *advance(int n) const;			// удаляет n позиций из списка
 
 
-	Link* next() const
+	Link *next() const
 	{
 		return succ;
 	}
 
-	Link* previous() const
+	Link *previous() const
 	{
 		return prev;
 	}
 
 private:
 
-	Link* prev;
-	Link* succ;
+	Link *prev;
+	Link *succ;
 
 };
 //=======================================================================================================================
-Link* Link::advance(int n) const
+Link *Link::advance(int n) const
 // удаляет n позиций из списка если не находит, возвращает 0
 // при положительном n переносит указатель на n узлов вперед, при отрицательном — на n узлов назад
 {
 	if (this == 0)
 		return 0;
+
 
 	if (0 < n)
 	{
@@ -54,7 +55,8 @@ Link* Link::advance(int n) const
 		{
 			if (this->succ == 0) return 0;
 
-			this->succ;
+
+			 succ;
 		}
 	}
 	else if (n < 0)
@@ -69,19 +71,28 @@ Link* Link::advance(int n) const
 	return 0;
 }
 //=======================================================================================================================
-Link* Link::find(const std::string& s)
+Link *Link::find(const std::string &s)
 // находит s в списке; если не находит, возвращает 0
 {
-	while (this)
-	{
-		if (this->value == s) return this;
+	Link *p = this;
 
-		this->succ;
+	while (p)
+	{
+		if (p->value == s)
+			return this;
+
+		if (p->prev)
+		{
+			p = p->prev;
+		}
+
+		else
+			p = this->succ;
 	}
 	return 0;
 }
 //=======================================================================================================================
-Link* Link::erase()
+Link *Link::erase()
 // удаляет узел *p из списка; возвращает следующий за p
 {
 	if (this == 0)
@@ -94,21 +105,37 @@ Link* Link::erase()
 	return this->succ;
 }
 //=======================================================================================================================
-void print_all(Link* p)
+void print_all(Link *p)
 {
 	std::cout << "{ ";
-
+	//		 while(p->previous())
+	//		{
+	//			std::cout << p->previous()->value;
+	//			if (p = p->previous()) std::cout << ", ";
+	//		}	
+	//	while (p->previous())
+	//	{
+	//		std::cout << p->previous()->value << ", ";
+	//		if (!p->previous()->previous()->previous())
+	//			break;
+	//	}
 	while (p)
 	{
+		//	if (p->previous() && !p->previous()->previous() && !p->previous()->previous()->previous())
+		//	{
+		//		std::cout << p->previous()->value << ", ";
+		//	
+		//	}
+		//	if (p->previous())
+		//		std::cout << p->previous()->value << ", ";
 		std::cout << p->value;
-
+		//if (p = p->previous()) std::cout << ", ";
 		if (p = p->next()) std::cout << ", ";
 	}
-
 	std::cout << " }";
 }
 //=======================================================================================================================
-Link* Link::insert(Link* n)
+Link *Link::insert(Link *n)
 // вставляет n перед p; возвращает n
 {
 	if (n == 0)
@@ -120,28 +147,29 @@ Link* Link::insert(Link* n)
 	n->succ = this;						// p следует за n
 
 	if (prev)
-		prev->succ = n;
+		prev -> succ = n;
+	
+	n->prev = prev;
 
 	prev = n;								// succ(n) становится предшественником prev
 
 	return n;
 }
 //=======================================================================================================================
-Link* Link::add(Link* n) // вставляет n после p; возвращает n
+Link *Link::add(Link *n) // вставляет n после p; возвращает n
 {
 	if (n == 0)
 		return this;						// ничего не вставляем
 
 	if (this == 0)
 		return n;							// ничего не вставляем
-	
+
 	n->succ = this->succ;
 
 	//	if (prev)
 	//		this->succ = n;
-	
-	this->succ = n;
 
+	this->succ = n;
 	n->prev = this;
 
 	return n;
@@ -150,28 +178,28 @@ Link* Link::add(Link* n) // вставляет n после p; возвраща�
 //=======================================================================================================================
 int main()
 {
-	Link* norse_gods = new Link("Thor");
+	Link *norse_gods = new Link("Thor");
 	norse_gods = norse_gods->insert(new Link("Odin"));
 	norse_gods = norse_gods->insert(new Link("Zeus"));
 	norse_gods = norse_gods->insert(new Link("Freia"));
 
-	Link* greek_gods = new Link("Hera");
+	Link *greek_gods = new Link("Hera");
 	greek_gods = greek_gods->insert(new Link("Athena"));
 	greek_gods = greek_gods->insert(new Link("Mars"));
 	greek_gods = greek_gods->insert(new Link("Poseidon"));
 	greek_gods = greek_gods->add(new Link("Beshanin"));
-	//	greek_gods = greek_gods->add(new Link("Semen"));
+	greek_gods = greek_gods->add(new Link("Semen"));
 
-	//	Link *p = greek_gods->find("Mars");
-	//	if (p) p->value = "Ares";
-	//	
-	//	Link *p2 = norse_gods->find("Zeus");
-	//	if (p2)
-	//	{
-	//		if (p2 == norse_gods) norse_gods = p2->next();
-	//		p2->erase();
-	//		greek_gods = greek_gods->insert(p2);
-	//	}
+	Link *p = greek_gods->find("Mars");
+	if (p) p->value = "Ares";
+	
+	Link *p2 = norse_gods->find("Zeus");
+	if (p2)
+	{
+		if (p2 == norse_gods) norse_gods = p2->next();
+		p2->erase();
+		greek_gods = greek_gods->insert(p2);
+	}
 
 	print_all(norse_gods);
 	std::cout << "\n";
@@ -181,6 +209,8 @@ int main()
 //======================================================================================================================
 /*
 //======================================================================================================================
-	11. Завершите программу, создающую список богов, из раздела 17.10.1 и выполните ее.
+	V	11. Завершите программу, создающую список богов, из раздела 17.10.1 и выполните ее.
+//======================================================================================================================
+	12. Зачем нужны две версии функции find()?
 //======================================================================================================================
 */
