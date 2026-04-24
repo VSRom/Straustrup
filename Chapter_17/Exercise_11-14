@@ -86,14 +86,16 @@ Link *Link::find(const std::string &s)
 {
 	Link *p = this;
 
-	while (p->prev)
-	{
-		p = p->prev;
-	}
+	//	if (p->prev)
+	//	{
+	//		while(p)
+	//		p = p->prev;
+	//	}
 
 	while (p)
 	{
-		if (static_cast<God *>(p)->name== s)
+		
+		if (static_cast<God *>(p)->mifologia == s)
 			return p;
 
 		else
@@ -105,14 +107,16 @@ Link *Link::find(const std::string &s)
 Link *Link::erase()
 // удаляет узел *p(this) из списка; возвращает следующий за p(this)
 {
-	if (this == 0)
+	Link *p = const_cast<Link *>(this);
+
+	if (p == 0)
 		return 0;
 
-	if (this->succ) this->succ->prev = this->prev;
+	if (p->succ) p->succ->prev = p->prev;
 
-	if (this->prev) this->prev->succ = this->succ;
+	if (p->prev) p->prev->succ = p->succ;
 
-	return this->succ;
+	return p;
 }
 //=======================================================================================================================
 Link *Link::insert(Link *n)
@@ -154,27 +158,42 @@ Link *Link::add(Link *n) // вставляет n после p; возвраща�
 //=======================================================================================================================
 Link *Link::add_ordered(Link *n)
 {
-	Link *p = this;
+	Link *p = static_cast<God *>(n);
 
-	while (p->prev)
-	{
-		p = this->prev;
-	}
+	//	if (static_cast<God *>(this)->prev)
+	//	{
+	//		Link *p = this;
+	//		while (p->prev)
+	//			p = p->prev;
+	//	}
 
+	//	while (p->prev)
+	//	{
+	//		p = p->prev;
+	//	}
 	while (p)
 	{
 		if (static_cast<God *>(n)->name < static_cast<God *>(p)->name)
-			return insert(n);
+		{
+			insert(n);
+			return p;
+		}
 		else
-			return p = p->succ;
+			p = p->succ;
 	}
+			//		Нужно использовать текущий указатель на объект списка
+	//	while (p->prev)
+	//	{
+	//		p = p->prev;
+	//	}
 
 	return p;
 }
 //=======================================================================================================================
 void print_all(Link *g)
 {
-	while (God *prev_god = static_cast<God *>(g->previous()))
+	God *prev_god = static_cast<God *>(g->previous());
+	while (prev_god)
 	{
 		g = prev_god;
 	}
@@ -205,10 +224,99 @@ int main()
 	//		greek_gods = greek_gods->insert(p2);
 	//	}
 	
-	Link *gods = new God("Zeus", "Greece", "", "Lightning");
-	gods->add_ordered(new God ("Odin", "Norway", "The Eight-Legged Flying Horse Named Sleipner", "") );
+	Link *mix_gods = new God("Zeus", "Greece", "Celestial chariot", "Lightning bolt");
+	mix_gods = mix_gods->insert(new God("Athena", "Greece", "Owl", "Spear and Aegis"));
+	mix_gods = mix_gods->insert(new God("Poseidon", "Greece", "Seashell chariot", "Trident"));
+	mix_gods = mix_gods->insert(new God("Odin", "Norway", "Eight-legged horse Sleipnir", "Spear Gungnir"));
+	mix_gods = mix_gods->insert(new God("Thor", "Norway", "Goat-drawn chariot", "Hammer Mjolnir"));
+	mix_gods = mix_gods->insert(new God("Freya", "Norway", "Cat-drawn chariot", "Falcon cloak"));
+	mix_gods = mix_gods->insert(new God("Ra", "Egypt", "Solar barque", "Staff and Ankh"));
+	mix_gods = mix_gods->insert(new God("Anubis", "Egypt", "Desert sands", "Scales and Knife"));
+	mix_gods = mix_gods->insert(new God("Horus", "Egypt", "Falcon", "Spear and Was-scepter"));
 
-	print_all(gods);
+	Link *egypt_gods = nullptr;
+	Link *norse_gods = nullptr;
+	Link *greek_gods = nullptr;
+
+	while (mix_gods)
+	{
+		//	if (mix_gods->previous())
+		//	{
+		//		while(mix_gods)
+		//		mix_gods = mix_gods->previous();
+		//	}
+	   
+		Link *p1 = mix_gods->find("Egypt");
+
+		if (p1 == mix_gods) mix_gods = p1->next();
+		
+		egypt_gods = egypt_gods->add_ordered(p1);
+		p1->erase();
+
+		//		if (mix_gods->previous())
+		//		{
+		//			while (mix_gods)
+		//			{
+		//				next = mix_gods->next();
+		//				mix_gods = mix_gods->previous();
+		//				mix_gods = next;
+		//			}
+		//		}
+
+		Link *p2 = mix_gods->find("Norway");
+
+		if (p2 == mix_gods) mix_gods = p2->next();
+		
+		norse_gods = norse_gods->add_ordered(p2);
+		p2->erase();
+
+		//	if (mix_gods->previous())
+		//	{
+		//		while (mix_gods)
+		//			mix_gods = mix_gods->previous();
+		//	}
+
+		Link *p3 = mix_gods->find("Greece");
+		if (p3 == mix_gods) mix_gods = p3->next();
+		
+		greek_gods = greek_gods->add_ordered(p3);
+		p3->erase();
+	}
+
+	//			прохожу 7 элементов, подвергается очистке только 5, 2 теряются из-за обрыва связи с прошлыми элементами
+
+	//	Link *ptr_norse = mix_gods->find("Norway");
+	//	Link *ptr_egypt = mix_gods->find("Egypt");
+	//	Link *ptr_greek = mix_gods->find("Greece");
+
+	//			if (ptr_norse)
+	//			{
+	//				if (ptr_norse == norse_gods) ptr_norse = ptr_norse->next();
+	//				ptr_norse->erase();
+	//				norse_gods = norse_gods->insert(ptr_norse);
+	//			}
+	//			
+	//			if (ptr_egypt)
+	//			{
+	//				if (ptr_egypt == norse_gods) ptr_norse = ptr_egypt->next();
+	//				ptr_egypt->erase();
+	//				egypt_gods = egypt_gods->insert(ptr_egypt);
+	//			}
+	//			
+	//			if (ptr_greek)
+	//			{
+	//				if (ptr_egypt == norse_gods) ptr_norse = ptr_egypt->next();
+	//				ptr_egypt->erase();
+	//				egypt_gods = egypt_gods->insert(ptr_egypt);
+	//			}
+
+	//	mix_gods->add_ordered(new God ("Odin", "Norway", "The Eight-Legged Flying Horse Named Sleipner", "") );
+
+	print_all(egypt_gods);
+	std::cout << "\n";
+	print_all(norse_gods);
+	std::cout << "\n";
+	print_all(greek_gods);
 	std::cout << "\n";
 }
 //======================================================================================================================
