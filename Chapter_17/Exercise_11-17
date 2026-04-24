@@ -1,17 +1,15 @@
 #include <iostream>
 #include <iostream>
 #include <vector>
+
 //=======================================================================================================================
 class Link
 {
 
 public:
-	std::string value;
-
-	Link(const std::string &v, Link *p = 0, Link *s = 0)
-		:value(v), prev(p), succ(s)
-	{
-	}
+	Link(Link *p = 0, Link *s = 0)
+		: prev(p), succ(s)
+	{ }
 
 	Link *insert(Link *n);				// вставляет n перед данным объектом
 
@@ -23,6 +21,7 @@ public:
 
 	Link *advance(int n) const;			// удаляет n позиций из списка
 
+	Link *add_ordered(Link *n);			// размещает новый элемент с помощью оператора new в правильной лексикографической позиции
 
 	Link *next() const
 	{
@@ -35,10 +34,21 @@ public:
 	}
 
 private:
-
 	Link *prev;
 	Link *succ;
+};
+//=======================================================================================================================
+struct God : public Link
+{
+	God(std::string n, std::string m, std::string c, std::string g)
+		: Link(), name(n), mifologia(m), car(c), gun(g)
+	
+	{ }
 
+	std::string name;
+	std::string mifologia;
+	std::string car;
+	std::string gun;
 };
 //=======================================================================================================================
 Link *Link::advance(int n) const
@@ -47,25 +57,25 @@ Link *Link::advance(int n) const
 {
 	if (this == 0)
 		return 0;
-
-
+	
+	Link *p = const_cast<Link*>(this);
+	
 	if (0 < n)
 	{
 		while (n--)
 		{
-			if (this->succ == 0) return 0;
+			if (p->succ == 0) return 0;
 
-
-			 succ;
+			p = p->succ;
 		}
 	}
 	else if (n < 0)
 	{
 		while (n++)
 		{
-			if (this->prev == 0) return 0;
+			if (p->prev == 0) return 0;
 
-			this->prev;
+			p = p->prev;
 		}
 	}
 	return 0;
@@ -76,24 +86,24 @@ Link *Link::find(const std::string &s)
 {
 	Link *p = this;
 
+	while (p->prev)
+	{
+		p = p->prev;
+	}
+
 	while (p)
 	{
-		if (p->value == s)
-			return this;
-
-		if (p->prev)
-		{
-			p = p->prev;
-		}
+		if (static_cast<God *>(p)->name== s)
+			return p;
 
 		else
-			p = this->succ;
+			p = p->succ;
 	}
 	return 0;
 }
 //=======================================================================================================================
 Link *Link::erase()
-// удаляет узел *p из списка; возвращает следующий за p
+// удаляет узел *p(this) из списка; возвращает следующий за p(this)
 {
 	if (this == 0)
 		return 0;
@@ -103,36 +113,6 @@ Link *Link::erase()
 	if (this->prev) this->prev->succ = this->succ;
 
 	return this->succ;
-}
-//=======================================================================================================================
-void print_all(Link *p)
-{
-	std::cout << "{ ";
-	//		 while(p->previous())
-	//		{
-	//			std::cout << p->previous()->value;
-	//			if (p = p->previous()) std::cout << ", ";
-	//		}	
-	//	while (p->previous())
-	//	{
-	//		std::cout << p->previous()->value << ", ";
-	//		if (!p->previous()->previous()->previous())
-	//			break;
-	//	}
-	while (p)
-	{
-		//	if (p->previous() && !p->previous()->previous() && !p->previous()->previous()->previous())
-		//	{
-		//		std::cout << p->previous()->value << ", ";
-		//	
-		//	}
-		//	if (p->previous())
-		//		std::cout << p->previous()->value << ", ";
-		std::cout << p->value;
-		//if (p = p->previous()) std::cout << ", ";
-		if (p = p->next()) std::cout << ", ";
-	}
-	std::cout << " }";
 }
 //=======================================================================================================================
 Link *Link::insert(Link *n)
@@ -159,51 +139,76 @@ Link *Link::insert(Link *n)
 Link *Link::add(Link *n) // вставляет n после p; возвращает n
 {
 	if (n == 0)
-		return this;						// ничего не вставляем
+		return this;
 
 	if (this == 0)
-		return n;							// ничего не вставляем
+		return n;
 
 	n->succ = this->succ;
-
-	//	if (prev)
-	//		this->succ = n;
 
 	this->succ = n;
 	n->prev = this;
 
 	return n;
-	// напоминает insert (см. упр. 11)
+}
+//=======================================================================================================================
+Link *Link::add_ordered(Link *n)
+{
+	Link *p = this;
+
+	while (p->prev)
+	{
+		p = this->prev;
+	}
+
+	while (p)
+	{
+		if (static_cast<God *>(n)->name < static_cast<God *>(p)->name)
+			return insert(n);
+		else
+			return p = p->succ;
+	}
+
+	return p;
+}
+//=======================================================================================================================
+void print_all(Link *g)
+{
+	while (God *prev_god = static_cast<God *>(g->previous()))
+	{
+		g = prev_god;
+	}
+
+	std::cout << "{ ";
+
+	while (g)
+	{
+		std::cout << static_cast<God *>(g)->name << ", " << static_cast<God *>(g)->mifologia << ", " << static_cast<God *>(g)->car << ", " << static_cast<God *>(g)->gun;
+
+		if (g = static_cast<God *>(g->next())) std::cout << " }\n{ ";
+		else
+		std::cout << " }";
+	}
+	
 }
 //=======================================================================================================================
 int main()
 {
-	Link *norse_gods = new Link("Thor");
-	norse_gods = norse_gods->insert(new Link("Odin"));
-	norse_gods = norse_gods->insert(new Link("Zeus"));
-	norse_gods = norse_gods->insert(new Link("Freia"));
-
-	Link *greek_gods = new Link("Hera");
-	greek_gods = greek_gods->insert(new Link("Athena"));
-	greek_gods = greek_gods->insert(new Link("Mars"));
-	greek_gods = greek_gods->insert(new Link("Poseidon"));
-	greek_gods = greek_gods->add(new Link("Beshanin"));
-	greek_gods = greek_gods->add(new Link("Semen"));
-
-	Link *p = greek_gods->find("Mars");
-	if (p) p->value = "Ares";
+	//	Link *p = greek_gods->find("Mars");
+	//	if (p) p->value = "Ares";
+	//	
+	//	Link *p2 = norse_gods->find("Zeus");
+	//	if (p2)
+	//	{
+	//		if (p2 == norse_gods) norse_gods = p2->next();
+	//		p2->erase();
+	//		greek_gods = greek_gods->insert(p2);
+	//	}
 	
-	Link *p2 = norse_gods->find("Zeus");
-	if (p2)
-	{
-		if (p2 == norse_gods) norse_gods = p2->next();
-		p2->erase();
-		greek_gods = greek_gods->insert(p2);
-	}
+	Link *gods = new God("Zeus", "Greece", "", "Lightning");
+	gods->add_ordered(new God ("Odin", "Norway", "The Eight-Legged Flying Horse Named Sleipner", "") );
 
-	print_all(norse_gods);
-	std::cout << "\n";
-	print_all(greek_gods);
+	print_all(gods);
 	std::cout << "\n";
 }
 //======================================================================================================================
@@ -211,6 +216,15 @@ int main()
 //======================================================================================================================
 	V	11. Завершите программу, создающую список богов, из раздела 17.10.1 и выполните ее.
 //======================================================================================================================
-	12. Зачем нужны две версии функции find()?
+	V	12. Зачем нужны две версии функции find()? const и не const==/==Для защиты 
 //======================================================================================================================
+	13. Модифицируйте класс Link из раздела 17.10.1, чтобы он хранил значение типа struct God.
+Класс God должен иметь члены типа string: имя, мифология, транспортное средство и оружие.
+Например, God("Зевс", "Греция", "", "молния") and God("Один", "Норвегия", "Восьминогий летающий конь по имени Слейпнер", "").
+Напишите программу print_all(), выводящую имена богов и их атрибуты построчно.
+Добавьте функцию-член add_ordered(), размещающую новый элемент с помощью оператора new в правильной лексикографической позиции.
+Используя объекты класса Link со значениями типа God, составьте список богов из трех мифологий;
+затем переместите элементы (богов) из этого списка в три лексикографически упорядоченных списка — по одному на каждую мифологию.
+//======================================================================================================================
+
 */
