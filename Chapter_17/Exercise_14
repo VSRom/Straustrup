@@ -1,0 +1,285 @@
+#include <iostream>
+#include <iostream>
+#include <vector>
+
+//=======================================================================================================================
+class Link
+{
+
+public:
+	Link(Link *s = 0)
+		: succ(s)
+	{
+	}
+
+	Link *insert(Link *n);				// вставляет n перед данным объектом
+
+	Link *add(Link *n);					// вставляет n после данного объекта
+
+	Link *erase();						// удаляет данный объект из списка
+
+	Link *find(const std::string &s);		// находит s в списке
+
+	Link *advance(int n) const;			// удаляет n позиций из списка
+
+	Link *add_ordered(Link *n);			// размещает новый элемент с помощью оператора new в правильной лексикографической позиции
+
+	Link *next() const
+	{
+		return succ;
+	}
+
+	//	Link *previous() const
+	//	{
+	//		return prev;
+	//	}
+
+private:
+	//	Link *prev;
+	Link *succ;
+};
+//=======================================================================================================================
+struct God : public Link
+{
+	God(std::string n, std::string m, std::string c, std::string g)
+		: Link(), name(n), mifologia(m), car(c), gun(g)
+
+	{
+	}
+
+	std::string name;
+	std::string mifologia;
+	std::string car;
+	std::string gun;
+};
+//=======================================================================================================================
+Link *Link::advance(int n) const
+// удаляет n позиций из списка если не находит, возвращает 0
+// при положительном n переносит указатель на n узлов вперед, при отрицательном — на n узлов назад
+{
+	if (this == 0)
+		return 0;
+
+	Link *p = const_cast<Link *>(this);
+
+	if (0 < n)
+	{
+		while (n--)
+		{
+			if (p->succ == 0) return 0;
+
+			p = p->succ;
+		}
+	}
+	else if (n < 0)
+	{
+		while (n++)
+		{
+			if (p->prev == 0) return 0;
+
+			p = p->prev;
+		}
+	}
+	return 0;
+}
+//=======================================================================================================================
+Link *Link::find(const std::string &s)
+// находит s в списке; если не находит, возвращает 0
+{
+	Link *p = this;
+
+	while (p)
+	{
+		if (p == nullptr)
+			return 0;
+
+		if (static_cast<God *>(p)->mifologia == s)
+			return p;
+
+		p = p->succ;
+	}
+	return 0;
+}
+//=======================================================================================================================
+Link *Link::erase()
+// удаляет узел *p(this) из списка; возвращает следующий за p(this)
+{
+	Link *p = const_cast<Link *>(this);
+
+	if (p == 0)
+		return 0;
+
+	if (p->succ) p->succ->prev = p->prev;
+
+	if (p->prev) p->prev->succ = p->succ;
+
+	p = this->succ;
+
+	this->succ = 0;
+	this->prev = 0;
+
+	return p;
+}
+//=======================================================================================================================
+Link *Link::insert(Link *n)
+// вставляет n перед p; возвращает n
+{
+	if (n == 0)
+		return this;						// ничего не вставляем
+
+	if (this == 0)
+		return n;							// ничего не вставляем
+
+	n->succ = this;						// p следует за n
+
+	if (prev)
+		prev->succ = n;
+
+	n->prev = prev;
+
+	prev = n;								// n становится предшественником prev
+
+	return n;
+}
+//=======================================================================================================================
+Link *Link::add(Link *n) // вставляет n после p; возвращает n
+{
+	if (n == 0)
+		return this;
+
+	if (this == 0)
+		return n;
+
+	n->succ = this->succ;
+
+	this->succ = n;
+	n->prev = this;
+
+	return n;
+}
+//=======================================================================================================================
+Link *Link::add_ordered(Link *n)
+{
+	Link *p = static_cast<God *>(this);
+
+	while (p->previous())
+		p = p->previous();
+
+	while (p)
+	{
+		if (static_cast<God *>(n)->name < static_cast<God *>(p)->name)
+		{
+			p = p->succ;
+
+			if (p == nullptr)
+			{
+				insert(n);
+				return this;
+			}
+
+
+			if (!(static_cast<God *>(n)->name > static_cast<God *>(p)->name))
+				return add(n);
+
+		}
+
+		if (p->succ == nullptr)
+		{
+			add(n);
+			return this->succ;
+		}
+
+
+		p = p->succ;
+
+	}
+
+	return 0;
+}
+//=======================================================================================================================
+void print_all(Link *g)
+{
+	std::cout << "{ ";
+
+	while (g->previous())
+		g = g->previous();
+
+	while (g)
+	{
+		std::cout << static_cast<God *>(g)->name << ", " << static_cast<God *>(g)->mifologia << ", " << static_cast<God *>(g)->car << ", " << static_cast<God *>(g)->gun;
+
+		if (g = g->next()) std::cout << " }\n{ ";
+		else
+			std::cout << " }";
+	}
+}
+//=======================================================================================================================
+int main()
+{
+	Link *mix_gods = new God("Zeus", "Greece", "Celestial chariot", "Lightning bolt");
+	mix_gods = mix_gods->insert(new God("Athena", "Greece", "Owl", "Spear and Aegis"));
+	mix_gods = mix_gods->insert(new God("Poseidon", "Greece", "Seashell chariot", "Trident"));
+	mix_gods = mix_gods->insert(new God("Odin", "Norway", "Eight-legged horse Sleipnir", "Spear Gungnir"));
+	mix_gods = mix_gods->insert(new God("Thor", "Norway", "Goat-drawn chariot", "Hammer Mjolnir"));
+	mix_gods = mix_gods->insert(new God("Freya", "Norway", "Cat-drawn chariot", "Falcon cloak"));
+	mix_gods = mix_gods->insert(new God("Ra", "Egypt", "Solar barque", "Staff and Ankh"));
+	mix_gods = mix_gods->insert(new God("Anubis", "Egypt", "Desert sands", "Scales and Knife"));
+	mix_gods = mix_gods->insert(new God("Horus", "Egypt", "Falcon", "Spear and Was-scepter"));
+
+	Link *egypt_gods = nullptr;
+	Link *norse_gods = nullptr;
+	Link *greek_gods = nullptr;
+
+	while (mix_gods)
+	{
+		Link *p1 = mix_gods->find("Egypt");
+		if (p1 == mix_gods)
+			mix_gods = p1->next();
+
+		p1->erase();
+
+		if (egypt_gods == nullptr)
+			egypt_gods = egypt_gods->insert(p1);
+		else
+			egypt_gods = egypt_gods->add_ordered(p1);
+
+
+		Link *p2 = mix_gods->find("Norway");
+		if (p2 == mix_gods)
+			mix_gods = p2->next();
+
+		p2->erase();
+
+		if (norse_gods == nullptr)
+			norse_gods = norse_gods->insert(p2);
+		else
+			norse_gods = norse_gods->add_ordered(p2);
+
+
+		Link *p3 = mix_gods->find("Greece");
+		if (p3 == mix_gods)
+			mix_gods = p3->next();
+
+		p3->erase();
+
+		if (greek_gods == nullptr)
+			greek_gods = greek_gods->insert(p3);
+		else
+			greek_gods = greek_gods->add_ordered(p3);
+	}
+
+	print_all(egypt_gods);
+	std::cout << "\n" << "\n";
+	print_all(norse_gods);
+	std::cout << "\n" << "\n";
+	print_all(greek_gods);
+	std::cout << "\n" << "\n";
+}
+//======================================================================================================================
+/*
+//======================================================================================================================
+	14. Можно ли написать список богов из раздела 17.10.1 в виде односвязного списка; другими словами,
+могли бы мы удалить член prev из класса Link? Какие причины могли бы нас заставить это сделать?
+В каких ситуациях разумно использовать односвязные списки? Переделайте этот пример с помощью односвязного списка.
+//======================================================================================================================
+*/
