@@ -1,0 +1,50 @@
+# Build directories
+build/
+Debug/
+Release/
+x64/
+x86/
+
+# Visual Studio
+*.sln
+*.slnx
+*.vcxproj
+*.vcxproj.filters
+*.user
+*.suo
+.vs/
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.vcxproj.user
+ipch/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+
+# Compiled files
+*.exe
+*.dll
+*.lib
+*.obj
+*.pdb
+*.ilk
+*.res
+*.exp
+
+# Temporary files
+*.log
+*.tmp
+*.bak
+*.swp
+*.jpg
+*.gif
+*~
+
+# FLTK build artifacts (if bundled)
+fltk-build/
+_FLTK_*
