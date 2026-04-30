@@ -8,7 +8,7 @@ include(FetchContent)
 
 FetchContent_Declare(
     fltk
-    GIT_REPOSITORY https://github.com/fltk/fltk.git
+    GIT_REPOSITORY https://github.com/VSRom/Straustrup/tree/main/Chapter_12-13_FLTK
     GIT_TAG master
     GIT_SHALLOW TRUE
 )
