@@ -1,0 +1,160 @@
+#include <iostream>
+//=========================================================================================================================
+char* cat_dog(const char* s1, const char* s2, const char* raz)
+{
+	const char *cat = s1; int count_cat = 0;
+	const char *dog = s2; int count_dog = 0;
+	const char *r = raz;  int count_raz = 0;
+
+	while (*s1) { count_cat++; s1++; }
+	while (*s2) { count_dog++; s2++; }
+	while (*r)  { count_raz++;  r++; }
+
+	int count = count_cat + count_dog + count_raz;
+
+	char *ptr = new char[count + 2];
+	char *ptr_rez = ptr;
+
+	while (*cat != '\0') { *ptr = *cat; cat++; ptr++; }
+	while (*raz != '\0') { *ptr = *raz; raz++; ptr++; }
+	while (*dog != '\0') { *ptr = *dog; dog++; ptr++; }
+
+	*ptr = '\0';
+
+	return ptr_rez;
+}
+//=========================================================================================================================
+int main()
+{
+	char cat[] = {'B', 'e', 's', 'h', 'a', 'n', 'i', 'n', '\0'};
+	char dog[] = {'S', 'e', 'm', 'e', 'n', '\0' };
+	char razdel[] = {'/', '=', '/', '\0' };
+
+	char *c = cat;
+	char *d = dog;
+	char *r = razdel;
+
+	char *result = cat_dog(c, d, r);
+
+	char *del = result;
+
+	std::cout << result;
+
+	delete[] del;
+}
+//=========================================================================================================================
+/*
+//=========================================================================================================================
+	V	5. Напишите функцию string cat_dot(const string & s1, const string & s2),
+выполняющую конкатенацию двух строк с точкой между ними.Например,
+cat_dot("Нильс", "Бор") вернет строку Нильс.Бор.
+//=========================================================================================================================
+std::string cat_dog(const std::string &s1, const std::string &s2)
+{
+	std::string result = {};
+
+	for (char f : s1) result += f;
+	result += ".";
+	for (char f : s2) result += f;
+
+	return result;
+}
+//=========================================================================================================================
+	V	6. Модифицируйте функцию cat_dot() из предыдущего упражнения так,
+чтобы в качестве третьего аргумента она получала строку, используемую как разделитель(а не точку).
+//=========================================================================================================================
+std::string cat_dog(const std::string &s1, const std::string &s2, const std::string &razdel)
+{
+	std::string result = {};
+
+	for (char f : s1) result += f;
+	result += razdel;
+	for (char f : s2) result += f;
+
+	return result;
+}
+//=========================================================================================================================
+	V	7. Напишите варианты функции cat_dot() из предыдущих упражнений,
+получающие в качестве аргументов строки в стиле языка C и возвращающие
+строку в стиле языка С, размещенную в свободной памяти.Не используйте
+никаких стандартных функций или типов.Протестируйте эти функции на
+нескольких строках.Убедитесь, что вся память, занятая вами с помощью
+оператора new, освобождается с помощью оператора delete.Сравните усилия,
+затраченные вами на выполнение упр. 5 и 6.
+//=========================================================================================================================
+char* cat_dog(const char* s1, const char* s2)
+{
+	const char *cat = s1;
+	const char *dog = s2;
+
+	int count_cat = 0;
+	int count_dog = 0;
+
+	while (*s1) { count_cat++; s1++; }
+	while (*s2) { count_dog++; s2++; }
+
+	int count = count_cat + count_dog;
+
+	char *ptr = new char[count + 2];
+	char *ptr_rez = ptr;
+
+	while (*cat != '\0') {
+		*ptr = *cat;
+		cat++; ptr++;
+	}
+
+	*ptr = '.'; ptr++;
+
+	while (*dog != '\0') {
+		*ptr = *dog;
+		dog++; ptr++;
+	}
+
+	*ptr = '\0';
+
+	return ptr_rez;
+}
+//=========================================================================================================================
+char* cat_dog(const char* s1, const char* s2, const char* raz)
+{
+	const char *cat = s1; int count_cat = 0;
+	const char *dog = s2; int count_dog = 0;
+	const char *r = raz;  int count_raz = 0;
+
+	while (*s1) { count_cat++; s1++; }
+	while (*s2) { count_dog++; s2++; }
+	while (*r)  { count_raz++;  r++; }
+
+	int count = count_cat + count_dog + count_raz;
+
+	char *ptr = new char[count + 2];
+	char *ptr_rez = ptr;
+
+	while (*cat != '\0') { *ptr = *cat; cat++; ptr++; }
+	while (*raz != '\0') { *ptr = *raz; raz++; ptr++; }
+	while (*dog != '\0') { *ptr = *dog; dog++; ptr++; }
+
+	*ptr = '\0';
+
+	return ptr_rez;
+}
+//=========================================================================================================================
+int main()
+{
+	char cat[] = {'B', 'e', 's', 'h', 'a', 'n', 'i', 'n', '\0'};
+	char dog[] = {'S', 'e', 'm', 'e', 'n', '\0' };
+	char razdel[] = {'/', '=', '/', '\0' };
+
+	char *c = cat;
+	char *d = dog;
+	char *r = razdel;
+
+	char *result = cat_dog(c, d);
+
+	char *del = result;
+
+	std::cout << result;
+	delete[] del;
+}
+//=========================================================================================================================
+*/
