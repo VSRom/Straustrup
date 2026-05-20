@@ -1,0 +1,167 @@
+#include <iostream>
+//==================================================================================
+//	class vector {
+//		int sz;
+//		double *elem;
+//		int space;
+//	
+//	public:
+//	
+//		vector() :sz(0), elem(0), space(0) {}
+//		explicit vector(int s) :sz(s), elem(new double[s]), space(s) {
+//			for (int i = 0; i < sz; ++i) elem[i] = 0;	// элементы инициализированы
+//		}
+//	
+//		vector(const vector &);							// копирующий конструктор
+//		vector &operator=(const vector &);				// копирующее присваивание
+//	
+//		~vector() { delete[] elem; }					// деструктор
+//		double &operator[ ](int n) { return elem[n]; }	// доступ
+//		const double &operator[](int n) const { return elem[n]; }
+//	
+//		int size() const { return sz; }
+//		int capacity() const { return space; }
+//	
+//		void reserve(int newalloc);
+//		void resize(int newsize);
+//		void push_back(double d);
+//	};
+//==================================================================================
+template<class T> class vector {			// почти реальный вектор элементов типа T читается как "для всех типов T" (почти так же, как в математике)
+	int sz;									// размер
+	T *elem;								// указатель на элементы
+	int space;								// размер + свободная память
+
+public:
+	vector() :sz(0), elem(0), space(0) {}
+	explicit vector(int s);
+
+	vector(const vector &);					// копирующий конструктор
+	vector &operator=(const vector &);		// копирующее присваивание
+	~vector() { delete[] elem; }			// деструктор
+
+	T &operator[](int n) { return elem[n]; }// доступ: возвращает ссылку
+	template<typename T, typename A> T& vector<T,A>::operator[](int n) { return elem[n]; }
+
+	int size() const { return sz; }			// текущий размер
+	int capacity() const { return space; }
+	void resize(int newsize, T def = T());				// увеличивает вектор
+	void push_back(const T &d);
+	void reserve(int newalloc);
+};
+//==================================================================================
+template<class T> class allocator {
+public:
+	T *allocate(int n);						// выделяет память для n объектов типа T
+	void deallocate(T *p, int n);			// освобождает память, занятую n
+	// объектами типа T, начиная с адреса p
+
+	void construct(T *p, const T &v);		// создает объект типа T со значением v по адресу p
+	void destroy(T *p);						// уничтожает объект T по адресу p
+};
+//==================================================================================
+template<class T, class A = allocator<T> > class vector {
+	A alloc;								// используем объект класса allocator для работы с памятью, выделяемой для элементов
+//==================================================================================
+struct out_of_range {			};			// класс, сообщающий об ошибках, связанных с выходом за пределы допустимого диапазона
+template<class T, class A = allocator<T> > class vector {
+	// ...
+	T &at(int n);							// доступ с проверкой
+	const T &at(int n) const;				// доступ с проверкой
+	T &operator[](int n);					// доступ без проверки
+	const T &operator[](int n) const;		// доступ без проверки
+};
+//==================================================================================
+class T, class A > T &vector<T, A>::at(int n)
+{
+	if (n < 0 || sz <= n) throw out_of_range();
+	return elem[n];
+}
+//==================================================================================
+template<class T, class A>
+void vector<T, A>::reserve(int newalloc)
+{
+	if (newalloc <= space) return;								// размер не уменьшается
+	T *p = alloc.allocate(newalloc);							// выделяем новую память
+	for (int i = 0; i < sz; ++i) alloc.construct(&p[i], elem[i]);// копируем
+	for (int i = 0; i < sz; ++i) alloc.destroy(&elem[i]);		// уничтожаем
+	alloc.deallocate(elem, space);								// освобождаем старую память
+	elem = p;
+	space = newalloc;
+}
+//==================================================================================
+void suspicious(vector<int> &v, int s)
+{
+	int *p = new int[s];
+	vector<int>v1;
+	// ...
+	int *q = new int[s];
+	vector<double> v2;
+	// ...
+	delete[] p;
+	delete[] q;
+}
+//==================================================================================
+//	Добавьте блоки try в последний пример и убедитесь, что все ресурсы будут правильно освобождаться при любых исключениях.(19.5.2)
+//==================================================================================
+template<class T, class A>
+void vector<T, A>::resize(int newsize, T val = T())
+{
+	reserve(newsize);
+	for (int i = sz; i < newsize; ++i) alloc.construct(&elem[i], val);
+																		// создаем
+	for (int i = newsize; i < sz; ++i) alloc.destroy(&elem[i]);
+																		// уничтожаем
+	sz = newsize;
+}
+//==================================================================================
+template<class T, class A>
+void vector<T, A>::push_back(const T &val)
+{
+	if (space == 0) reserve(8);					// начинаем с памяти для 8 элементов
+	else if (sz == space) reserve(2 * space);	// выделяем больше памяти
+	alloc.construct(&elem[sz], val);			// добавляем в конец значение val
+	++sz;										// увеличиваем размер
+}
+//==================================================================================
+template<typename T> &vector<T>::operator=(const vector &a)
+												// похож на конструктор копирования,
+												// но мы должны работать со старыми элементами
+{
+	double *p = new double[a.sz];				// выделяем новую память
+	for (int i = 0; i < a.sz; ++i) p[i] = a.elem[i];	// копируем элементы
+	delete[] elem;								// освобождаем старую память
+	space = sz = a.sz;							// устанавливаем новый размер
+	elem = p;									// устанавливаем новые элементы
+	return *this;								// возвращаем ссылку на себя
+}
+//==================================================================================
+void print_some(vector<int> &v)
+{
+	int i = –1;
+	std::cin >> i;
+	while (i != –1) try {
+		std::cout << "v[" << i << "]==" << v.at(i) << "\n";
+	}
+	catch (out_of_range) {
+		std::cout << "Неправильный индекс: " << i << "\n";
+	}
+}
+//==================================================================================
+int main()
+{
+	vector<double>;
+	vector<int>;
+	vector<Month>;
+	vector<Window*>;						// вектор указателей на объекты класса Window
+	vector<vector<Record>>;				// вектор векторов из объектов класса Record
+	vector<char>;
+	
+	vector<double> vd;						// T — double
+	vector<int> vi;							// T — int
+	vector<double *> vpd;					// T — double*
+	vector< vector<int> > vvi;				// T — vector<int>, в котором T — int
+
+
+	return 0;
+}
