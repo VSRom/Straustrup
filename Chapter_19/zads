@@ -57,14 +57,18 @@ T &S<T>::read_val(T &v) {
 		while (std::cin >> elem)
 			v.push_back(elem);
 	}
+	else if constexpr (std::is_same_v<T, std::string>) {
+		std::cin >> v;
+	}
 	else
 		std::cin >> v;
+
 			val = v;
 
 	return val;
 }
 //==================================================================================
-//	template<>
+//	template<>	// Первые элемент не запишется в вектор, так как будет вначале вызвана функция выше(функция выше имеет правильный вид для вектора и любого другого класса)
 //	std::vector<int> &S<std::vector<int>>::read_val(std::vector<int> &v)
 //	{
 //		int elem;
