@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 #include <istream>
+#include <type_traits>
 //==================================================================================
 template<typename T>
 struct S {
@@ -15,51 +16,50 @@ struct S {
 		: val(value)
 	{ }
 
-	T& read_val(T &v);
-	const T& get() const;
-	T& set(const T& value);
-	//	friend std::ostream &operator<<(std::ostream &os, const S &obj) { os << obj.val; return os; }
+	T &read_val(T &v);
+	const T &get() const;
+	T &set(const T &value);
+	friend std::ostream &operator<<(std::ostream &os, const S<T> &obj) { os << obj.val; return os; }
 	friend std::ifstream &operator>>(std::ifstream &is, const S &obj) { is >> obj.val; return is; }
-	friend std::ifstream &operator>>(std::ifstream &is, std::vector<T> &obj) { is >> obj.push_back(T); return is; }
-
-	template<typename T>
-	friend std::ostream &operator<<(std::ostream &is, const std::vector<T> &obj) {
-		for (T a : obj)
-			is << a << '\n';
-
-		return is;
-	}
-
-	const T &operator[](T) const { return val; };
-	T &operator[](T) { return val; };
+	
+	const T &operator[](const T&) const { return val; };
+	T &operator[](T&) { return val; };
 
 private:
 	T val;
 };
 //==================================================================================
 template<typename T>
-const T& S<T>::get() const
+std::ostream &operator<<(std::ostream &os, const std::vector<T> &obj) {
+	for (const T &a : obj)
+		os << a << '\t';
+
+	return os;
+}
+//==================================================================================
+template<typename T>
+const T &S<T>::get() const
 {
 	return val;
 }
 //==================================================================================
 template<typename T>
-T& S<T>::set(const T& value)
+T &S<T>::set(const T &value)
 {
 	val = value;
 	return val;
 }
 //==================================================================================
 template<typename T>
-T& S<T>::read_val(T &v)
-{
-	int elem;
-
-	while (std::cin >> v)
-	{
-		val = v;
-		break;
+T &S<T>::read_val(T &v) {
+	if constexpr (std::is_same_v<T, std::vector<int>>) { // Проверка является ли тип <T> - std::vector
+		int elem;
+		while (std::cin >> elem)
+			v.push_back(elem);
 	}
+	else
+		std::cin >> v;
+			val = v;
 
 	return val;
 }
@@ -106,10 +106,8 @@ int main()
 
 	lov.read_val(vec);
 
-
-
 	//std::cout << loc[0] << '\n' << los['\0'] << '\n' << lod[0] << '\n' << stroke[""] << '\n';
-	
+
 	std::cout << lov;
 
 	return 0;
@@ -147,8 +145,8 @@ int main()
 	V	13. Используйте функцию read_val(), чтобы считать данные в каждую из переменных,
 			перечисленных в п. 3, за исключением переменной S<vector<int>>.
 //==================================================================================
-	14. Бонус: определите класс template<class T> istream & operator<<(istream &, vector<T>&) так,
-чтобы функция read_val() также обрабатывала переменную S<vector<int>>.
-Не забудьте выполнить тестирование после каждого этапа.
+	V	14. Бонус: определите класс template<class T> istream & operator<<(istream &, vector<T>&) так,
+		чтобы функция read_val() также обрабатывала переменную S<vector<int>>.
+		Не забудьте выполнить тестирование после каждого этапа.
 //==================================================================================
 */
