@@ -1,0 +1,93 @@
+//==================================================================================
+	V	1. Напишите шаблонную функцию, складывающую векторы элементов любых типов, допускающих сложение.
+//==================================================================================
+#include <iostream>
+#include <memory>
+#include <vector>
+//==================================================================================
+template<typename T>
+class add_vector {
+public:
+	add_vector()
+	{ }
+
+	add_vector(T value)
+		: val(value) { }
+
+	friend add_vector operator+(const add_vector &obj1, const add_vector &obj2) {
+		T result;
+		for (const auto &a : obj1.val) {
+			for (const auto &b : obj2.val)
+			result.push_back(a + b);
+			if (result.size() == obj1.val.size()) break;
+		}
+
+		return add_vector(result);
+	}
+
+	friend std::ostream &operator<<(std::ostream &os, const add_vector<T> &obj) {
+		for (const auto &a : obj.val)
+			os << a << '\t';
+
+		return os;
+	}
+private:
+	T val;
+};
+//==================================================================================
+int main()
+{
+	std::vector<int> one = { 10, 15 };
+	std::vector<int> two = { 32, 982 };
+
+	std::vector<std::string> oni = { "Hello", "Gud" };
+	std::vector<std::string> twi = { "Buzelka", "kalala" };
+
+	add_vector<std::vector<std::string>> onis(oni);
+	add_vector<std::vector<std::string>> twis(twi);
+
+	add_vector<std::vector<int>> ones(one);
+	add_vector<std::vector<int>> twos(two);
+	std::cout << onis + twis << '\n';
+
+
+
+	return 0;
+}
+//==================================================================================
+	V	2. Напишите шаблонную функцию,
+получающую в качестве аргументов объекты типов vector<T> vt и vector<U> vu
+и возвращающую сумму всех выражений vt[i] * vu[i].
+//==================================================================================
+/*
+#include <memory>
+#include <iostream>
+#include <vector>
+//==================================================================================
+template<typename T, typename U>
+int objects(std::vector<T>& val1, std::vector<U>& val2)
+{
+	std::vector<T> result;
+	for (int i = 0; i < val1.size(); i++) {
+		auto res = val1[i] * val2[i];
+		result.push_back(res);
+	}
+	auto resul = 0;
+
+	for (auto p : result)
+		resul += p;
+
+	return resul;
+}
+//==================================================================================
+int main()
+{
+	std::vector<int> result{ 12,7,3 };
+	std::vector<int> kalup{ 2, 2, 2 };
+
+	std::cout << objects(result, kalup) << '\n';
+	return 0;
+}
+
+*/
+//==================================================================================
