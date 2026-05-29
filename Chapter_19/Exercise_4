@@ -1,18 +1,289 @@
-#include <memory>
 #include <iostream>
-//==========================================================================
-
-//==========================================================================
-int main()
+#include <vector>
+#include <memory>
+#include <string>
+struct God;
+//=======================================================================================================================
+template <typename T>
+class Link
 {
 
-return 0;
+public:
+	Link(T* p = 0, T* s = 0)
+		: prev(p), succ(s)
+	{
+	}
+
+	T* advance(int n) const;			// удаляет n позиций из списка
+	T* erase();						// удаляет данный объект из списка
+	T* insert(Link<T>* n);				// вставляет n перед данным объектом
+	T* add(Link<T>* n);					// вставляет n после данного объекта
+	
+	T* next() const {
+		return succ;
+	}
+
+	T* previous() const {
+		return prev;
+	}
+
+protected:
+	T* prev;
+	T* succ;
+};
+//=======================================================================================================================
+struct God : public Link<God>
+{
+	God(std::string n, std::string m, std::string c, std::string g)
+		: Link<God>(), name(n), mifologia(m), car(c), gun(g)
+
+	{
+	}
+
+	God* add_ordered(God* n);
+	God* find(const std::string& s);
+
+
+	std::string name;
+	std::string mifologia;
+	std::string car;
+	std::string gun;
+};
+//=======================================================================================================================
+template <typename T>
+T* Link<T>::advance(int n) const
+// удаляет n позиций из списка если не находит, возвращает 0
+// при положительном n переносит указатель на n узлов вперед, при отрицательном — на n узлов назад
+{
+	if (this == nullptr)
+		return nullptr;
+
+	Link<T>* p = static_cast<T*>(this);
+
+	if (0 < n)
+	{
+		while (n--)
+		{
+			if (p->succ == 0) return nullptr;
+
+			p = p->succ;
+		}
+	}
+	else if (n < 0)
+	{
+		while (n++)
+		{
+			if (p->prev == 0) return nullptr;
+
+			p = p->prev;
+		}
+	}
+	else return this;
+}
+//=======================================================================================================================
+template <typename T>
+T* Link<T>::erase()
+// удаляет узел *p(this) из списка; возвращает следующий за p(this)
+{
+	Link<T>* p = static_cast<Link<T>*>(this);
+
+	if (!p) return nullptr;
+
+	Link<T>* next_node = p->succ;
+	Link<T>* prev_node = p->prev;
+
+	if (p->succ) next_node->prev = p->prev;
+
+	if (p->prev) prev_node->succ = p->succ;
+
+	T* ptr = static_cast<T*>(this->succ);
+
+	p->succ = nullptr;
+	p->prev = nullptr;
+
+	return ptr;
+}
+//=======================================================================================================================
+template <typename T>
+T* Link<T>::insert(Link<T>* n)
+// вставляет n перед p; возвращает n
+{
+	Link<T>* p = static_cast<Link<T>*>(this);
+
+	if (n == 0)
+		return static_cast<T*>(p);						// ничего не вставляем
+
+	if (p == nullptr)
+		return static_cast<T*>(n);							// ничего не вставляем
+
+	Link<T>* prev_node = prev;
+
+	n->succ = static_cast<T*>(p);						// p следует за n
+
+	if (prev)
+		prev_node->succ = static_cast<T*>(n);
+
+	n->prev = prev;
+
+	prev = static_cast<T*>(n);								// n становится предшественником prev
+
+	return static_cast<T*>(n);
+}
+//=======================================================================================================================
+template <typename T>
+T* Link<T>::add(Link<T>* n) // вставляет n после p; возвращает n
+{
+	Link<T>* p = static_cast<Link<T>*>(this);
+
+	if (n == nullptr)
+		return static_cast<T*>(p);
+
+	if (p == nullptr)
+		return static_cast<T*>(n);
+
+	n->succ = p->succ;
+
+	p->succ = static_cast<T*>(n);
+	n->prev = static_cast<T*>(p);
+
+	return static_cast<T*>(n);
+}
+//=======================================================================================================================
+God* God::find(const std::string& s)
+// находит s в списке; если не находит, возвращает 0
+{
+	God* current = this;
+	while (current)
+	{
+		if (!current)
+			return nullptr;
+
+		if (current->mifologia == s)
+			return current;
+
+		current = current->succ;
+	}
+	return nullptr;
+}
+//=======================================================================================================================
+God* God::add_ordered(God* n)
+{
+	if (!this)
+		return n;
+
+	God* head = this;
+	God* current = this;
+
+	while (current->prev)
+		current = current->prev;
+
+	while (current)
+	{
+		if (n->name < current->name) {
+			current->insert(n);
+			return n;
+		}
+
+		if (!current->succ) {
+			current->add(n);
+			return head;
+		}
+
+		current = current->succ;
+	}
+
+	return head;
+}
+//=======================================================================================================================
+void print_all(God* g)
+{
+	std::cout << "{ ";
+
+	while (g->previous())
+		g = g->previous();
+
+	while (g)
+	{
+		std::cout << g->name << ", " << g->mifologia << ", " << g->car << ", " << g->gun;
+
+		if (g = g->next()) std::cout << " }\n{ ";
+		else
+			std::cout << " }";
+	}
+}
+//=======================================================================================================================
+int main()
+{
+	God* mix_gods = new God("Zeus", "Greece", "Celestial chariot", "Lightning bolt");
+	mix_gods = mix_gods->insert(new God("Athena", "Greece", "Owl", "Spear and Aegis"));
+	mix_gods = mix_gods->insert(new God("Poseidon", "Greece", "Seashell chariot", "Trident"));
+	mix_gods = mix_gods->insert(new God("Odin", "Norway", "Eight-legged horse Sleipnir", "Spear Gungnir"));
+	mix_gods = mix_gods->insert(new God("Thor", "Norway", "Goat-drawn chariot", "Hammer Mjolnir"));
+	mix_gods = mix_gods->insert(new God("Freya", "Norway", "Cat-drawn chariot", "Falcon cloak"));
+	mix_gods = mix_gods->insert(new God("Ra", "Egypt", "Solar barque", "Staff and Ankh"));
+	mix_gods = mix_gods->insert(new God("Anubis", "Egypt", "Desert sands", "Scales and Knife"));
+	mix_gods = mix_gods->insert(new God("Horus", "Egypt", "Falcon", "Spear and Was-scepter"));
+	
+	God* egypt_gods = nullptr;
+	God* norse_gods = nullptr;
+	God* greek_gods = nullptr;
+	
+	while (mix_gods)
+	{
+		God* p1 = mix_gods->find("Egypt");
+		if (p1 == mix_gods)
+			mix_gods = p1->next();
+	
+		p1->erase();
+	
+		if (egypt_gods == nullptr)
+			egypt_gods = egypt_gods->insert(p1);
+		else
+			egypt_gods = egypt_gods->add_ordered(p1);
+
+		God* p2 = mix_gods->find("Norway");
+		if (p2 == mix_gods)
+			mix_gods = p2->next();
+	
+		p2->erase();
+	
+		if (norse_gods == nullptr)
+			norse_gods = norse_gods->insert(p2);
+		else
+			norse_gods = norse_gods->add_ordered(p2);
+	
+	
+		God* p3 = mix_gods->find("Greece");
+		if (p3 == mix_gods)
+			mix_gods = p3->next();
+	
+		p3->erase();
+	
+		if (greek_gods == nullptr)
+			greek_gods = greek_gods->insert(p3);
+		else
+			greek_gods = greek_gods->add_ordered(p3);
+	}
+	
+	print_all(egypt_gods);
+	std::cout << "\n" << "\n";
+	print_all(norse_gods);
+	std::cout << "\n" << "\n";
+	print_all(greek_gods);
+	std::cout << "\n" << "\n";
 }
 //==========================================================================
 /*
 //==========================================================================
-4. Превратите класс Link из раздела 17.9.3 в шаблонный.
+	V	4. Превратите класс Link из раздела 17.9.3 в шаблонный.
 Затем выполните заново упр. 13 из главы 17 на основе класса Link<God>.
 //==========================================================================
-*/
+	V	13. Модифицируйте класс Link из раздела 17.10.1, чтобы он хранил значение типа struct God.
+Класс God должен иметь члены типа string: имя, мифология, транспортное средство и оружие.
+Например, God("Зевс", "Греция", "", "молния") and God("Один", "Норвегия", "Восьминогий летающий конь по имени Слейпнер", "").
+Напишите программу print_all(), выводящую имена богов и их атрибуты построчно. Добавьте функцию-член add_ordered(),
+размещающую новый элемент с помощью оператора new в правильной лексикографической позиции. Используя объекты класса 
+Link со значениями типа God, составьте список богов из трех мифологий; затем переместите элементы (богов) из этого списка
+в три лексикографически упорядоченных списка — по одному на каждую мифологию.
 //==========================================================================
+*/
