@@ -7,11 +7,27 @@
 template<class T>
 class my_allocator {
 public:
-	T* allocate(int n);					// выделяет память для n объектов типа T
-	void deallocate(T* p, int n);		// освобождает память, занятую n объектами типа T, начиная с адреса p
+	T* allocate(int n) {					// выделяет память для n объектов типа T
+		T* ptr = (T*)malloc(n * sizeof(T));
+		if (ptr == nullptr) {
+			std::cout << "EROOR malloc == nullptr\n";
+			return 0;
+		}
+		return ptr;
+	}
 
-	void construct(T* p, const T& v);	// создает объект типа T со значением v по адресу p
-	void destroy(T* p);					// уничтожает объект T по адресу p
+	void deallocate(T* p, int n) {		// освобождает память, занятую n объектами типа T, начиная с адреса p
+		free(p);
+		p = nullptr;
+	}
+
+	void construct(T* p, const T& v) {	// создает объект типа T со значением v по адресу p
+		*p = v;
+	}
+
+	void destroy(T* p) {					// уничтожает объект T по адресу p
+		p->~T();
+	}
 };
 //=============================================================================================
 template<class T, class A = my_allocator<T>>
@@ -24,11 +40,6 @@ class my_vector {
 
 public:
 	my_vector() :sz(0), elem(0), space(0) {}
-	explicit my_vector(int s);
-
-	my_vector(const my_vector&);					// копирующий конструктор
-	my_vector& operator=(const my_vector&);		// копирующее присваивание
-	~my_vector() { delete[] elem; }			// деструктор
 
 	T& operator[](int n) { return elem[n]; }	// доступ: возвращает ссылку
 	const T& operator[](int n) const { return elem[n]; }
@@ -40,7 +51,16 @@ public:
 	void reserve(int newalloc);
 	void push_back(const T& val);
 
-	void push_back(const T& d);
+	
+	~my_vector() {
+		if (elem != nullptr) {
+			for (int i = 0; i < sz; ++i) {
+
+				alloc.destroy(&elem[i]);
+			}
+			alloc.deallocate(elem, space);
+		}
+	}
 
 };
 //=============================================================================================
@@ -75,21 +95,7 @@ void my_vector<T, A>::push_back(const T& val)
 }
 //=============================================================================================
 int main() {
-	my_vector<double> v1;
-	v1.resize(100);						// добавляем 100 копий объекта double(), т.е. 0.0
-	v1.resize(200, 0.0);				// добавляем 200 копий числа 0.0 — упоминание излишне
-	v1.resize(300, 1.0);				// добавляем 300 копий числа 1.0
-	struct No_default {
-		No_default(int);				// единственный конструктор класса No_default
-	};
 
-	my_vector<No_default> v2(10);		// ошибка: попытка создать 10
-	// No_default()
-	my_vector<No_default> v3;
-	v3.resize(100, No_default(2));		// добавляем 100 копий объектов
-	// No_default(2)
-	v3.resize(200);						// ошибка: попытка создать 200
-	// No_default()
 }
 //=============================================================================================
 /*
