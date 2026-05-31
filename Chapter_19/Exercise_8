@@ -1,0 +1,101 @@
+#include <iostream>
+#include <memory>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+//=============================================================================================
+template<class T>
+class my_allocator {
+public:
+	T* allocate(int n);					// выделяет память для n объектов типа T
+	void deallocate(T* p, int n);		// освобождает память, занятую n объектами типа T, начиная с адреса p
+
+	void construct(T* p, const T& v);	// создает объект типа T со значением v по адресу p
+	void destroy(T* p);					// уничтожает объект T по адресу p
+};
+//=============================================================================================
+template<class T, class A = my_allocator<T>>
+class my_vector {
+
+	A alloc;								// Для работы с памятью
+	int sz;									// размер
+	T* elem;								// указатель на элементы
+	int space;								// размер + свободная память
+
+public:
+	my_vector() :sz(0), elem(0), space(0) {}
+	explicit my_vector(int s);
+
+	my_vector(const my_vector&);					// копирующий конструктор
+	my_vector& operator=(const my_vector&);		// копирующее присваивание
+	~my_vector() { delete[] elem; }			// деструктор
+
+	T& operator[](int n) { return elem[n]; }	// доступ: возвращает ссылку
+	const T& operator[](int n) const { return elem[n]; }
+
+	int size() const { return sz; }			// текущий размер
+	int capacity() const { return space; }
+
+	void resize(int newsize, T def = T());
+	void reserve(int newalloc);
+	void push_back(const T& val);
+
+	void push_back(const T& d);
+
+};
+//=============================================================================================
+template<class T, class A>
+void my_vector<T, A>::resize(int newsize, T val)
+{
+	reserve(newsize);
+	for (int i = sz; i < newsize; ++i) alloc.construct(&elem[i], val); // создаем
+	for (int i = newsize; i < sz; ++i) alloc.destroy(&elem[i]); // уничтожаем
+	sz = newsize;
+}
+//=============================================================================================
+template<class T, class A>
+void my_vector<T, A>::reserve(int newalloc)
+{
+	if (newalloc <= space) return;			// размер не уменьшается
+	T* p = alloc.allocate(newalloc);		// выделяем новую память
+	for (int i = 0; i < sz; ++i) alloc.construct(&p[i], elem[i]); // копируем
+	for (int i = 0; i < sz; ++i) alloc.destroy(&elem[i]); // уничтожаем
+	alloc.deallocate(elem, space);			// освобождаем старую память
+	elem = p;
+	space = newalloc;
+}
+//=============================================================================Ы================
+template<class T, class A>
+void my_vector<T, A>::push_back(const T& val)
+{
+	if (space == 0) reserve(8);					// начинаем с памяти для 8 элементов
+	else if (sz == space) reserve(2 * space);	// выделяем больше памяти
+	alloc.construct(&elem[sz], val);			// добавляем в конец значение val
+	++sz;										// увеличиваем размер
+}
+//=============================================================================================
+int main() {
+	my_vector<double> v1;
+	v1.resize(100);						// добавляем 100 копий объекта double(), т.е. 0.0
+	v1.resize(200, 0.0);				// добавляем 200 копий числа 0.0 — упоминание излишне
+	v1.resize(300, 1.0);				// добавляем 300 копий числа 1.0
+	struct No_default {
+		No_default(int);				// единственный конструктор класса No_default
+	};
+
+	my_vector<No_default> v2(10);		// ошибка: попытка создать 10
+	// No_default()
+	my_vector<No_default> v3;
+	v3.resize(100, No_default(2));		// добавляем 100 копий объектов
+	// No_default(2)
+	v3.resize(200);						// ошибка: попытка создать 200
+	// No_default()
+}
+//=============================================================================================
+/*
+	8. Реализуйте распределитель памяти(см.раздел 19.3.6),
+используя функции malloc() и free() (раздел Б.10.4).
+Создайте класс vector так, как описано в конце раздела 19.4,
+для работы с несколькими тестовыми примерами.
+*/
+//=============================================================================================
