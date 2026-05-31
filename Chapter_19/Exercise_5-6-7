@@ -1,23 +1,109 @@
 //===============================================================================================================================
-/* 5. Определите класс Int, содержащий единственный член типа int.
+/*	V	5. Определите класс Int, содержащий единственный член типа int.
 Определите конструкторы, оператор присваивания и операторы +, –, * и /.
 Протестируйте этот класс и при необходимости уточните его структуру
 (например, определите операторы << и >> для обычного ввода-вывода).
 //===============================================================================================================================
-  6. Повторите предыдущее упражнение с классом Number<T>, где T — любой числовой тип.
+	V	6. Повторите предыдущее упражнение с классом Number<T>, где T — любой числовой тип.
 Попытайте добавить в класс Number оператор % и посмотрите, что получится,
 когда вы попробуете применить оператор % к типам Number<double> и Number<int>.
 //===============================================================================================================================
-  7. Примените решение упр. 2 к нескольким объектам типа Number.*/
+	V	7. Примените решение упр. 2 к нескольким объектам типа Number.
+	
+	" 2. Напишите шаблонную функцию,
+получающую в качестве аргументов объекты типов number<T> vt   и   number<U> vu
+и возвращающую сумму всех выражений vt[i] * vu[i]. "
 //===============================================================================================================================
 #include <iostream>
 #include <memory>
+#include <fstream>
+#include <vector>
+//===============================================================================================================================
+template<typename T>
+class number {
+public:
+	number ()
+	{ }
 
+	number(T m)
+		: member(m)
+	{ }
 
+	number<T> operator+(const number<T>& other) {
+		return number<T>(this->member + other.member);
+	}
 
+	number<T>& operator+=(const number<T>& other) {
+		this->member += other.member;
+		return *this;
+	}
+
+	number<T> operator*(const number<T>& other) {
+		return number<T>(this->member * other.member);
+	}
+
+	number<T> operator/(const number<T>& other) {
+		return number<T>(this->member / other.member);
+	}
+
+	number<T> operator-(const number<T>& other) {
+		return number<T>(this->member - other.member);
+	}
+
+	friend std::ostream& operator<<(std::ostream& os, const number<T>& eth) {
+		return os << eth.member;
+	}
+
+	//	friend std::ostream& operator<<(std::ostream& os, const std::vector<number>& eth) {
+	//		for (auto p : eth)
+	//			os << p;
+	//	
+	//	}
+	
+	friend std::istream& operator>>(std::istream& is, number<T>& eth) {
+		return is >> eth.member;
+	}
+
+	T get_member() const { return member; }
+
+private:
+	T member = 0;
+};
+//===============================================================================================================================
+template<typename T, typename U>
+T objects(const std::vector<number<T>>& val1, const std::vector<number<U>>& val2)
+{
+	if (val1.size() != val2.size())
+		return 0;
+
+	T resul = {};
+	for (int i = 0; i < val1.size(); i++) {
+		T res = val1[i].get_member() * val2[i].get_member();
+		resul += res;
+	}
+
+	return resul;
+}
 //===============================================================================================================================
 int main() {
 
-  return 0;
+	number<double> raz = 258.27;
+	number<int> dva = 140;
+	number<double> tri = 420.81;
+	number<int> chet = 230;
+	number<int> res = dva + chet;
+	number<double> result = raz + tri;
+
+	//	number<int> ret = raz % dva;
+
+	//	std::cout << res << '\n' << result;
+
+	std::vector<number<double>> hello{ 23.7, 19.78 };
+	std::vector<number<double>> hell{ 13.2, 9.12 };
+
+	std::cout << objects(hello, hell) << '\n';
+
+	return 0;
 }
 //===============================================================================================================================
+*/
