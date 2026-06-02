@@ -1,0 +1,37 @@
+/*
+#include <iostream>
+#include <fstream>
+#include <memory>
+#include <string>
+//===============================================================================================================================
+class File_handle {
+	std::string name_file = {};
+	std::fstream f;
+
+public:
+	File_handle(std::string file) : name_file(file) { f.open(file); if (!f.is_open()) std::cout << "Error! File don`t open!\n"; }
+
+	File_handle(const File_handle&) = delete;				// Запрет копирования
+	File_handle& operator=(const File_handle&) = delete;	// Запрет присваивания
+
+	File_handle(File_handle&&) = default;					// && - rvalue-ссылка на временный объект
+	File_handle& operator=(File_handle&&) = default;		// Разрешаем передачу владения .. move
+
+
+	~File_handle() {
+		if (f.is_open())
+		f.close();
+		std::cout << "Error! File don`t open!\n";
+	}
+
+};
+//===============================================================================================================================
+int main() {
+	return 0;
+}
+//===============================================================================================================================
+	V	12. Определите класс File_handle,
+конструктор которого получает аргумент типа string(имя файла)
+и открывает файл, а деструктор закрывает файл.
+*/
+//===============================================================================================================================
