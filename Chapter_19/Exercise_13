@@ -22,7 +22,7 @@ public:
 		return *this;						// Возврат текущего объекта
 	}
 
-	tracer& operator=(const tracer&& other) noexcept{		// Оператор присваивания перемещением
+	tracer& operator=(tracer&& other) noexcept{		// Оператор присваивания перемещением
 		stroke = std::move(other.stroke) + "_move_assigned";
 		std::cout << "[Move assigned] == [" << stroke << "]\n";
 		return *this;
