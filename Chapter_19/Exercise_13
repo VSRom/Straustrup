@@ -7,47 +7,63 @@ class tracer {
 	std::string stroke = {};
 
 public:
-	tracer(std::string str) : stroke(){
-		std::getline(std::cin, stroke);
+	tracer(std::string str) : stroke(std::move(str)) {
+		std::cout << "[Created] == [" << stroke << "]\n";
 	}
-	tracer(const tracer& other) {
-		stroke = other.stroke;	// Конструктор копирования
-		
+	tracer(const tracer& other) : stroke(other.stroke + "_copy") {
+		std::cout << "[Copy created] == [" << stroke << "]\n";;	// Конструктор копирования
+
 	}
-	tracer operator=(const tracer other) { // Конструктор присваивания
+	tracer operator=(const tracer& other) { // Конструктор присваивания
 		if (this == &other) return *this;	// Самоприсваивание
 
-		this->stroke = other.stroke;		// Присваивание 
+		stroke = other.stroke + "_assigned";		// Присваивание 
+		std::cout << "[Copy assigned] == [" << stroke << "]\n";
 		return *this;						// Возврат текущего объекта
 	}
 
-	tracer& operator=(const tracer&& other) noexcept {
-
-	}	// Оператор присваивания перемещением
-
-	tracer(tracer&& other) noexcept {
-
-	}	// Конструктор перемещения
-	~tracer() {
-		std::cout << stroke << '\n';
+	tracer& operator=(const tracer&& other) noexcept{		// Оператор присваивания перемещением
+		stroke = std::move(other.stroke) + "_move_assigned";
+		std::cout << "[Move assigned] == [" << stroke << "]\n";
+		return *this;
 	}
+
+	tracer(tracer&& other) noexcept : stroke(std::move(other.stroke) + "_moved") {	// Конструктор перемещения
+		std::cout << "[Move created] == [" << stroke << "]\n";
+	}	
+
+	~tracer() {
+		std::cout << "[Destroy] == [" << stroke << "]\n";
+	}
+};
+//===============================================================================================================================
+tracer global("Global");
+//===============================================================================================================================
+class container {
+	tracer member;
+public:
+	container() : member("Member") { }
 };
 //===============================================================================================================================
 int main() {
 
-	std::string naming = {};
-	std::string naming2 = {};
+	tracer local("Local");
 
-	tracer tru(naming);
-	tracer tru2(naming2);
+	container c;
 
-	tru = tru2;
+	auto ptr = std::make_unique<tracer>("Heap");
+
+	tracer copy = local;
+	copy = local;
+
+	tracer moved = std::move(local);
+	moved = std::move(copy);
 
 	return 0;
 }
 //===============================================================================================================================
 /*
-	13. Напишите класс Tracer, в котором конструктор вводит, а деструктор выводит строки.
+	V	13. Напишите класс Tracer, в котором конструктор вводит, а деструктор выводит строки.
 Аргументами конструктора должны быть строки.
 Используйте этот пример для демонстрации того, как работают объекты,
 соответствующие принципу RAII(например, поэкспериментируйте с объектами класса Tracer,
