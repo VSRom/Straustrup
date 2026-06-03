@@ -1,0 +1,42 @@
+class RawResource {
+    int* data;
+public:
+    ~RawResource() { delete[] data; }
+    RawResource(const RawResource& other); // Глубокое копирование
+    RawResource& operator=(const RawResource& other);
+    RawResource(RawResource&& other) noexcept; // Перемещение
+    RawResource& operator=(RawResource&& other) noexcept;
+};
+
+
+class MyClass {
+    std::unique_ptr<int[]> data;
+    size_t size;
+
+public:
+    // Конструктор копирования
+    MyClass(const MyClass& other) 
+        : data(std::make_unique<int[]>(other.size)), size(other.size) {
+        std::copy(other.data.get(), other.data.get() + size, data.get());
+    }
+
+    // Конструктор перемещения
+    MyClass(MyClass&& other) noexcept 
+        : data(std::move(other.data)), size(other.size) {
+        other.size = 0;
+    }
+
+    // Оператор присваивания (копирование и перемещение в одном)
+    MyClass& operator=(MyClass other) noexcept { // Принимаем по значению!
+        swap(*this, other); // Используем swap
+        return *this;
+    }
+
+    friend void swap(MyClass& a, MyClass& b) noexcept {
+        using std::swap;
+        swap(a.data, b.data);
+        swap(a.size, b.size);
+    }
+
+    ~MyClass() = default; // Компилятор сгенерирует правильно
+};
